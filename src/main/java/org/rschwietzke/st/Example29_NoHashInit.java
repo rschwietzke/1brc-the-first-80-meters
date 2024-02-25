@@ -32,7 +32,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class Example28_ParseIntegerFixed extends Benchmark
+public class Example29_NoHashInit extends Benchmark
 {
 	@Override
 	public String run(final String fileName) throws IOException
@@ -68,7 +68,7 @@ public class Example28_ParseIntegerFixed extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(Example28_ParseIntegerFixed.class.getDeclaredConstructor(), args);
+		Benchmark.run(Example29_NoHashInit.class.getDeclaredConstructor(), args);
 	}
 
 	public static class City implements Comparable<City>
@@ -201,7 +201,7 @@ public class Example28_ParseIntegerFixed extends Benchmark
 
 		public LineInfo readLine(final LineInfo data) throws IOException
 		{
-			this.hash = 0;
+			// this.hash = 0; // not needed, we do that later anyway
 			this.separatorPos = -1;
 			int currentPos = this.startPos;
 
@@ -216,7 +216,7 @@ public class Example28_ParseIntegerFixed extends Benchmark
 			// done
 			if (this.separatorPos >= 0)
 			{
-				data.set(buffer, startPos, separatorPos, currentPos - 1, hash);
+				data.set(this.buffer, this.startPos, this.separatorPos, currentPos - 1, this.hash);
 				this.startPos = currentPos + 1;
 				return data;
 			}

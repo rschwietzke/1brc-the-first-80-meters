@@ -21,8 +21,8 @@ public abstract class Benchmark
 	/**
 	 * How often?
 	 */
-	private static int WARMUP_RUNS = 1;
-	private static int MEASUREMENT_RUNS = 1;
+	private static int WARMUP_RUNS = 4;
+	private static int MEASUREMENT_RUNS = 2;
 
     /**
      * The interface to implement to make all implementation easily pluggable

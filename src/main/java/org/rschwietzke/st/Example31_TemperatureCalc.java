@@ -32,13 +32,13 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class Example28_ParseIntegerFixed extends Benchmark
+public class Example31_TemperatureCalc extends Benchmark
 {
 	@Override
 	public String run(final String fileName) throws IOException
 	{
 		// our storage
-		final FastHashSet cities = new FastHashSet(500, 0.5f);
+		final FastHashSet cities = new FastHashSet(5000, 0.5f);
 
 		try (final var r = new LineInputStream(new BufferedInputStream(new FileInputStream(fileName))))
 		{
@@ -48,12 +48,14 @@ public class Example28_ParseIntegerFixed extends Benchmark
 			{
 				// put all data together
 				city.data(l);
+				final int temperature = ParseDouble.parseIntegerFixed(l.buffer, l.separator + 1, l.end);
 
 				// get us our data store for the city, which is another
 				// version of a city
 				City totalsCity = cities.getPutOnEmpty(city, l);
+
 				// store aka add the temperature to the totals
-				totalsCity.temperatures.add(city.temperature);
+				totalsCity.temperatures.add(temperature);
 			}
 		}
 
@@ -68,13 +70,12 @@ public class Example28_ParseIntegerFixed extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(Example28_ParseIntegerFixed.class.getDeclaredConstructor(), args);
+		Benchmark.run(Example31_TemperatureCalc.class.getDeclaredConstructor(), args);
 	}
 
 	public static class City implements Comparable<City>
 	{
 		public String city;
-		public int temperature;
 
 		// for comparison, if needed
 		private byte[] buffer;
@@ -86,16 +87,11 @@ public class Example28_ParseIntegerFixed extends Benchmark
 
 		public Temperatures temperatures;
 
-		public City()
-		{
-		}
-
 		public void data(final LineInfo line)
 		{
 			this.buffer = line.buffer;
 			this.hashCode = line.hash;
 			this.mismatchPos = line.separator;
-			this.temperature = ParseDouble.parseIntegerFixed(line.buffer, line.separator + 1, line.end);
 		}
 
 		public int hashCode()
@@ -201,7 +197,7 @@ public class Example28_ParseIntegerFixed extends Benchmark
 
 		public LineInfo readLine(final LineInfo data) throws IOException
 		{
-			this.hash = 0;
+			// this.hash = 0; // not needed, we do that later anyway
 			this.separatorPos = -1;
 			int currentPos = this.startPos;
 
@@ -216,7 +212,7 @@ public class Example28_ParseIntegerFixed extends Benchmark
 			// done
 			if (this.separatorPos >= 0)
 			{
-				data.set(buffer, startPos, separatorPos, currentPos - 1, hash);
+				data.set(this.buffer, this.startPos, this.separatorPos, currentPos - 1, this.hash);
 				this.startPos = currentPos + 1;
 				return data;
 			}
@@ -453,9 +449,31 @@ public class Example28_ParseIntegerFixed extends Benchmark
 	        m_threshold = (int) (capacity * fillFactor);
 	    }
 
+	    /**
+	     * Computes key.hashCode() and spreads (XORs) higher bits of hash
+	     * to lower.  Because the table uses power-of-two masking, sets of
+	     * hashes that vary only in bits above the current mask will
+	     * always collide. (Among known examples are sets of Float keys
+	     * holding consecutive whole numbers in small tables.)  So we
+	     * apply a transform that spreads the impact of higher bits
+	     * downward. There is a tradeoff between speed, utility, and
+	     * quality of bit-spreading. Because many common sets of hashes
+	     * are already reasonably distributed (so don't benefit from
+	     * spreading), and because we use trees to handle large sets of
+	     * collisions in bins, we just XOR some shifted bits in the
+	     * cheapest possible way to reduce systematic lossage, as well as
+	     * to incorporate impact of the highest bits that would otherwise
+	     * never be used in index calculations because of table bounds.
+	     *
+	     * From java.util.HashMap
+	     */
+	    static final int hash(final int hashCode) {
+	        return hashCode ^ (hashCode >>> 16);
+	    }
+
 	    public City getPutOnEmpty( final City key, LineInfo line )
 	    {
-	        int ptr = key.hashCode() & m_mask;
+	        int ptr = hash(key.hashCode()) & m_mask;
 	        City k = m_data[ ptr ];
 
 	        if ( k == FREE_KEY )
@@ -469,6 +487,8 @@ public class Example28_ParseIntegerFixed extends Benchmark
 	        {
 	            return k;
 	        }
+
+//	        System.out.print("C");
 
 	        while ( true )
 	        {
@@ -489,7 +509,7 @@ public class Example28_ParseIntegerFixed extends Benchmark
 
 	    public City put(final City key)
 	    {
-	        int ptr = key.hashCode() & m_mask;
+	        int ptr = hash(key.hashCode()) & m_mask;
 	        City k = m_data[ptr];
 
 	        if ( k == FREE_KEY ) //end of chain already
