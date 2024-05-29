@@ -14,7 +14,7 @@ import org.rschwietzke.st.Example36_IfInMapGetDifferent.Temperatures;
  */
 public class CityMap
 {
-	private 
+
 	private List<City> cities = new ArrayList<>(500);
 
 	public static class City implements Comparable<City>
