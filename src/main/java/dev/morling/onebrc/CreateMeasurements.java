@@ -279,12 +279,15 @@ public class CreateMeasurements {
                 new WeatherStation("Yinchuan", 9.0), new WeatherStation("Zagreb", 10.7),
                 new WeatherStation("Zanzibar City", 26.0), new WeatherStation("Zürich", 9.3));
 
+        var r = ThreadLocalRandom.current();
+        r.setSeed(42L);
+
         try (BufferedWriter bw = Files.newBufferedWriter(MEASUREMENT_FILE)) {
             for (int i = 0; i < size; i++) {
                 if (i > 0 && i % 50_000_000 == 0) {
                     System.out.printf("Wrote %,d measurements in %s ms%n", i, System.currentTimeMillis() - start);
                 }
-                WeatherStation station = stations.get(ThreadLocalRandom.current().nextInt(stations.size()));
+                WeatherStation station = stations.get(r.nextInt(stations.size()));
                 bw.write(station.id());
                 bw.write(";" + station.measurement());
                 bw.write('\n');
