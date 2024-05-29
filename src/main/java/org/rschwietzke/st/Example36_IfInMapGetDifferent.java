@@ -31,13 +31,13 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class Example33_RandomAccess extends Benchmark
+public class Example36_IfInMapGetDifferent extends Benchmark
 {
 	@Override
 	public String run(final String fileName) throws IOException
 	{
 		// our storage
-		final FastHashSet cities = new FastHashSet(5000, 0.5f);
+		final FastHashSet cities = new FastHashSet(1000, 0.5f);
 
 		try (final var r = new LineInputStream(new RandomAccessFile(fileName, "r")))
 		{
@@ -67,7 +67,7 @@ public class Example33_RandomAccess extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(Example33_RandomAccess.class.getDeclaredConstructor(), args);
+		Benchmark.run(Example36_IfInMapGetDifferent.class.getDeclaredConstructor(), args);
 	}
 
 	public static class City implements Comparable<City>
@@ -91,27 +91,27 @@ public class Example33_RandomAccess extends Benchmark
 
 		public boolean equals(final LineInfo lineInfo)
 		{
-//			final int l = this.buffer.length;
-//			if (l != lineInfo.separator - lineInfo.from)
-//			{
-//				return false;
-//			}
-//
-//			for (int i = 0; i < l; i++)
-//			{
-//				byte a = this.buffer[i];
-//				byte b = lineInfo.buffer[lineInfo.from + i];
-//				if (a != b)
-//				{
-//					return false;
-//				}
-//			}
-//			return true;
+			final int l = this.buffer.length;
+			if (l != lineInfo.separator - lineInfo.from)
+			{
+				return false;
+			}
 
-			// too expensive
-			return Arrays.mismatch(
-					this.buffer, 0, this.buffer.length - 1,
-					lineInfo.buffer, lineInfo.from, lineInfo.separator - 1) == -1;
+			for (int i = 0; i < l; i++)
+			{
+				byte a = this.buffer[i];
+				byte b = lineInfo.buffer[lineInfo.from + i];
+				if (a != b)
+				{
+					return false;
+				}
+			}
+			return true;
+
+//			// too expensive
+//			return Arrays.mismatch(
+//					this.buffer, 0, this.buffer.length - 1,
+//					lineInfo.buffer, lineInfo.from, lineInfo.separator - 1) == -1;
 		}
 
 		public City()
@@ -196,10 +196,13 @@ public class Example33_RandomAccess extends Benchmark
 			return Arrays.toString(new String(buffer).toCharArray());
 		}
 
-		public LineInputStream(final RandomAccessFile file)
+		public LineInputStream(final RandomAccessFile file) throws IOException
 		{
 			this.file = file;
-			this.buffer = new byte[1000];
+			this.buffer = new byte[4000];
+
+			// read something already to avoid ifs later
+			this.length = file.read(this.buffer, 0, this.buffer.length);
 		}
 
 		public LineInfo readLine(final LineInfo data) throws IOException
@@ -260,50 +263,29 @@ public class Example33_RandomAccess extends Benchmark
 					}
 				}
 
-				// if we got here, we have not seen a ;, so we have to reload the buffer
-				// if we are not into the buffer at all, we cannot move anything forward
-				if (this.startPos == 0)
+				// ok, we are not sitting at the front, so we can move
+				int moveBy = startPos;
+				System.arraycopy(localBuffer, startPos, buffer, 0, localBuffer.length - moveBy);
+
+				// we can fill the rest now
+				final int read = file.read(localBuffer, localBuffer.length - moveBy, moveBy);
+				if (read == -1)
 				{
-					// we have not moved a bit, so increase buffer size
-					localBuffer = buffer = Arrays.copyOf(buffer, (localBuffer.length << 1));
-
-					// load from current pos up
-					final int read = file.read(localBuffer, currentPos, localBuffer.length - currentPos);
-					if (read == -1)
-					{
-						// all read, we end here
-						this.hash = localHash;
-						return currentPos;
-					}
-
-					this.length = localLength = currentPos + read;
+					// ok, nothing more
+					this.hash = localHash;
+					return currentPos;
 				}
-				else
-				{
-					// ok, we are not sitting at the front, so we can move
-					int moveBy = startPos;
-					System.arraycopy(localBuffer, startPos, buffer, 0, localBuffer.length - moveBy);
 
-					// we can fill the rest now
-					final int read = file.read(localBuffer, localBuffer.length - moveBy, moveBy);
-					if (read == -1)
-					{
-						// ok, nothing more
-						this.hash = localHash;
-						return currentPos;
-					}
-
-					// adjust start pos and pos, we are into our current data, so don't start from 0
-					// just continue reading, but we increase currentPos over length, so take it back
-					// one
-					currentPos = currentPos - moveBy;
-					// current data record start is now here
-					this.startPos = 0;
-					// how much can we read
-					this.length = localLength = currentPos + read;
-					// seperator moved too
-					this.separatorPos = this.separatorPos - moveBy;
-				}
+				// adjust start pos and pos, we are into our current data, so don't start from 0
+				// just continue reading, but we increase currentPos over length, so take it back
+				// one
+				currentPos = currentPos - moveBy;
+				// current data record start is now here
+				this.startPos = 0;
+				// how much can we read
+				this.length = localLength = currentPos + read;
+				// seperator moved too
+				this.separatorPos = this.separatorPos - moveBy;
 			}
 		}
 
@@ -326,48 +308,28 @@ public class Example33_RandomAccess extends Benchmark
 					}
 				}
 
-				// if we got here, we have not seen a ;, so we have to reload the buffer
-				// if we are not into the buffer at all, we cannot move anything forward
-				if (this.startPos == 0)
+				// ok, we are not sitting at the front, so we can move
+				int moveBy = startPos;
+				System.arraycopy(localBuffer, startPos, localBuffer, 0, localBuffer.length - moveBy);
+
+				// we can fill the rest now
+				final int read = file.read(localBuffer, localBuffer.length - moveBy, moveBy);
+				if (read == -1)
 				{
-					// we have not moved a bit, so increase buffer size
-					this.buffer = localBuffer = Arrays.copyOf(localBuffer, (localBuffer.length << 1));
-
-					// load from current pos up
-					final int read = file.read(localBuffer, currentPos, localBuffer.length - currentPos);
-					if (read == -1)
-					{
-						// all read, we end here
-						return currentPos;
-					}
-
-					this.length = localLength = currentPos + read;
+					// ok, nothing more
+					return currentPos;
 				}
-				else
-				{
-					// ok, we are not sitting at the front, so we can move
-					int moveBy = startPos;
-					System.arraycopy(localBuffer, startPos, localBuffer, 0, localBuffer.length - moveBy);
 
-					// we can fill the rest now
-					final int read = file.read(localBuffer, localBuffer.length - moveBy, moveBy);
-					if (read == -1)
-					{
-						// ok, nothing more
-						return currentPos;
-					}
-
-					// adjust start pos and pos, we are into our current data, so don't start from 0
-					// just continue reading, but we increase currentPos over length, so take it back
-					// one
-					currentPos = currentPos - moveBy;
-					// current data record start is now here
-					this.startPos = 0;
-					// how much can we read
-					this.length = localLength = currentPos + read;
-					// seperator moved too
-					this.separatorPos = this.separatorPos - moveBy;
-				}
+				// adjust start pos and pos, we are into our current data, so don't start from 0
+				// just continue reading, but we increase currentPos over length, so take it back
+				// one
+				currentPos = currentPos - moveBy;
+				// current data record start is now here
+				this.startPos = 0;
+				// how much can we read
+				this.length = localLength = currentPos + read;
+				// seperator moved too
+				this.separatorPos = this.separatorPos - moveBy;
 			}
 		}
 
@@ -481,19 +443,22 @@ public class Example33_RandomAccess extends Benchmark
 	    public City getPutOnEmpty(final LineInfo line)
 	    {
 	        int ptr = hash(line.hashCode()) & m_mask;
-	        City k = m_data[ ptr ];
+	        City k = this.m_data[ ptr ];
 
-	        if ( k == FREE_KEY )
+	        if ( k != FREE_KEY )
+	        {
+		        if (k.hashCode() == line.hashCode() && k.equals(line))
+		        {
+		            return k;
+		        }
+	        }
+	        else
 	        {
 	        	k = City.materalize(line);
 	        	put(k);
-	            return k;  //end of chain already
-	        }
-
-	        if (k.hashCode() == line.hashCode() && k.equals(line))
-	        {
 	            return k;
 	        }
+
 
 //	        System.out.println(line.text() + " " + line.hashCode() + " "+ hash(line.hashCode()));
 

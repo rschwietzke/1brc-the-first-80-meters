@@ -59,17 +59,29 @@ public abstract class Benchmark
     	// did we get anything?
     	if (args.length == 0)
     	{
-            System.err.println("Where is the argument? Need the file");
+            System.err.println("Where are the arguments? <file> [warmUpCount] [measurementCount]");
             return;
     	}
 
     	final String fileName = args[0];
 
+    	// do we have an additional second and third?
+    	int warmUpRuns = WARMUP_RUNS;
+    	int measurementRuns = MEASUREMENT_RUNS;
+    	if (args.length > 1)
+    	{
+    		warmUpRuns = Integer.valueOf(args[1]);
+    	}
+    	if (args.length > 2)
+    	{
+    		measurementRuns = Integer.valueOf(args[2]);
+    	}
+
         System.out.println("==== WARMUP =======================");
-        var results = measure(ctr, Mode.WARMUP, WARMUP_RUNS, fileName);
+        var results = measure(ctr, Mode.WARMUP, warmUpRuns, fileName);
 
         System.out.println("==== MEASUREMENT ==================");
-        results = measure(ctr, Mode.MEASUREMENT, MEASUREMENT_RUNS, fileName);
+        results = measure(ctr, Mode.MEASUREMENT, measurementRuns, fileName);
 
         System.out.println("==== RESULT ========================");
         long total = 0;
