@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.random.RandomGeneratorFactory;
 
 public class CreateMeasurements {
 
@@ -279,8 +280,7 @@ public class CreateMeasurements {
                 new WeatherStation("Yinchuan", 9.0), new WeatherStation("Zagreb", 10.7),
                 new WeatherStation("Zanzibar City", 26.0), new WeatherStation("Zürich", 9.3));
 
-        var r = ThreadLocalRandom.current();
-        r.setSeed(42L);
+        var r = RandomGeneratorFactory.of("Xoroshiro128PlusPlus").create(424242L);
 
         try (BufferedWriter bw = Files.newBufferedWriter(MEASUREMENT_FILE)) {
             for (int i = 0; i < size; i++) {
