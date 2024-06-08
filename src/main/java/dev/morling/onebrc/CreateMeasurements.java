@@ -18,13 +18,14 @@ package dev.morling.onebrc;
 import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.random.RandomGeneratorFactory;
 
 public class CreateMeasurements {
 
-    private static final Path MEASUREMENT_FILE = Path.of("./measurements.txt");
+    // private static final Path MEASUREMENT_FILE = Path.of("./measurements.txt");
 
     private record WeatherStation(String id, double meanTemperature) {
         double measurement() {
@@ -36,8 +37,8 @@ public class CreateMeasurements {
     public static void main(String[] args) throws Exception {
         long start = System.currentTimeMillis();
 
-        if (args.length != 1) {
-            System.out.println("Usage: create_measurements.sh <number of records to create>");
+        if (args.length != 2) {
+            System.out.println("Usage: create_measurements.sh <number of records to create> <filename>");
             System.exit(1);
         }
 
@@ -282,7 +283,7 @@ public class CreateMeasurements {
 
         var r = RandomGeneratorFactory.of("Xoroshiro128PlusPlus").create(424242L);
 
-        try (BufferedWriter bw = Files.newBufferedWriter(MEASUREMENT_FILE)) {
+        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(args[1]))) {
             for (int i = 0; i < size; i++) {
                 if (i > 0 && i % 50_000_000 == 0) {
                     System.out.printf("Wrote %,d measurements in %s ms%n", i, System.currentTimeMillis() - start);
