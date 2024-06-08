@@ -17,19 +17,25 @@ package dev.morling.onebrc;
 
 import java.io.BufferedWriter;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.random.RandomGenerator;
 import java.util.random.RandomGeneratorFactory;
 
 public class CreateMeasurements {
+    private static class WeatherStation {
+        final RandomGenerator r;
+        final String id;
+        final double meanTemperature;
 
-    // private static final Path MEASUREMENT_FILE = Path.of("./measurements.txt");
+        public WeatherStation(String id, double meanTemperature) {
+        	this.id = id;
+        	this.meanTemperature = meanTemperature;
+        	this.r = RandomGeneratorFactory.of("Xoroshiro128PlusPlus").create(id.hashCode());
+        }
 
-    private record WeatherStation(String id, double meanTemperature) {
         double measurement() {
-            double m = ThreadLocalRandom.current().nextGaussian(meanTemperature, 10);
+            double m = r.nextGaussian(meanTemperature, 10);
             return Math.round(m * 10.0) / 10.0;
         }
     }
@@ -289,7 +295,7 @@ public class CreateMeasurements {
                     System.out.printf("Wrote %,d measurements in %s ms%n", i, System.currentTimeMillis() - start);
                 }
                 WeatherStation station = stations.get(r.nextInt(stations.size()));
-                bw.write(station.id());
+                bw.write(station.id);
                 bw.write(";" + station.measurement());
                 bw.write('\n');
             }
