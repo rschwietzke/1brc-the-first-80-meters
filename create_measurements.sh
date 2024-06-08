@@ -14,6 +14,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-
-
-java --class-path target/1brc-for-learners-1.0.jar dev.morling.onebrc.CreateMeasurements $1
+CLASSPATH=target/classes/
+echo "File: $1"
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineST $1 1 1 --batchMode "Test"
