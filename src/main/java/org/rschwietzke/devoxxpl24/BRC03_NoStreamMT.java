@@ -18,7 +18,6 @@ package org.rschwietzke.devoxxpl24;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,11 +78,10 @@ public class BRC03_NoStreamMT extends Benchmark
 	static class Worker extends Thread
 	{
 		private final Map<String, Temperatures> temperatures = new HashMap<>();
-		private final ArrayBlockingQueue<List<String>> buffer;
+		final ArrayBlockingQueue<List<String>> buffer = new ArrayBlockingQueue<>(100);
 
-		public Worker(final ArrayBlockingQueue<List<String>> buffer)
+		public Worker()
 		{
-			this.buffer = buffer;
 			this.setDaemon(true);
 		}
 
@@ -129,11 +127,12 @@ public class BRC03_NoStreamMT extends Benchmark
 	@Override
 	public String run(final String fileName) throws IOException
 	{
-		final ArrayBlockingQueue<List<String>> buffer = new ArrayBlockingQueue<>(1000);
+		final int cpuCount = Runtime.getRuntime().availableProcessors();
+
 		final List<Worker> threads = new ArrayList<>();
-		for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++)
+		for (int i = 0; i < cpuCount; i++)
 		{
-			var t = new Worker(buffer);
+			var t = new Worker();
 			threads.add(t);
 			t.start();
 		}
@@ -141,8 +140,11 @@ public class BRC03_NoStreamMT extends Benchmark
 		try (var reader = Files.newBufferedReader(Paths.get(fileName)))
 		{
 			String line;
+			int round = 0;
 			while ((line = reader.readLine()) != null)
 			{
+				round++;
+
 				var list = new ArrayList<String>(1000);
 				list.add(line);
 
@@ -153,7 +155,7 @@ public class BRC03_NoStreamMT extends Benchmark
 
 				try
 				{
-					buffer.put(list);
+					threads.get(round % cpuCount).buffer.put(list);
 				}
 				catch (InterruptedException e)
 				{
@@ -164,9 +166,9 @@ public class BRC03_NoStreamMT extends Benchmark
 		}
 
 		var result = new TreeMap<String, Temperatures>();
-		for (int i = 0; i < threads.size(); i++)
+		for (Worker thread : threads)
 		{
-			buffer.add(List.of());
+			thread.buffer.add(List.of());
 		}
 		threads.forEach(t ->
 		{
