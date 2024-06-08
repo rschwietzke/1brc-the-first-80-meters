@@ -131,7 +131,7 @@ public class BRC03_NoStreamMT extends Benchmark
 	{
 		final ArrayBlockingQueue<List<String>> buffer = new ArrayBlockingQueue<>(1000);
 		final List<Worker> threads = new ArrayList<>();
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++)
 		{
 			var t = new Worker(buffer);
 			threads.add(t);
@@ -143,10 +143,10 @@ public class BRC03_NoStreamMT extends Benchmark
 			String line;
 			while ((line = reader.readLine()) != null)
 			{
-				var list = new ArrayList<String>(100);
+				var list = new ArrayList<String>(1000);
 				list.add(line);
 
-				while (list.size() < 100 && (line = reader.readLine()) != null)
+				while (list.size() < 1000 && (line = reader.readLine()) != null)
 				{
 					list.add(line);
 				}
