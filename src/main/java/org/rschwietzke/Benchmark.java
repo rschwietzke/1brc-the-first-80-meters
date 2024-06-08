@@ -9,6 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * This is an interface to be implemented for our benchmark classes to enable it to run either standalone or later in a
@@ -51,48 +52,96 @@ public abstract class Benchmark
     }
 
     /**
+     * Helper for printing
+     */
+    static void print(final boolean batchMode, final Supplier<String> s)
+    {
+    	if (!batchMode)
+    	{
+    		System.out.print(s.get());
+    	}
+    }
+
+    /**
+     * Error output
+     */
+    private static void printError()
+    {
+        System.err.println("Where are the arguments?");
+        System.err.println("Usage: <file> [warmUpCount] [measurementCount] [--batchmode <comment>]");
+    }
+
+    /**
      * Just runs our test and measures things
      * @throws NoSuchAlgorithmException
      */
     public static void run(final Constructor<? extends Benchmark> ctr, final String[] args)
     {
     	// did we get anything?
-    	if (args.length == 0)
+    	if (args.length < 3)
     	{
-            System.err.println("Where are the arguments? <file> [warmUpCount] [measurementCount]");
+    		printError();
             return;
     	}
 
     	final String fileName = args[0];
 
     	// do we have an additional second and third?
-    	int warmUpRuns = WARMUP_RUNS;
-    	int measurementRuns = MEASUREMENT_RUNS;
-    	if (args.length > 1)
+    	final int warmUpRuns = Integer.valueOf(args[1]);
+    	final int measurementRuns = Integer.valueOf(args[2]);
+
+    	final boolean batchMode = args.length > 3 && args[3].equalsIgnoreCase("--batchmode");
+
+    	final String batchComment;
+    	if (batchMode && args.length < 5)
     	{
-    		warmUpRuns = Integer.valueOf(args[1]);
+   			printError();
+   			return;
     	}
-    	if (args.length > 2)
+    	else if (batchMode && args.length == 5)
     	{
-    		measurementRuns = Integer.valueOf(args[2]);
+    		batchComment = args[4];
+    	}
+    	else
+    	{
+    		batchComment = "";
     	}
 
-        System.out.println("==== WARMUP =======================");
-        var results = measure(ctr, Mode.WARMUP, warmUpRuns, fileName);
+    	Benchmark.print(batchMode, () -> "==== WARMUP ==================\n");
+   		var results = measure(ctr, Mode.WARMUP, warmUpRuns, fileName, batchMode);
 
-        System.out.println("==== MEASUREMENT ==================");
-        results = measure(ctr, Mode.MEASUREMENT, measurementRuns, fileName);
+        Benchmark.print(batchMode, () -> "==== MEASUREMENT ==================\n");
+        results = measure(ctr, Mode.MEASUREMENT, measurementRuns, fileName, batchMode);
 
-        System.out.println("==== RESULT ========================");
+        Benchmark.print(batchMode, () -> "==== RESULT ========================\n");
         long total = 0;
         for (BenchmarkResult result : results)
         {
         	total += result.runtime;
         }
-        System.out.println(String.format("Mean Measurement Runtime: %d ms", Math.round(total / results.size())));
+        final int mean = Math.round(total / results.size());
+
+        //  verify the checksum
+        final var crcs = results.stream().map(r -> r.crc).sorted().distinct().toList();
+        if (crcs.size() > 1)
+        {
+        	throw new RuntimeException("CRC results vary!!!");
+        }
+
+        if (batchMode)
+        {
+        	var clazzName = ctr.getDeclaringClass().getName();
+        	System.out.print(String.format("%s - %s - %s: %d ms%n", clazzName, batchComment, crcs.get(0), mean));
+        }
+        else
+        {
+        	System.out.println(String.format("Mean Measurement Runtime: %d ms", mean));
+        }
     }
 
-    private static List<BenchmarkResult> measure(final Constructor<? extends Benchmark> ctr, Mode mode, int iterationCount, String fileName)
+    private static List<BenchmarkResult> measure(final Constructor<? extends Benchmark> ctr,
+    		Mode mode, int iterationCount, String fileName,
+    		final boolean batchMode)
     {
         final List<BenchmarkResult> results = new ArrayList<>();
 
@@ -113,8 +162,8 @@ public abstract class Benchmark
 			var result = measure(benchmark, fileName);
 	        results.add(result);
 
-	        System.out.println(String.format(mode == Mode.WARMUP ? "Warmup Runtime: %d ms" : "Measurement Runtime: %d ms", result.runtime));
-	        System.out.println(String.format("Checksum: %s", result.data));
+	        Benchmark.print(batchMode,
+	        		() -> String.format(mode == Mode.WARMUP ? "Warmup Runtime (%s): %d ms%n" : "Measurement Runtime (%s): %d ms%n", result.crc, result.runtime));
     	}
 
     	return results;
@@ -127,8 +176,6 @@ public abstract class Benchmark
             final long start = System.currentTimeMillis();
             final String data = benchmark.run(fileName);
             final long end = System.currentTimeMillis();
-
-//            System.out.println(data);
 
             // checksum the data to ensure we always produce the same output
             final MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -150,7 +197,7 @@ public abstract class Benchmark
         return null;
     }
 
-    private static record BenchmarkResult(long runtime, String data)
+    private static record BenchmarkResult(long runtime, String crc)
     {
     }
 
