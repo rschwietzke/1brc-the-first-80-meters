@@ -37,11 +37,6 @@ public class BRC02_NoGroupingMT extends Benchmark {
 		}
 	}
 
-	private static record ResultRow(double min, double mean, double max)
-	{
-
-	};
-
 	private static class MeasurementAggregator
 	{
 		private double min = Double.POSITIVE_INFINITY;
