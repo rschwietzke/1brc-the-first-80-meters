@@ -27,10 +27,10 @@ import org.rschwietzke.util.ParseDouble;
 
 /**
  * Double parsing is high on cpu, let's do that ourselves
- *
+ * 
  * @author Rene Schwietzke
  */
-public class BRC06_NewDoubleParsing extends Benchmark
+public class BRC06_NewDoubleParsingST extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -121,6 +121,6 @@ public class BRC06_NewDoubleParsing extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-		Benchmark.run(BRC06_NewDoubleParsing.class, args);
+		Benchmark.run(BRC06_NewDoubleParsingST.class, args);
     }
 }
