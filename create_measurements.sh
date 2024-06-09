@@ -19,10 +19,13 @@ echo "File: $1"
 echo "Warmups: $2"
 echo "Measurements: $3"
 
+alias time='/usr/bin/time -f "Elapsed: %E, Faults: %F, Minor: %R, Max RSS: %M KB, FS Input: %I, FS Output: %O, System: %S s, User: %U s, Context I/V: %c/%w"'
+
 # Read file several times to warmup cache
-echo "File Warmup\n"
-wc -l $1
-cat $1 > /dev/null
+echo "File Warmup 1\n"
+time wc -l $1
+echo "File Warmup 2\n"
+time cat $1 > /dev/null
 
 echo "== Measurements"
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineMT $1 $2 $3 --batchMode ""
