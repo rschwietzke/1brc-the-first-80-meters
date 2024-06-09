@@ -26,12 +26,12 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.ParseDouble;
 
 /**
- * But why do we copy something for double? We throw that string
- * away instantly.
+ * Using doubles is expensive, let's squeeze the lemon a little more
+ * and just use int for the moment, and only format the output to double
  *
  * @author Rene Schwietzke
  */
-public class BRC07_NoCopyForDoubleST extends Benchmark
+public class BRC08_GoIntST extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -39,12 +39,12 @@ public class BRC07_NoCopyForDoubleST extends Benchmark
 	 */
 	private static class Temperatures
 	{
-		private final double min;
-		private final double max;
-		private final double total;
-		private final long count;
+		private final int min;
+		private final int max;
+		private final int total;
+		private final int count;
 
-		public Temperatures(final double value)
+		public Temperatures(final int value)
 		{
 			this.min = value;
 			this.max = value;
@@ -52,7 +52,7 @@ public class BRC07_NoCopyForDoubleST extends Benchmark
 			this.count = 1;
 		}
 
-		private Temperatures(double min, double max, double total, long count)
+		private Temperatures(int min, int max, int total, int count)
 		{
 			this.min = min;
 			this.max = max;
@@ -78,7 +78,7 @@ public class BRC07_NoCopyForDoubleST extends Benchmark
 		 */
 		private double round(double value)
 		{
-			return Math.round(value * 10.0) / 10.0;
+			return Math.round(value) / 10.0;
 		}
 
 		/**
@@ -86,7 +86,7 @@ public class BRC07_NoCopyForDoubleST extends Benchmark
 		 */
 		public String toString()
 		{
-			return round(min) + "," + round((double)total / (double)count) + "," + round(max);
+			return round(min) + "," + round(((double)total / (double)count)) + "," + round(max);
 		}
 	}
 
@@ -108,7 +108,7 @@ public class BRC07_NoCopyForDoubleST extends Benchmark
     			final String city = line.substring(0, pos);
 
     			// parse our temperature inline without an instance of a string for temperature
-    			final double temperature = ParseDouble.parseDouble(line, pos + 1, line.length() - 1);
+    			final int temperature = ParseDouble.parseInteger(line, pos + 1, line.length() - 1);
 
     			// merge the data into the captured data
 				cities.merge(city, new Temperatures(temperature), (t1, t2) -> t1.merge(t2));
@@ -122,6 +122,6 @@ public class BRC07_NoCopyForDoubleST extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-		Benchmark.run(BRC07_NoCopyForDoubleST.class, args);
+		Benchmark.run(BRC08_GoIntST.class, args);
     }
 }

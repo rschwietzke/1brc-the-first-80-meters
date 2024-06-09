@@ -38,6 +38,8 @@ java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchM
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC05_ReplaceSplitST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC06_NewDoubleParsingST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC07_NoCopyForDoubleST $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC08_GoIntST $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC09_NoMergeST $1 $2 $3 --batchMode ""
 
 
 #java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineMT $1 $2 $3 --batchMode ""
