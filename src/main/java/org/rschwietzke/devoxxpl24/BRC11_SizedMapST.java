@@ -87,7 +87,7 @@ public class BRC11_SizedMapST extends Benchmark
     public String run(final String fileName) throws IOException
     {
     	// our cities with temperatures, assume we get about 400, so we get us decent space
-    	final Map<String, Temperatures> cities = new HashMap<>(1023);
+    	final Map<String, Temperatures> cities = new HashMap<>(4023);
 
     	try (var reader = Files.newBufferedReader(Paths.get(fileName)))
         {
