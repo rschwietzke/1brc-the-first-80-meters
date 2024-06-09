@@ -45,10 +45,12 @@ public class BRC13_HardcodedSetST extends Benchmark
 		private int total;
 		private int count;
 		private final String city;
+		private final int hashCode;
 
 		public Temperatures(final String city, final int value)
 		{
 			this.city = city;
+			this.hashCode = city.hashCode();
 			this.min = value;
 			this.max = value;
 			this.total = value;
@@ -71,10 +73,10 @@ public class BRC13_HardcodedSetST extends Benchmark
 		@Override
 		public int hashCode()
 		{
-			return city.hashCode();
+			return hashCode;
 		}
 
-		public boolean equals(String s)
+		public boolean equals(final String s)
 		{
 			return this.city.equals(s);
 		}
@@ -172,7 +174,8 @@ public class BRC13_HardcodedSetST extends Benchmark
 
         public void getPutOrUpdate( final String city, int value )
         {
-            int ptr = city.hashCode() & m_mask;
+        	final int hash = city.hashCode();
+            int ptr = hash & m_mask;
             Temperatures k = m_data[ ptr ];
 
             if ( k == FREE_KEY )
@@ -181,7 +184,7 @@ public class BRC13_HardcodedSetST extends Benchmark
             	return;
             }
 
-            if ( k.hashCode() == city.hashCode() && k.equals( city ) )
+            if ( k.hashCode() == hash && k.equals( city ) )
             {
             	k.add(value);
                 return;
@@ -196,7 +199,7 @@ public class BRC13_HardcodedSetST extends Benchmark
                 	put(new Temperatures(city, value));
                     return;
                 }
-                if (k.hashCode() == city.hashCode() && k.equals( city ))
+                if (k.hashCode() == hash && k.equals( city ))
                 {
                 	k.add(value);
                     return;
@@ -206,7 +209,8 @@ public class BRC13_HardcodedSetST extends Benchmark
 
         private Temperatures put(final Temperatures key)
         {
-            int ptr = key.hashCode() & m_mask;
+        	final int hash = key.hashCode();
+            int ptr = hash & m_mask;
             Temperatures k = m_data[ptr];
 
             if ( k == FREE_KEY ) //end of chain already
@@ -218,7 +222,7 @@ public class BRC13_HardcodedSetST extends Benchmark
                     ++m_size;
                 return null;
             }
-            else if (k.hashCode() == key.hashCode() && k.equals( key.city ))
+            else if (k.hashCode() == hash && k.equals( key.city ))
             {
                 final Temperatures ret = m_data[ptr];
                 m_data[ptr] = key;
@@ -238,7 +242,7 @@ public class BRC13_HardcodedSetST extends Benchmark
                         ++m_size;
                     return null;
                 }
-                else if ( k.hashCode() == key.hashCode() && k.equals( key.city ) )
+                else if ( k.hashCode() == hash && k.equals( key.city ) )
                 {
                     final Temperatures ret = m_data[ptr];
                     m_data[ptr] = key;
