@@ -16,6 +16,8 @@
 #
 CLASSPATH=target/classes/
 echo "File: $1"
+echo "Warmups: $2"
+echo "Measurements: $3"
 
 # Read file several times to warmup cache
 echo "File Warmup\n"
@@ -23,11 +25,12 @@ wc -l $1
 cat $1 > /dev/null
 
 echo "== Measurements"
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineMT $1 1 1 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineST $1 1 1 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineMT $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineST $1 $2 $3 --batchMode ""
 
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC02_NoGroupingMT $1 1 1 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC02_NoGroupingST $1 1 1 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC02_NoGroupingMT $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC02_NoGroupingST $1 $2 $3 --batchMode ""
 
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC03_NoStreamMT $1 1 1 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC03_NoStreamST $1 1 1 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC03_NoStreamMT $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC03_NoStreamST $1 $2 $3 --batchMode ""
+
