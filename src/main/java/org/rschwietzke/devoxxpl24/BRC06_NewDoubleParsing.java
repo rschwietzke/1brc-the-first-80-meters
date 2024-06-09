@@ -23,14 +23,19 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.ParseDouble;
 
 /**
- *
+ * Double parsing is high on cpu, let's do that ourselves
  *
  * @author Rene Schwietzke
  */
-public class BRC03_NoStreamST extends Benchmark
+public class BRC06_NewDoubleParsing extends Benchmark
 {
+	/**
+	 * Holds our temperature data without the station, because the
+	 * map already knows that
+	 */
 	private static class Temperatures
 	{
 		private final double min;
@@ -54,16 +59,30 @@ public class BRC03_NoStreamST extends Benchmark
 			this.count = count;
 		}
 
-		private double round(double value)
-		{
-			return Math.round(value * 10.0) / 10.0;
-		}
-
+		/**
+		 * Combine two temperatures
+		 *
+		 * @param other the other city temperature
+		 * @return a new combined state
+		 */
 		public Temperatures merge(final Temperatures other)
 		{
 			return new Temperatures(Math.min(min, other.min), Math.max(max, other.max), total + other.total, count + other.count);
 		}
 
+		/**
+		 * 1BRC wants to have one decimal digits
+		 * @param value the value to transform
+		 * @return the rounded value
+		 */
+		private double round(double value)
+		{
+			return Math.round(value * 10.0) / 10.0;
+		}
+
+		/**
+		 * Our final printing format
+		 */
 		public String toString()
 		{
 			return round(min) + "," + round(total / count) + "," + round(max);
@@ -73,7 +92,7 @@ public class BRC03_NoStreamST extends Benchmark
     @Override
     public String run(final String fileName) throws IOException
     {
-    	// our storage
+    	// our cities with temperatures
     	final Map<String, Temperatures> cities = new HashMap<>();
 
     	try (var reader = Files.newBufferedReader(Paths.get(fileName)))
@@ -82,22 +101,26 @@ public class BRC03_NoStreamST extends Benchmark
     		while ((line = reader.readLine()) != null)
     		{
     			// split the line
-    			final String[] cols = line.split(";");
+    			final int pos = line.indexOf(';');
 
-    			final String city = cols[0];
-    			final double temperature = Double.parseDouble(cols[1]);
+    			// get us the city
+    			final String city = line.substring(0, pos);
+    			final String temperatureAsString = line.substring(pos + 1);
 
-    			// get us our data store for the city
+    			// parse our temperature
+    			final double temperature = ParseDouble.parseDouble(temperatureAsString);
+
+    			// merge the data into the captured data
 				cities.merge(city, new Temperatures(temperature), (t1, t2) -> t1.merge(t2));
     		}
     	}
 
-    	// ok, we got everything, now we need to order it
+    	// ok, we got everything, now we need to order it and print it
         return new TreeMap<String, Temperatures>(cities).toString();
     }
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-		Benchmark.run(BRC03_NoStreamST.class, args);
+		Benchmark.run(BRC06_NewDoubleParsing.class, args);
     }
 }

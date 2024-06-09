@@ -28,12 +28,17 @@ echo "File Warmup 2\n"
 time cat $1 > /dev/null
 
 echo "== Measurements"
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineMT $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineST $1 $2 $3 --batchMode ""
-
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC02_NoGroupingMT $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC02_NoGroupingST $1 $2 $3 --batchMode ""
-
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC03_NoStreamMT $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC03_NoStreamST $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode ""
+java -Xms4g -Xmx4g -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode "Memory 4G"
+java -Xms4g -Xmx4g -XX:+AlwaysPreTouch -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode "Memory 4G, touched"
+java -Xmx100m -XX:+AlwaysPreTouch -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode "Memory 100m, touched"
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC05_ReplaceSplitST $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC06_NewDoubleParsing $1 $2 $3 --batchMode ""
 
+
+#java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineMT $1 $2 $3 --batchMode ""
+#java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC02_NoGroupingMT $1 $2 $3 --batchMode ""
+#java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC03_NoStreamMT $1 $2 $3 --batchMode ""
