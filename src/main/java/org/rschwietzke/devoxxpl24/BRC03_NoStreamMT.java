@@ -78,7 +78,7 @@ public class BRC03_NoStreamMT extends Benchmark
 	static class Worker extends Thread
 	{
 		private final Map<String, Temperatures> temperatures = new HashMap<>();
-		final ArrayBlockingQueue<List<String>> buffer = new ArrayBlockingQueue<>(100);
+		final ArrayBlockingQueue<List<String>> buffer = new ArrayBlockingQueue<>(1000);
 
 		public Worker()
 		{
