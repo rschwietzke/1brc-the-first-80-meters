@@ -43,6 +43,7 @@ java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC09_NoMergeST $1 $2 $3 --batchM
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC10_MutateST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC11_SizedMapST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC12_NewMapST $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC13_HardcodedSetST $1 $2 $3 --batchMode ""
 
 
 #java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineMT $1 $2 $3 --batchMode ""
