@@ -49,6 +49,7 @@ public class Example14d_JustReadIntoByteArray extends Benchmark
 			}
 		}
 
+		System.out.println("Lines: " + count);
 		return String.valueOf(count);
 	}
 

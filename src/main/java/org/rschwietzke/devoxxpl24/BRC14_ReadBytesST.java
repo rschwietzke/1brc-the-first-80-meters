@@ -106,8 +106,8 @@ public class BRC14_ReadBytesST extends Benchmark
 		}
 	}
 
-	private static int MIN_BUFFERSIZE = 1024;
-	private static int REMAINING_MIN_BUFFERSIZE = 512;
+	private static int MIN_BUFFERSIZE = 102400;
+	private static int REMAINING_MIN_BUFFERSIZE = 200;
 
 	static class Line
 	{
@@ -137,27 +137,27 @@ public class BRC14_ReadBytesST extends Benchmark
 		 */
 		private void readFromChannel()
 		{
-			if (pos > REMAINING_MIN_BUFFERSIZE)
-			{
-				System.arraycopy(data, pos, data, 0, data.length - pos);
-				end = end - pos;
-				pos = 0;
-				buffer.position(end);
-			}
-
 			// read new, old data is gone
 			hashCode = -1;
 
 			try
 			{
-				final int readBytes = channel.read(buffer);
-				if (readBytes == -1)
+				if (end - pos < REMAINING_MIN_BUFFERSIZE)
 				{
-					EOF = true;
-					hasNewLine = false;
-				}
+					System.arraycopy(data, pos, data, 0, data.length - pos);
+					end = end - pos;
+					pos = 0;
+					buffer.position(end);
 
-				end = buffer.position();
+					final int readBytes = channel.read(buffer);
+					if (readBytes == -1)
+					{
+						EOF = true;
+						hasNewLine = false;
+					}
+
+					end = buffer.position();
+				}
 			}
 			catch (IOException e)
 			{
