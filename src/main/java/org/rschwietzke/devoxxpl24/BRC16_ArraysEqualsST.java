@@ -229,24 +229,7 @@ public class BRC16_ArraysEqualsST extends Benchmark
 
 		public boolean equals(Line line)
 		{
-		    var l1 = data.length;
-		    var l2 = line.semicolonPos - line.lineStartPos;
-		    if (l1 != l2)
-		    {
-		        return false;
-		    }
-
-		    var lineData = line.buffer.array();
-
-		    for (int i = 0; i < data.length; i++)
-		    {
-		        if (data[i] != lineData[line.lineStartPos + i])
-		        {
-		            return false;
-		        }
-		    }
-
-		    return true;
+			return Arrays.equals(data, 0, data.length, line.buffer.array(), line.lineStartPos, line.semicolonPos);
 		}
 
 		public boolean equals(City city)
