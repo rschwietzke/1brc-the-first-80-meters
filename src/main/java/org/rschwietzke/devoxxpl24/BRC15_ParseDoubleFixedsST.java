@@ -33,7 +33,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class BRC14_ReadBytesST extends Benchmark
+public class BRC15_ParseDoubleFixedsST extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -270,7 +270,7 @@ public class BRC14_ReadBytesST extends Benchmark
 					//System.out.println(new String(line.data, line.lineStartPos, line.end - line.lineStartPos));
 
 					// parse our temperature inline without an instance of a string for temperature
-					final int temperature = ParseDouble.parseInteger(line.data, line.semicolonPos + 1, line.newlinePos - 1);
+					final int temperature = ParseDouble.parseIntegerFixed(line.data, line.semicolonPos + 1, line.newlinePos - 1);
 
 					// find and update
 					cities.getPutOrUpdate(line, temperature);
@@ -294,7 +294,7 @@ public class BRC14_ReadBytesST extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(BRC14_ReadBytesST.class, args);
+		Benchmark.run(BRC15_ParseDoubleFixedsST.class, args);
 	}
 
 	static class FastHashSet

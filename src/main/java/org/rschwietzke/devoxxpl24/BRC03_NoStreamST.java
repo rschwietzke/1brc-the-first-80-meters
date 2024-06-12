@@ -25,12 +25,18 @@ import java.util.TreeMap;
 import org.rschwietzke.Benchmark;
 
 /**
- *
+ * We are tuning the single threaded performance first, because
+ * it is easier to profile. Just make this code nice first and tune
+ * from there.
  *
  * @author Rene Schwietzke
  */
 public class BRC03_NoStreamST extends Benchmark
 {
+    /**
+     * Holds our temperature data without the station, because the
+     * map already knows that
+     */
 	private static class Temperatures
 	{
 		private final double min;
@@ -54,15 +60,15 @@ public class BRC03_NoStreamST extends Benchmark
 			this.count = count;
 		}
 
-		private double round(double value)
-		{
-			return Math.round(value * 10.0) / 10.0;
-		}
-
 		public Temperatures merge(final Temperatures other)
 		{
 			return new Temperatures(Math.min(min, other.min), Math.max(max, other.max), total + other.total, count + other.count);
 		}
+
+        private double round(double value)
+        {
+            return Math.round(value * 10.0) / 10.0;
+        }
 
 		public String toString()
 		{

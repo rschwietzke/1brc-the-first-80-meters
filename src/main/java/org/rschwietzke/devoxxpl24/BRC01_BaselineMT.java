@@ -86,7 +86,7 @@ public class BRC01_BaselineMT extends Benchmark {
         		.parallel()
         		.map(l -> l.split(";"))
                 .map(l -> new Measurement(l))
-                .collect(groupingBy(Measurement::station, collector));
+                .collect(groupingBy(m -> m.station(), collector));
 
         return new TreeMap<>(result).toString();
     }

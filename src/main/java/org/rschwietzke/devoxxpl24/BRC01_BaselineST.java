@@ -15,14 +15,12 @@
  */
 package org.rschwietzke.devoxxpl24;
 
-import static java.util.stream.Collectors.groupingBy;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.TreeMap;
 import java.util.stream.Collector;
-import java.util.stream.Collector.Characteristics;
+import java.util.stream.Collectors;
 
 import org.rschwietzke.Benchmark;
 
@@ -62,14 +60,19 @@ public class BRC01_BaselineST extends Benchmark {
     }
 
     @Override
-    public String run(final String fileName) throws IOException {
-        Collector<Measurement, MeasurementAggregator, ResultRow> collector = Collector.of(MeasurementAggregator::new,
-                (agg, m) -> {
+    public String run(final String fileName) throws IOException
+    {
+        final Collector<Measurement, MeasurementAggregator, ResultRow> collector =
+        		Collector.of(MeasurementAggregator::new,
+                (agg, m) ->
+        		{
                     agg.min = Math.min(agg.min, m.value);
                     agg.max = Math.max(agg.max, m.value);
                     agg.sum += m.value;
                     agg.count++;
-                }, (agg1, agg2) -> {
+                },
+        		(agg1, agg2) ->
+                {
                     var res = new MeasurementAggregator();
                     res.min = Math.min(agg1.min, agg2.min);
                     res.max = Math.max(agg1.max, agg2.max);
@@ -77,15 +80,16 @@ public class BRC01_BaselineST extends Benchmark {
                     res.count = agg1.count + agg2.count;
 
                     return res;
-                }, agg -> {
-                    return new ResultRow(agg.min, (Math.round(agg.sum * 10.0) / 10.0) / agg.count, agg.max);
                 },
-                Characteristics.CONCURRENT);
+                agg ->
+                {
+                    return new ResultRow(agg.min, (Math.round(agg.sum * 10.0) / 10.0) / agg.count, agg.max);
+                });
 
         var result = Files.lines(Paths.get(fileName))
         		.map(l -> l.split(";"))
                 .map(l -> new Measurement(l))
-                .collect(groupingBy(Measurement::station, collector));
+                .collect(Collectors.groupingByConcurrent(m -> m.station(), collector));
 
         return new TreeMap<>(result).toString();
     }
