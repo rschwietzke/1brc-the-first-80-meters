@@ -32,7 +32,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class BRC24_ReorderAddST extends Benchmark
+public class BRC25_DifferentBranchInHashCode2ST extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -64,9 +64,6 @@ public class BRC24_ReorderAddST extends Benchmark
 		 */
 		public void add(final int value)
 		{
-            this.total += value;
-            this.count++;
-
             if (value < this.min)
             {
                 this.min = value;
@@ -75,6 +72,8 @@ public class BRC24_ReorderAddST extends Benchmark
             {
                 this.max = value;
             }
+			this.total += value;
+			this.count++;
 		}
 
 		@Override
@@ -175,7 +174,7 @@ public class BRC24_ReorderAddST extends Benchmark
 				throw new RuntimeException(e);
 			}
 
-			lineStartPos = pos;
+			this.lineStartPos = pos;
 
 			// look for semicolon and new line
 			// when checking for semicolon, we do the hashcode right away
@@ -184,12 +183,16 @@ public class BRC24_ReorderAddST extends Benchmark
 			for (; i < end; i++)
 			{
 				final byte b = data[i];
-				if (b == ';')
+
+				if (b != ';')
 				{
-					semicolonPos = i;
-					break;
+	                h = (h << 5) - h + b;
 				}
-                h = 31 * h + b;
+				else
+				{
+                    this.semicolonPos = i;
+                    break;
+				}
 			}
 			this.hashCode = h;
 
@@ -199,9 +202,9 @@ public class BRC24_ReorderAddST extends Benchmark
                 final byte b = data[i];
 				if (b == '\n')
 				{
-					newlinePos = i;
-					pos = i + 1;
-					hasNewLine = true;
+					this.newlinePos = i;
+					this.pos = i + 1;
+					this.hasNewLine = true;
 					return;
 				}
 			}
@@ -299,7 +302,7 @@ public class BRC24_ReorderAddST extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(BRC24_ReorderAddST.class, args);
+		Benchmark.run(BRC25_DifferentBranchInHashCode2ST.class, args);
 	}
 
 	static class FastHashSet
