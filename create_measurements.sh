@@ -53,6 +53,7 @@ java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC23_NoMulST $1 $2 $3 --batchMod
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC24_DifferentBranchInHashCodeST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC25_SmallAddReordingST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC26_MoreMapSpaceST $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC27_SmallPutST $1 $2 $3 --batchMode ""
 
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC30_DangerNoEqualsST $1 $2 $3 --batchMode ""
 
