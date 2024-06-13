@@ -17,6 +17,7 @@
 CLASSPATH=target/classes/
 LOWER=$(echo $1 | tr '[:upper:]' '[:lower:]')
 
+native-image -O3 -H:TuneInlinerExploration=1 --gc=epsilon -H:-GenLoopSafepoints -march=native -H:ReflectionConfigurationFiles=reflection.json -cp $CLASSPATH -o org.rschwietzke.devoxxpl24.$LOWER.best org.rschwietzke.devoxxpl24.$1
 native-image --pgo-instrument --gc=epsilon -H:-GenLoopSafepoints -march=native -H:ReflectionConfigurationFiles=reflection.json  -cp $CLASSPATH org.rschwietzke.devoxxpl24.$1
 
 ./org.rschwietzke.devoxxpl24.$LOWER $2 $3 $4
