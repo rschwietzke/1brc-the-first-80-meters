@@ -32,7 +32,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class BRC30_NoEqualsDangerST extends Benchmark
+public class BRC24_ReorderAddST extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -64,6 +64,9 @@ public class BRC30_NoEqualsDangerST extends Benchmark
 		 */
 		public void add(final int value)
 		{
+            this.total += value;
+            this.count++;
+
             if (value < this.min)
             {
                 this.min = value;
@@ -72,8 +75,6 @@ public class BRC30_NoEqualsDangerST extends Benchmark
             {
                 this.max = value;
             }
-			this.total += value;
-			this.count++;
 		}
 
 		@Override
@@ -84,7 +85,7 @@ public class BRC30_NoEqualsDangerST extends Benchmark
 
 		public boolean equals(final Line l)
 		{
-			return true;//this.city.equals(l);
+			return this.city.equals(l);
 		}
 
 		public boolean equals(final City c)
@@ -188,7 +189,7 @@ public class BRC30_NoEqualsDangerST extends Benchmark
 					semicolonPos = i;
 					break;
 				}
-				h = 31 * h + b;
+                h = 31 * h + b;
 			}
 			this.hashCode = h;
 
@@ -298,7 +299,7 @@ public class BRC30_NoEqualsDangerST extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(BRC30_NoEqualsDangerST.class, args);
+		Benchmark.run(BRC24_ReorderAddST.class, args);
 	}
 
 	static class FastHashSet

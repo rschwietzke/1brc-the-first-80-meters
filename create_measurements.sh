@@ -29,9 +29,9 @@ time cat $1 > /dev/null
 
 echo "== Measurements"
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC02_NoGroupingST $1 $2 $3 --batchMode ""
+#java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC02_NoGroupingST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC03_NoStreamST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode ""
+#java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode ""
 #java -Xms4g -Xmx4g -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode "Memory 4G"
 #java -Xms4g -Xmx4g -XX:+AlwaysPreTouch -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode "Memory 4G, touched"
 #java -Xmx100m -XX:+AlwaysPreTouch -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode "Memory 100m, touched"
@@ -50,6 +50,9 @@ java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC20_UseArrayNoBufferST $1 $2 $3
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC21_ManualMinMaxST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC22_EarlyHashCodeST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC23_NoMulST $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC24_ReorderAddST $1 $2 $3 --batchMode ""
+
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC30_DangerNoHashCodeST $1 $2 $3 --batchMode ""
 
 
 #java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineMT $1 $2 $3 --batchMode ""
