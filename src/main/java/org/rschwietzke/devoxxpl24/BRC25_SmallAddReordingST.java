@@ -259,7 +259,7 @@ public class BRC25_SmallAddReordingST extends Benchmark
 	public String run(final String fileName) throws IOException
 	{
 		// our cities with temperatures, assume we get about 400, so we get us decent space
-		final FastHashSet cities = new FastHashSet(1000, 0.5f);
+		final FastHashSet cities = new FastHashSet(4000, 0.5f);
 
 		try (var raf = new RandomAccessFile(fileName, "r");
 				var channel = raf.getChannel();)
