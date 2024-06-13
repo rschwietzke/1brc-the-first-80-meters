@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
-import org.rschwietzke.devoxxpl24.BRC24_DifferentBranchInHashCodeST.FastHashSet;
 import org.rschwietzke.util.ParseDouble;
 
 /**
@@ -33,7 +32,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class BRC25_SmallAddReordingST extends Benchmark
+public class BRC26_MoreMapSpaceST extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -260,7 +259,7 @@ public class BRC25_SmallAddReordingST extends Benchmark
 	public String run(final String fileName) throws IOException
 	{
 		// our cities with temperatures, assume we get about 400, so we get us decent space
-        final FastHashSet cities = new FastHashSet(2023, 0.5f);
+		final FastHashSet cities = new FastHashSet(4000, 0.5f);
 
 		try (var raf = new RandomAccessFile(fileName, "r");
 				var channel = raf.getChannel();)
@@ -298,7 +297,7 @@ public class BRC25_SmallAddReordingST extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(BRC25_SmallAddReordingST.class, args);
+		Benchmark.run(BRC26_MoreMapSpaceST.class, args);
 	}
 
 	static class FastHashSet
