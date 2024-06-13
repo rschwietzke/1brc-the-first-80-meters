@@ -32,7 +32,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class BRC15_ParseDoubleFixedST extends Benchmark
+public class BRC20_UseArrayNoBufferST extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -237,7 +237,7 @@ public class BRC15_ParseDoubleFixedST extends Benchmark
 
 		public boolean equals(Line line)
 		{
-			return Arrays.mismatch(data, 0, data.length, line.buffer.array(), line.lineStartPos, line.semicolonPos) == -1;
+			return Arrays.mismatch(data, 0, data.length, line.data, line.lineStartPos, line.semicolonPos) == -1;
 		}
 
 		public boolean equals(City city)
@@ -300,7 +300,7 @@ public class BRC15_ParseDoubleFixedST extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(BRC15_ParseDoubleFixedST.class, args);
+		Benchmark.run(BRC20_UseArrayNoBufferST.class, args);
 	}
 
 	static class FastHashSet

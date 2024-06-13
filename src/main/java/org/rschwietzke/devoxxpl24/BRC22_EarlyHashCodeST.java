@@ -32,7 +32,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class BRC15_ParseDoubleFixedST extends Benchmark
+public class BRC22_EarlyHashCodeST extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -64,8 +64,14 @@ public class BRC15_ParseDoubleFixedST extends Benchmark
 		 */
 		public void add(final int value)
 		{
-			this.min = Math.min(this.min, value);
-			this.max = Math.max(this.max, value);
+            if (value < this.min)
+            {
+                this.min = value;
+            }
+            else if (value > this.max)
+            {
+                this.max = value;
+            }
 			this.total += value;
 			this.count++;
 		}
@@ -171,6 +177,8 @@ public class BRC15_ParseDoubleFixedST extends Benchmark
 			lineStartPos = pos;
 
 			// look for semicolon and new line
+			// when checking for semicolon, we do the hashcode right away
+	        int h = 1;
 			int i = pos;
 			for (; i < end; i++)
 			{
@@ -180,7 +188,9 @@ public class BRC15_ParseDoubleFixedST extends Benchmark
 					semicolonPos = i;
 					break;
 				}
+				h = 31 * h + b;
 			}
+			this.hashCode = h;
 
 			i++;
 			for (; i < end; i++)
@@ -199,18 +209,6 @@ public class BRC15_ParseDoubleFixedST extends Benchmark
 		@Override
 		public int hashCode()
 		{
-			if (hashCode == -1)
-			{
-				var p = buffer.position();
-				var l = buffer.limit();
-
-				buffer.position(lineStartPos);
-				buffer.limit(semicolonPos);
-				hashCode = buffer.hashCode();
-
-				buffer.limit(l);
-				buffer.position(p);
-			}
 			return hashCode;
 		}
 
@@ -237,7 +235,7 @@ public class BRC15_ParseDoubleFixedST extends Benchmark
 
 		public boolean equals(Line line)
 		{
-			return Arrays.mismatch(data, 0, data.length, line.buffer.array(), line.lineStartPos, line.semicolonPos) == -1;
+			return Arrays.mismatch(data, 0, data.length, line.data, line.lineStartPos, line.semicolonPos) == -1;
 		}
 
 		public boolean equals(City city)
@@ -300,7 +298,7 @@ public class BRC15_ParseDoubleFixedST extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(BRC15_ParseDoubleFixedST.class, args);
+		Benchmark.run(BRC22_EarlyHashCodeST.class, args);
 	}
 
 	static class FastHashSet
