@@ -32,7 +32,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class BRC25_DifferentBranchInHashCode2ST extends Benchmark
+public class BRC25_KeepIntStartST extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -130,6 +130,7 @@ public class BRC25_DifferentBranchInHashCode2ST extends Benchmark
 		int newlinePos = -1;
 
 		int hashCode = -1;
+		int numberStartPos = 0;
 
 		public Line(final FileChannel channel)
 		{
@@ -184,19 +185,20 @@ public class BRC25_DifferentBranchInHashCode2ST extends Benchmark
 			{
 				final byte b = data[i];
 
-				if (b != ';')
+				// this will move the ; into the hash of the city, who cares?
+                h = (h << 5) - h + b;
+
+				if (b == ';')
 				{
-	                h = (h << 5) - h + b;
-				}
-				else
-				{
-                    this.semicolonPos = i;
-                    break;
+					this.semicolonPos = i;
+					break;
 				}
 			}
 			this.hashCode = h;
 
 			i++;
+			this.numberStartPos = i;
+
 			for (; i < end; i++)
 			{
                 final byte b = data[i];
@@ -278,7 +280,7 @@ public class BRC25_DifferentBranchInHashCode2ST extends Benchmark
 				if (line.hasNewLine)
 				{
 					// parse our temperature inline without an instance of a string for temperature
-					final int temperature = ParseDouble.parseIntegerFixed(line.data, line.semicolonPos + 1, line.newlinePos - 1);
+					final int temperature = ParseDouble.parseIntegerFixed(line.data, line.numberStartPos, line.newlinePos - 1);
 
 					// find and update
 					cities.getPutOrUpdate(line, temperature);
@@ -302,7 +304,7 @@ public class BRC25_DifferentBranchInHashCode2ST extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(BRC25_DifferentBranchInHashCode2ST.class, args);
+		Benchmark.run(BRC25_KeepIntStartST.class, args);
 	}
 
 	static class FastHashSet
