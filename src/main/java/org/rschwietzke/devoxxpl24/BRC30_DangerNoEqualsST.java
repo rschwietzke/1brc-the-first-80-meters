@@ -32,7 +32,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class BRC25_KeepIntStartST extends Benchmark
+public class BRC30_DangerNoEqualsST extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -84,7 +84,7 @@ public class BRC25_KeepIntStartST extends Benchmark
 
 		public boolean equals(final Line l)
 		{
-			return this.city.equals(l);
+			return true; // this.city.equals(l);
 		}
 
 		public boolean equals(final City c)
@@ -130,7 +130,6 @@ public class BRC25_KeepIntStartST extends Benchmark
 		int newlinePos = -1;
 
 		int hashCode = -1;
-		int numberStartPos = 0;
 
 		public Line(final FileChannel channel)
 		{
@@ -197,8 +196,6 @@ public class BRC25_KeepIntStartST extends Benchmark
 			this.hashCode = h;
 
 			i++;
-			this.numberStartPos = i;
-
 			for (; i < end; i++)
 			{
                 final byte b = data[i];
@@ -280,7 +277,7 @@ public class BRC25_KeepIntStartST extends Benchmark
 				if (line.hasNewLine)
 				{
 					// parse our temperature inline without an instance of a string for temperature
-					final int temperature = ParseDouble.parseIntegerFixed(line.data, line.numberStartPos, line.newlinePos - 1);
+					final int temperature = ParseDouble.parseIntegerFixed(line.data, line.semicolonPos + 1, line.newlinePos - 1);
 
 					// find and update
 					cities.getPutOrUpdate(line, temperature);
@@ -304,7 +301,7 @@ public class BRC25_KeepIntStartST extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(BRC25_KeepIntStartST.class, args);
+		Benchmark.run(BRC30_DangerNoEqualsST.class, args);
 	}
 
 	static class FastHashSet

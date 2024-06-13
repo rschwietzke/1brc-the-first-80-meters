@@ -32,7 +32,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class BRC30_DangerNoHashCodeST extends Benchmark
+public class BRC25_SmallAddReordingST extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -64,8 +64,14 @@ public class BRC30_DangerNoHashCodeST extends Benchmark
 		 */
 		public void add(final int value)
 		{
-            this.min = Math.min(this.min, value);
-            this.max = Math.max(this.max, value);
+            if (value < this.min)
+            {
+                this.min = value;
+            }
+            else if (value > this.max)
+            {
+                this.max = value;
+            }
 			this.total += value;
 			this.count++;
 		}
@@ -78,7 +84,7 @@ public class BRC30_DangerNoHashCodeST extends Benchmark
 
 		public boolean equals(final Line l)
 		{
-			return true; // !!!! DANGEROUS
+			return this.city.equals(l);
 		}
 
 		public boolean equals(final City c)
@@ -179,21 +185,20 @@ public class BRC30_DangerNoHashCodeST extends Benchmark
 				final byte b = data[i];
 				if (b == ';')
 				{
-					semicolonPos = i;
+					semicolonPos = i++;
 					break;
 				}
-				h = 31 * h + b;
+				h = (h << 5) - h + b;
 			}
 			this.hashCode = h;
 
-			i++;
 			for (; i < end; i++)
 			{
                 final byte b = data[i];
 				if (b == '\n')
 				{
-					newlinePos = i;
-					pos = i + 1;
+					newlinePos = i++;
+					pos = i;
 					hasNewLine = true;
 					return;
 				}
@@ -292,7 +297,7 @@ public class BRC30_DangerNoHashCodeST extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(BRC30_DangerNoHashCodeST.class, args);
+		Benchmark.run(BRC25_SmallAddReordingST.class, args);
 	}
 
 	static class FastHashSet

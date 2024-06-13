@@ -51,9 +51,9 @@ java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC21_ManualMinMaxST $1 $2 $3 --b
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC22_EarlyHashCodeST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC23_NoMulST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC24_DifferentBranchInHashCodeST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC25_KeepIntStartST $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC25_SmallAddReordingST $1 $2 $3 --batchMode ""
 
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC30_DangerNoHashCodeST $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC30_DangerNoEqualsST $1 $2 $3 --batchMode ""
 
 
 #java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineMT $1 $2 $3 --batchMode ""
