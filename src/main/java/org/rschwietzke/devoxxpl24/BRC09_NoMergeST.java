@@ -109,7 +109,7 @@ public class BRC09_NoMergeST extends Benchmark
     			// parse our temperature inline without an instance of a string for temperature
     			final int temperature = ParseDouble.parseInteger(line, pos + 1, line.length() - 1);
 
-    			// get city
+    			// get city and update
     			final var v = cities.get(city);
     			final var t = new Temperatures(temperature);
     			cities.put(city, v != null ? v.merge(t) : t);

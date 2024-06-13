@@ -134,7 +134,7 @@ public final class ParseDouble
      */
     public static int parseIntegerFixed(final byte[] b, final int offset, final int end)
     {
-        final int length = end - offset; // one is missng, we care for that later
+        final int length = end - offset; // one is missing, we care for that later
 
     	// we know the first three pieces already 9.9
     	int p0 = b[end];

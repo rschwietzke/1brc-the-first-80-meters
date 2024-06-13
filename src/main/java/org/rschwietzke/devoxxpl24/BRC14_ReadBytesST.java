@@ -137,23 +137,26 @@ public class BRC14_ReadBytesST extends Benchmark
 		 */
 		private void readFromChannel()
 		{
-			// read new, old data is gone
 			hashCode = -1;
+            hasNewLine = false;
 
 			try
 			{
+			    // do we near the end of the buffer?
 				if (end - pos < REMAINING_MIN_BUFFERSIZE)
 				{
+				    // we move the buffer indirectly, because the ByteBuffer just
+				    // wraps our array, nothing for the tenderhearted
 					System.arraycopy(data, pos, data, 0, data.length - pos);
 					end = end - pos;
 					pos = 0;
 					buffer.position(end);
 
+					// fill the buffer up
 					final int readBytes = channel.read(buffer);
 					if (readBytes == -1)
 					{
 						EOF = true;
-						hasNewLine = false;
 					}
 
 					end = buffer.position();
@@ -169,13 +172,21 @@ public class BRC14_ReadBytesST extends Benchmark
 			lineStartPos = pos;
 
 			// look for semicolon and new line
-			for (int i = pos; i < end; i++)
+			int i = pos;
+			for (; i < end; i++)
 			{
 				final byte b = data[i];
 				if (b == ';')
 				{
 					semicolonPos = i;
+					break;
 				}
+			}
+
+			i++;
+			for (; i < end; i++)
+			{
+                final byte b = data[i];
 				if (b == '\n')
 				{
 					newlinePos = i;
@@ -184,9 +195,7 @@ public class BRC14_ReadBytesST extends Benchmark
 					return;
 				}
 			}
-
-			hasNewLine = false;
-		}
+       	}
 
 		@Override
 		public int hashCode()
@@ -267,8 +276,6 @@ public class BRC14_ReadBytesST extends Benchmark
 
 				if (line.hasNewLine)
 				{
-					//System.out.println(new String(line.data, line.lineStartPos, line.end - line.lineStartPos));
-
 					// parse our temperature inline without an instance of a string for temperature
 					final int temperature = ParseDouble.parseInteger(line.data, line.semicolonPos + 1, line.newlinePos - 1);
 

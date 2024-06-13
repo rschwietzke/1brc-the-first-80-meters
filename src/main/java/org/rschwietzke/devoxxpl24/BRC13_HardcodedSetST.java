@@ -142,7 +142,6 @@ public class BRC13_HardcodedSetST extends Benchmark
 
     static class FastHashSet
     {
-    	// we need only the reference, not the content
         private static final Temperatures FREE_KEY = null;
 
         /** Keys and values */
@@ -184,7 +183,7 @@ public class BRC13_HardcodedSetST extends Benchmark
             	return;
             }
 
-            if ( k.hashCode() == hash && k.equals( city ) )
+            if ( k.equals( city ) )
             {
             	k.add(value);
                 return;
@@ -199,7 +198,7 @@ public class BRC13_HardcodedSetST extends Benchmark
                 	put(new Temperatures(city, value));
                     return;
                 }
-                if (k.hashCode() == hash && k.equals( city ))
+                if ( k.equals( city ) )
                 {
                 	k.add(value);
                     return;
