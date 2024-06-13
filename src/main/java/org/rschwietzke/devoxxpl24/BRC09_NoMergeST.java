@@ -110,17 +110,9 @@ public class BRC09_NoMergeST extends Benchmark
     			final int temperature = ParseDouble.parseInteger(line, pos + 1, line.length() - 1);
 
     			// get city
-    			Temperatures v = cities.get(city);
-    			if (v != null)
-    			{
-    				// know it, put both together
-    				v = v.merge(new Temperatures(temperature));
-    			}
-    			else
-    			{
-        			v = new Temperatures(temperature);
-    			}
-    			cities.put(city, v);
+    			final var v = cities.get(city);
+    			final var t = new Temperatures(temperature);
+    			cities.put(city, v != null ? v.merge(t) : t);
     		}
     	}
 
