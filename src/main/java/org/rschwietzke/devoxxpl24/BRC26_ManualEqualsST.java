@@ -234,31 +234,31 @@ public class BRC26_ManualEqualsST extends Benchmark
 
         public boolean equals(Line line)
         {
-            if (data.length == line.semicolonPos - line.lineStartPos)
-            {
-                int i1 = 0;
-                int i2 = line.lineStartPos;
+//            if (data.length == line.semicolonPos - line.lineStartPos)
+//            {
+//                int i1 = 0;
+//                int i2 = line.lineStartPos;
+//
+//                var data2 = line.data;
+//
+//                for (; i1 < data.length; i1++)
+//                {
+//                    if (data[i1] != data2[i2 + i1])
+//                    {
+//                        return false;
+//                    }
+//                }
+//
+//                return true;
+//            }
+//            return false;
 
-                var data2 = line.data;
-
-                for (; i1 < data.length; i1++)
-                {
-                    if (data[i1] != data2[i2 + i1])
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-            return false;
-
-            //			return Arrays.mismatch(data, 0, data.length, line.data, line.lineStartPos, line.semicolonPos) == -1;
+            return Arrays.equals(data, 0, data.length, line.data, line.lineStartPos, line.semicolonPos);
         }
 
         public boolean equals(City city)
         {
-            return Arrays.mismatch(data, 0, data.length, city.data, 0, city.data.length) == -1;
+            return Arrays.equals(data, 0, data.length, city.data, 0, city.data.length);
         }
 
         @Override
