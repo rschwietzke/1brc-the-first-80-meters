@@ -16,11 +16,21 @@
 #
 CLASSPATH=target/classes/
 LOWER=$(echo $1 | tr '[:upper:]' '[:lower:]')
+CLASS=org.rschwietzke.devoxxpl24.$1
 
-native-image -O3 -H:TuneInlinerExploration=1 --gc=epsilon -H:-GenLoopSafepoints -march=native -H:ReflectionConfigurationFiles=reflection.json -cp $CLASSPATH -o org.rschwietzke.devoxxpl24.$LOWER.best org.rschwietzke.devoxxpl24.$1
-native-image --pgo-instrument --gc=epsilon -H:-GenLoopSafepoints -march=native -H:ReflectionConfigurationFiles=reflection.json  -cp $CLASSPATH org.rschwietzke.devoxxpl24.$1
+REFLECTIONCFG="-H:ReflectionConfigurationFiles=reflection.json"
+MAXTUNINGCFG="-O3 -H:TuneInlinerExploration=1"
+GC="--gc=epsilon -H:-GenLoopSafepoints"
+ARCH="-march=native"
+
+# compile a great images, taken from #1br by thomaswuerthinger
+native-image $MAXTUNINGCFG $GC $ARCH $REFLECTIONCFG -cp $CLASSPATH -o $LOWER.best $CLASS
+
+# compile a base image with instrumentation
+native-image --pgo-instrument $GC $ARCH $REFLECTIONCFG -cp $CLASSPATH -o $LOWER $CLASS
 
 ./org.rschwietzke.devoxxpl24.$LOWER $2 $3 $4
 
-native-image --pgo --gc=epsilon -H:-GenLoopSafepoints -march=native -H:ReflectionConfigurationFiles=reflection.json -cp $CLASSPATH org.rschwietzke.devoxxpl24.$1
+# Recompile and take profiler output into account
+native-image --pgo $GC $ARCH $REFLECTIONCFG -cp $CLASSPATH -o $LOWER $CLASS
 rm default.iprof
