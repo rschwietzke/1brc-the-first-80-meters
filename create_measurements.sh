@@ -54,6 +54,9 @@ java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC24_DifferentBranchInHashCodeST
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC25_SmallAddReordingST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC26_MoreMapSpaceST $1 $2 $3 --batchMode ""
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC27_SmallPutST $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC28_FineTuningST $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC29a_ParseDoubleTuningST $1 $2 $3 --batchMode ""
+java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC29b_ParseDoubleTuning2ST $1 $2 $3 --batchMode ""
 
 java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC30_DangerNoEqualsST $1 $2 $3 --batchMode ""
 

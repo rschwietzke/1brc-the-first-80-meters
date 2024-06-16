@@ -30,7 +30,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class BRC28_FineTuningST extends Benchmark
+public class BRC29a_ParseDoubleTuningST extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -232,7 +232,9 @@ public class BRC28_FineTuningST extends Benchmark
                 if (line.hasNewLine)
                 {
                     // parse our temperature inline without an instance of a string for temperature
-                    final int temperature = ParseDouble.parseIntegerFixed(line.data, line.semicolonPos + 1, line.newlinePos - 1);
+                    final int temperature = parseDoubleAsInt(line.data,
+                            line.semicolonPos,
+                            line.newlinePos);
 
                     // find and update
                     cities.getPutOrUpdate(line, temperature);
@@ -247,9 +249,51 @@ public class BRC28_FineTuningST extends Benchmark
         return cities.toTreeMap().toString();
     }
 
+    private static final int DIGITOFFSET = 48;
+
+    /**
+     * Parses a double but ends up with an int, only because we know
+     * the format of the results -99.9 to 99.9
+     */
+    public static int parseDoubleAsInt(final byte[] b, final int semicolonPos, final int newlinePos)
+    {
+        final int end = newlinePos - 1;
+        final int length = end - semicolonPos;
+
+        // we know the first three pieces already 9.9
+        int p0 = b[end];
+        int p1 = b[end - 2] * 10;
+        int value = p0 + p1 - (DIGITOFFSET + DIGITOFFSET * 10);
+
+        // we are 9.9
+        if (length == 3)
+        {
+            return value;
+        }
+
+        // ok, we are either -9.9 or 99.9 or -99.9
+        if (b[semicolonPos + 1] != (byte)'-')
+        {
+            // we are 99.9
+            value += b[end - 3] * 100 - DIGITOFFSET * 100;
+            return value;
+        }
+
+        // we are either -99.9 or -9.9
+        if (length == 4)
+        {
+            // -9.9
+            return -value;
+        }
+
+        // -99.9
+        value += b[end - 3] * 100 - DIGITOFFSET * 100;
+        return -value;
+    }
+
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC28_FineTuningST.class, args);
+        Benchmark.run(BRC29a_ParseDoubleTuningST.class, args);
     }
 
     static class FastHashSet
