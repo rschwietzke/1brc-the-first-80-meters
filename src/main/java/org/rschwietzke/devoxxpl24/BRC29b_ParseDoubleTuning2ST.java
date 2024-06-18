@@ -193,7 +193,6 @@ public class BRC29b_ParseDoubleTuning2ST extends Benchmark
                 {
                     newlinePos = i++;
                     pos = i;
-                    //hasNewLine = true;
                     return;
                 }
             }
