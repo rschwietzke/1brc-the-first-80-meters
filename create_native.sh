@@ -15,7 +15,7 @@
 #  limitations under the License.
 #
 CLASSPATH=target/classes/
-LOWER=$(echo $1 | tr '[:upper:]' '[:lower:]')
+LOWER=org.rschwietzke.devoxxpl24.$(echo $1 | tr '[:upper:]' '[:lower:]')
 CLASS=org.rschwietzke.devoxxpl24.$1
 
 REFLECTIONCFG="-H:ReflectionConfigurationFiles=reflection.json"
@@ -29,7 +29,7 @@ native-image $MAXTUNINGCFG $GC $ARCH $REFLECTIONCFG -cp $CLASSPATH -o $LOWER.bes
 # compile a base image with instrumentation
 native-image --pgo-instrument $GC $ARCH $REFLECTIONCFG -cp $CLASSPATH -o $LOWER $CLASS
 
-./org.rschwietzke.devoxxpl24.$LOWER $2 $3 $4
+./$LOWER $2 $3 $4
 
 # Recompile and take profiler output into account
 native-image --pgo $GC $ARCH $REFLECTIONCFG -cp $CLASSPATH -o $LOWER $CLASS
