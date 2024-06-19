@@ -30,8 +30,8 @@ import org.rschwietzke.Benchmark;
  * This is a rewritten version to expand every step a little to make it more clear
  * and have a better handle on tuning.
  */
-public class BRC01_BaselineMT extends Benchmark {
-
+public class BRC01_BaselineMT extends Benchmark
+{
     private static record Measurement(String station, double value)
     {
         private Measurement(String[] parts)
@@ -51,7 +51,7 @@ public class BRC01_BaselineMT extends Benchmark {
         {
             return Math.round(value * 10.0) / 10.0;
         }
-    };
+    }
 
     private static class MeasurementAggregator
     {
