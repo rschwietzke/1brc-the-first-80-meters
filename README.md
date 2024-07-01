@@ -45,7 +45,30 @@ java  -cp target/classes/ org.rschwietzke.devoxxpl24.BRC13_HardcodedSetST measur
 
 You have to point to a file with the data, you have to specify the number of warmup rounds and the number of measurement rounds. While warmup and measurements are important for small data files, you can easily just say `0 1` when running the large 1 billion row file.
 
-### Warning
+## Native Image
+
+A very simple build file for a native image is provided that takes a compiled class and compiles it into a native image. It will create two versions: a standard optimized version and a PGO version.
+
+For the PGO version, we compile an instrumented version first and run it, later we use the profiling output and compile again.
+
+For both versions, we will run a standard Java execution first to enable the build agent of Graal native image to collect reflection data and write it down.
+
+```
+./create_native.sh BRC13_HardcodedSetST measurements-10m.txt 0 1
+```
+
+Specify the short class name for what you want to compile first (omit the package) and specify the test data and iterations as you normally do. This is used for the reflection data generation and the training runs for PGO.
+
+After the build, you will find the binaries in the main directory and you can run them like that:
+
+```
+./org.rschwietzke.devoxxpl24.brc13_hardcodedsetst.best measurements-10m.txt 0 1
+./org.rschwietzke.devoxxpl24.brc13_hardcodedsetst measurements-10m.txt 0 1
+```
+
+The version with `.best` is using a regular compile with optimization heuristics. The config has been borrowed from here: [prepare_thomaswue.sh](https://github.com/gunnarmorling/1brc/blob/main/prepare_thomaswue.sh).
+
+## Warning
 
 If you play with the large files, your hard disk or SSD or NVM might be the limiting factor. So, run it twice at least. The OS might cache it fully, if your RAM permits and the subsequent runs will be faster.
 

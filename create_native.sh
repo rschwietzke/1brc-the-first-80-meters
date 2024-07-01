@@ -14,23 +14,35 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-CLASSPATH=target/classes/
+CLASSPATH=target/classes
 LOWER=org.rschwietzke.devoxxpl24.$(echo $1 | tr '[:upper:]' '[:lower:]')
 CLASS=org.rschwietzke.devoxxpl24.$1
 
-REFLECTIONCFG="-H:ReflectionConfigurationFiles=reflection.json"
 MAXTUNINGCFG="-O3 -H:TuneInlinerExploration=1"
-GC="--gc=epsilon -H:-GenLoopSafepoints"
-ARCH="-march=native"
 
-# compile a great images, taken from #1br by thomaswuerthinger
-native-image $MAXTUNINGCFG $GC $ARCH $REFLECTIONCFG -cp $CLASSPATH -o $LOWER.best $CLASS
+# This works only with the version starting from BRC14
+# GC="--gc=epsilon -H:-GenLoopSafepoints"
+GC=""
+
+ARCH="-march=native"
+NATIVEIMAGE_CFG_DIR=$CLASSPATH/META-INF/native-image
+
+mkdir -p $NATIVEIMAGE_CFG_DIR
+
+# Create the reflection config on the fly
+java -cp $CLASSPATH -agentlib:native-image-agent=config-output-dir=$NATIVEIMAGE_CFG_DIR $CLASS $2 $3 $4
+
+# compile a fast image without PGO, taken from #1br by thomaswuerthinger
+native-image $MAXTUNINGCFG $GC $ARCH -cp $CLASSPATH -o $LOWER.best $CLASS
 
 # compile a base image with instrumentation
-native-image --pgo-instrument $GC $ARCH $REFLECTIONCFG -cp $CLASSPATH -o $LOWER $CLASS
+native-image --pgo-instrument $GC $ARCH -cp $CLASSPATH -o $LOWER $CLASS
 
+# Run it, outputs profiling data
 ./$LOWER $2 $3 $4
 
 # Recompile and take profiler output into account
-native-image --pgo $GC $ARCH $REFLECTIONCFG -cp $CLASSPATH -o $LOWER $CLASS
+native-image --pgo $GC $ARCH -cp $CLASSPATH -o $LOWER $CLASS
+
+# Delete the temp profiling data
 rm default.iprof
