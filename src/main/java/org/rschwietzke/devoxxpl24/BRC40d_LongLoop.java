@@ -17,8 +17,6 @@ package org.rschwietzke.devoxxpl24;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.TreeMap;
 
@@ -29,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC29a_ParseDoubleTuningST extends Benchmark
+public class BRC40d_LongLoop extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -79,9 +77,9 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
             return hashCode;
         }
 
-        public boolean equals(final byte[] other)
+        public int customEquals(final byte[] other)
         {
-            return Arrays.mismatch(data, 0, data.length, other, 0, other.length) == -1;
+            return Arrays.mismatch(data, 0, data.length, other, 0, other.length);
         }
 
         /**
@@ -108,16 +106,16 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
         }
     }
 
-    private static int MIN_BUFFERSIZE = 102400;
+    private static int MIN_BUFFERSIZE = 1_000_000;
     private static int REMAINING_MIN_BUFFERSIZE = 200;
 
     static class Line
     {
         public boolean EOF = false;
-        public boolean hasNewLine = true;
-        private final ByteBuffer buffer = ByteBuffer.allocate(MIN_BUFFERSIZE);
-        private final byte[] data = buffer.array();
-        private final FileChannel channel;
+        FastHashSet finalCities;
+
+        private final byte[] data = new byte[MIN_BUFFERSIZE];
+        private final RandomAccessFile file;
 
         int pos = 0;
         int end = 0;
@@ -127,77 +125,138 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
         int newlinePos = -1;
 
         int hashCode = -1;
+        int temperature;
 
-        public Line(final FileChannel channel)
+        public Line(final RandomAccessFile file)
         {
-            this.channel = channel;
+            this.file = file;
+        }
+
+        private void moveData()
+        {
+            System.arraycopy(this.data, this.pos, this.data, 0, this.data.length - this.pos);
+            this.end = this.end - this.pos;
+            this.lineStartPos = this.pos = 0;
+
+            // fill the buffer up
+            try
+            {
+                final int readBytes = file.read(this.data, this.end, MIN_BUFFERSIZE - this.end);
+                if (readBytes == -1)
+                {
+                    this.EOF = true;
+                }
+                else
+                {
+                    this.end += readBytes;
+                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                EOF = true;
+                throw new RuntimeException(e);
+            }
         }
 
         /**
          * @param channel the channel to read from
          * @param buffer the buffer to fill
          */
-        private void readFromChannel()
+        private void read()
         {
-            // do we near the end of the buffer?
-            if (end - pos < REMAINING_MIN_BUFFERSIZE)
-            {
-                // we move the buffer indirectly, because the ByteBuffer just
-                // wraps our array, nothing for the tenderhearted
-                System.arraycopy(data, pos, data, 0, data.length - pos);
-                end = end - pos;
-                pos = 0;
-                buffer.position(end);
+            final FastHashSet cities = new FastHashSet(2000, 0.5f);
 
-                // fill the buffer up
-                try
+            while (true)
+            {
+                // do we near the end of the buffer?
+                if (end - pos < REMAINING_MIN_BUFFERSIZE)
                 {
-                    final int readBytes = channel.read(buffer);
-                    if (readBytes == -1)
+                    moveData();
+
+                    if (end - pos == 0 && this.EOF)
                     {
-                        EOF = true;
+                        break;
                     }
                 }
-                catch (IOException e)
+                else
                 {
-                    e.printStackTrace();
-                    EOF = true;
-                    throw new RuntimeException(e);
+                    lineStartPos = pos;
                 }
 
-                end = buffer.position();
-            }
-
-            lineStartPos = pos;
-
-            // look for semicolon and new line
-            // when checking for semicolon, we do the hashcode right away
-            int h = 1;
-            int i = pos;
-            for (; i < end; i++)
-            {
-                final byte b = data[i];
-                if (b == ';')
+                // look for semicolon and new line
+                // when checking for semicolon, we do the hashcode right away
+                int h = 1;
+                int i = pos;
+                for (; i < end; i++)
                 {
-                    semicolonPos = i++;
-                    break;
+                    final byte b = data[i];
+                    if (b == ';')
+                    {
+                        semicolonPos = i++;
+                        break;
+                    }
+                    int x = -h + b;
+                    int y = (h << 5);
+                    h = x + y;
                 }
-                h = (h << 5) - h + b;
-            }
-            this.hashCode = h;
+                this.hashCode = h;
 
-            for (; i < end; i++)
-            {
-                final byte b = data[i];
-                if (b == '\n')
+                // we know for the numbers that we are very fix in length,
+                // so let's read forward
+                // we don't check if we have enough data because we have correct
+                // data and we read early enough to have always a full line in the buffer
+                byte b = data[i++];
+                int negative = 1;
+
+                // can be - or 0..9
+                if (b == '-')
                 {
-                    newlinePos = i++;
-                    pos = i;
-                    //hasNewLine = true;
-                    return;
+                    negative = -1;
+                    // read number again
+                    b = data[i++];
                 }
+
+                // ok, number for sure, -9 or 9
+                int value = b - DIGITOFFSET;
+                b = data[i++];
+
+                // now -99 or -9. or 99 or 9.
+                if (b == '.')
+                {
+                    // read again for the data after the .
+                    b = data[i++];
+                    value *= 10;
+                    value += b - DIGITOFFSET;
+                    this.newlinePos = i++;
+                    this.pos = i;
+                    this.temperature = negative * value;
+
+                    // find and update
+                    cities.getPutOrUpdate(this);
+
+                    continue;
+                }
+                // was -99 or 99
+                value *= 10;
+                value += b - DIGITOFFSET;
+
+                // we have been the end now for certain
+                // skip over .
+                i++;
+                b = data[i++];
+                value *= 10;
+                value += b - DIGITOFFSET;
+                this.newlinePos = i++;
+                this.pos = i;
+
+                this.temperature = negative * value;
+
+                // find and update
+                cities.getPutOrUpdate(this);
             }
-            hasNewLine = false;
+
+            this.finalCities = cities;
         }
 
         @Override
@@ -216,36 +275,13 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
     @Override
     public String run(final String fileName) throws IOException
     {
-        // our cities with temperatures, assume we get about 400, so we get us decent space
-        final FastHashSet cities = new FastHashSet(2000, 0.5f);
-
-        try (var raf = new RandomAccessFile(fileName, "r");
-                var channel = raf.getChannel();)
+        try (var raf = new RandomAccessFile(fileName, "r"))
         {
-            final Line line = new Line(channel);
+            final Line line = new Line(raf);
+            line.read();
 
-            while (true)
-            {
-                line.readFromChannel();
-
-                if (line.hasNewLine)
-                {
-                    // parse our temperature inline without an instance of a string for temperature
-                    final int temperature = parseDoubleAsInt(line.data,
-                            line.semicolonPos,
-                            line.newlinePos);
-
-                    // find and update
-                    cities.getPutOrUpdate(line, temperature);
-                }
-                else if (line.EOF)
-                {
-                    break;
-                }
-            }
+            return line.finalCities.toTreeMap().toString();
         }
-
-        return cities.toTreeMap().toString();
     }
 
     private static final int DIGITOFFSET = 48;
@@ -292,7 +328,7 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC29a_ParseDoubleTuningST.class, args);
+        Benchmark.run(BRC40d_LongLoop.class, args);
     }
 
     static class FastHashSet
@@ -321,7 +357,7 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
             m_threshold = (int) (capacity * fillFactor);
         }
 
-        public void getPutOrUpdate( final Line line, int value )
+        public void getPutOrUpdate( final Line line)
         {
             final int ptr = line.hashCode & m_mask;
             Temperatures k = m_data[ ptr ];
@@ -332,15 +368,15 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
                 final byte[] city = new byte[length];
                 System.arraycopy(line.data, line.lineStartPos, city, 0, length);
 
-                m_data[ ptr ] = new Temperatures(city, line.hashCode, value);
+                m_data[ ptr ] = new Temperatures(city, line.hashCode, line.temperature);
                 return;
             }
             else if (Arrays.equals(k.data, 0, k.data.length, line.data, line.lineStartPos, line.semicolonPos))
             {
-                k.add(value);
+                k.add(line.temperature);
                 return;
             }
-            getPutOrUpdateSlow(line, value, ptr);
+            getPutOrUpdateSlow(line, line.temperature, ptr);
         }
 
         private void getPutOrUpdateSlow( final Line line, int value, int ptr )
@@ -377,7 +413,7 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
                     ++m_size;
                 return null;
             }
-            else if (k.equals( key.data ))
+            else if (k.customEquals( key.data ) == -1)
             {
                 final Temperatures ret = m_data[ptr];
                 m_data[ptr] = key;
@@ -397,7 +433,7 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
                         ++m_size;
                     return null;
                 }
-                else if ( k.equals( key.data ) )
+                else if ( k.customEquals( key.data ) == -1)
                 {
                     final Temperatures ret = m_data[ptr];
                     m_data[ptr] = key;
@@ -478,9 +514,9 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
             x |= x >> 1;
             x |= x >> 2;
                 x |= x >> 4;
-            x |= x >> 8;
-            x |= x >> 16;
-            return ( x | x >> 32 ) + 1;
+                x |= x >> 8;
+                x |= x >> 16;
+                return ( x | x >> 32 ) + 1;
         }
 
         /** Returns the least power of two smaller than or equal to 2<sup>30</sup> and larger than or equal to <code>Math.ceil( expected / f )</code>.

@@ -32,7 +32,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class BRC25_SmallAddReordingST extends Benchmark
+public class BRC23a_NoMulSplitST extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -185,20 +185,23 @@ public class BRC25_SmallAddReordingST extends Benchmark
 				final byte b = data[i];
 				if (b == ';')
 				{
-					semicolonPos = i++;
+					semicolonPos = i;
 					break;
 				}
-				h = (h << 5) - h + b;
+				int x = -h + b;
+				int y = (h << 5);
+				h = x + y;
 			}
 			this.hashCode = h;
 
+			i++;
 			for (; i < end; i++)
 			{
                 final byte b = data[i];
 				if (b == '\n')
 				{
-					newlinePos = i++;
-					pos = i;
+					newlinePos = i;
+					pos = i + 1;
 					hasNewLine = true;
 					return;
 				}
@@ -259,7 +262,7 @@ public class BRC25_SmallAddReordingST extends Benchmark
 	public String run(final String fileName) throws IOException
 	{
 		// our cities with temperatures, assume we get about 400, so we get us decent space
-        final FastHashSet cities = new FastHashSet(2023, 0.5f);
+		final FastHashSet cities = new FastHashSet(2023, 0.5f);
 
 		try (var raf = new RandomAccessFile(fileName, "r");
 				var channel = raf.getChannel();)
@@ -297,7 +300,7 @@ public class BRC25_SmallAddReordingST extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(BRC25_SmallAddReordingST.class, args);
+		Benchmark.run(BRC23a_NoMulSplitST.class, args);
 	}
 
 	static class FastHashSet

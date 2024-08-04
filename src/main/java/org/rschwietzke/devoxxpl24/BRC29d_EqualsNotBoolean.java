@@ -29,7 +29,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC29a_ParseDoubleTuningST extends Benchmark
+public class BRC29d_EqualsNotBoolean extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -79,9 +79,9 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
             return hashCode;
         }
 
-        public boolean equals(final byte[] other)
+        public int customEquals(final byte[] other)
         {
-            return Arrays.mismatch(data, 0, data.length, other, 0, other.length) == -1;
+            return Arrays.mismatch(data, 0, data.length, other, 0, other.length);
         }
 
         /**
@@ -133,6 +133,34 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
             this.channel = channel;
         }
 
+        private void moveData()
+        {
+            // we move the buffer indirectly, because the ByteBuffer just
+            // wraps our array, nothing for the tenderhearted
+            System.arraycopy(data, pos, data, 0, data.length - pos);
+            end = end - pos;
+            lineStartPos = pos = 0;
+            buffer.position(end);
+
+            // fill the buffer up
+            try
+            {
+                final int readBytes = channel.read(buffer);
+                if (readBytes == -1)
+                {
+                    EOF = true;
+                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                EOF = true;
+                throw new RuntimeException(e);
+            }
+
+            end = buffer.position();
+        }
+
         /**
          * @param channel the channel to read from
          * @param buffer the buffer to fill
@@ -142,33 +170,12 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
             // do we near the end of the buffer?
             if (end - pos < REMAINING_MIN_BUFFERSIZE)
             {
-                // we move the buffer indirectly, because the ByteBuffer just
-                // wraps our array, nothing for the tenderhearted
-                System.arraycopy(data, pos, data, 0, data.length - pos);
-                end = end - pos;
-                pos = 0;
-                buffer.position(end);
-
-                // fill the buffer up
-                try
-                {
-                    final int readBytes = channel.read(buffer);
-                    if (readBytes == -1)
-                    {
-                        EOF = true;
-                    }
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                    EOF = true;
-                    throw new RuntimeException(e);
-                }
-
-                end = buffer.position();
+                moveData();
             }
-
-            lineStartPos = pos;
+            else
+            {
+                lineStartPos = pos;
+            }
 
             // look for semicolon and new line
             // when checking for semicolon, we do the hashcode right away
@@ -193,7 +200,6 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
                 {
                     newlinePos = i++;
                     pos = i;
-                    //hasNewLine = true;
                     return;
                 }
             }
@@ -292,7 +298,7 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC29a_ParseDoubleTuningST.class, args);
+        Benchmark.run(BRC29d_EqualsNotBoolean.class, args);
     }
 
     static class FastHashSet
@@ -377,7 +383,7 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
                     ++m_size;
                 return null;
             }
-            else if (k.equals( key.data ))
+            else if (k.customEquals( key.data ) == -1)
             {
                 final Temperatures ret = m_data[ptr];
                 m_data[ptr] = key;
@@ -397,7 +403,7 @@ public class BRC29a_ParseDoubleTuningST extends Benchmark
                         ++m_size;
                     return null;
                 }
-                else if ( k.equals( key.data ) )
+                else if ( k.customEquals( key.data ) == -1)
                 {
                     final Temperatures ret = m_data[ptr];
                     m_data[ptr] = key;

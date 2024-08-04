@@ -168,6 +168,69 @@ public final class ParseDouble
     }
 
     /**
+     * Parses a double but ends up with an int, only because we know
+     * the format of the results -99.9 to 99.9
+     */
+    public static int parseDoubleAsInt29g(final byte[] b, int pos, final int newlinePos)
+    {
+        int l = newlinePos - pos;
+        if (b[pos] == (byte)'-')
+        {
+            // -9.9
+            if (l == 4)
+            {
+                var p1 = b[pos + 1];
+                var p0 = b[pos + 3];
+
+                var value =
+                        ((p1 - DIGITOFFSET) * 10) +
+                        (p0 - DIGITOFFSET);
+                return -value;
+            }
+            else
+            {
+                // -99.9
+                var p2 = b[pos + 1];
+                var p1 = b[pos + 2];
+                var p0 = b[pos + 4];
+
+                var value =
+                        ((p2 - DIGITOFFSET) * 100) +
+                        ((p1 - DIGITOFFSET) * 10) +
+                        (p0 - DIGITOFFSET);
+                return -value;
+            }
+        }
+        else
+        {
+            // 9.9
+            if (l == 3)
+            {
+                var p1 = b[pos];
+                var p0 = b[pos + 2];
+
+                var value =
+                        ((p1 - DIGITOFFSET) * 10) +
+                        (p0 - DIGITOFFSET);
+                return value;
+            }
+            else
+            {
+                // 99.9
+                var p2 = b[pos];
+                var p1 = b[pos + 1];
+                var p0 = b[pos + 3];
+
+                var value =
+                        ((p2 - DIGITOFFSET) * 100) +
+                        ((p1 - DIGITOFFSET) * 10) +
+                        (p0 - DIGITOFFSET);
+                return value;
+            }
+        }
+    }
+
+    /**
      * In case we want to parse the full string
      */
     public static double parseDouble(final String s)
