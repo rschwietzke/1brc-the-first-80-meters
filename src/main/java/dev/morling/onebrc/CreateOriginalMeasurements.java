@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.random.RandomGenerator;
 import java.util.random.RandomGeneratorFactory;
 
-public class CreateMeasurements {
+public class CreateOriginalMeasurements {
     private static class WeatherStation {
         final RandomGenerator r;
         final String id;

@@ -27,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC40i_SmallerSemicolonLoop extends Benchmark
+public class BRC41_FixedFastHashSet extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -334,22 +334,24 @@ public class BRC40i_SmallerSemicolonLoop extends Benchmark
                 int l = line.semicolonPos - line.lineStartPos;
                 byte[] data = k.data;
 
+                // was
+                // if (Arrays.equals(data, 0, data.length, line.data, line.lineStartPos, line.semicolonPos))
+                // replaced to have less checks in the mix
+
                 // check length first
                 if (l == data.length)
                 {
                     // iterate old fashioned
-                    boolean notEquals = false;
                     int start = line.lineStartPos;
-                    for (int i = 0; i < l; i++)
+                    int i = 0;
+                    for (; i < l; i++)
                     {
                         if (data[i] != line.data[start + i])
                         {
-                            notEquals = true;
                             break;
                         }
                     }
-//                    if (Arrays.equals(data, 0, data.length, line.data, line.lineStartPos, line.semicolonPos))
-                    if (!notEquals)
+                    if (i == l)
                     {
                         k.add(line.temperature);
                         return;
@@ -358,18 +360,22 @@ public class BRC40i_SmallerSemicolonLoop extends Benchmark
             }
             else
             {
-                final int length = line.semicolonPos - line.lineStartPos;
-                final byte[] city = new byte[length];
-                System.arraycopy(line.data, line.lineStartPos, city, 0, length);
+                // have to do a proper put to avoid filling up the map
+                // without resizing
+                put(new Temperatures(
+                        Arrays.copyOfRange(
+                                line.data,
+                                line.lineStartPos, line.semicolonPos),
+                            line.hashCode, line.temperature));
 
-                m_data[ ptr ] = new Temperatures(city, line.hashCode, line.temperature);
                 return;
             }
 
-            getPutOrUpdateSlow(line, line.temperature, ptr);
+            putOrUpdateSlow(line, ptr);
+
         }
 
-        private void getPutOrUpdateSlow( final Line line, int value, int ptr )
+        private void putOrUpdateSlow( final Line line, int ptr)
         {
             while ( true )
             {
@@ -377,12 +383,14 @@ public class BRC40i_SmallerSemicolonLoop extends Benchmark
                 Temperatures k = m_data[ ptr ];
                 if ( k == FREE_KEY )
                 {
-                    put(new Temperatures(Arrays.copyOfRange(line.data, line.lineStartPos, line.semicolonPos), line.hashCode, value));
+                    put(new Temperatures(
+                            Arrays.copyOfRange(line.data, line.lineStartPos, line.semicolonPos),
+                            line.hashCode, line.temperature));
                     return;
                 }
                 else if (Arrays.mismatch(k.data, 0, k.data.length, line.data, line.lineStartPos, line.semicolonPos) == -1)
                 {
-                    k.add(value);
+                    k.add(line.temperature);
                     return;
                 }
             }
@@ -528,6 +536,6 @@ public class BRC40i_SmallerSemicolonLoop extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC40i_SmallerSemicolonLoop.class, args);
+        Benchmark.run(BRC41_FixedFastHashSet.class, args);
     }
 }

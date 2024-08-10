@@ -30,7 +30,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC41_MMap extends Benchmark
+public class BRC50_MMap extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -302,7 +302,7 @@ public class BRC41_MMap extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC41_MMap.class, args);
+        Benchmark.run(BRC50_MMap.class, args);
     }
 
     static class FastHashSet
