@@ -94,11 +94,11 @@ public abstract class Benchmark
     	}
     	else if (batchMode && args.length == 5)
     	{
-    		batchComment = args[4];
+    		batchComment = args[4].isBlank() ? "none" : args[4];
     	}
     	else
     	{
-    		batchComment = "";
+    		batchComment = "none";
     	}
 
     	Benchmark.print(batchMode, () -> "==== WARMUP ==================\n");
@@ -124,8 +124,8 @@ public abstract class Benchmark
 
         if (batchMode)
         {
-        	var clazzName = ctr.getDeclaringClass().getName();
-        	System.out.print(String.format("%s - %s - %s: %d ms%n", clazzName, batchComment, crcs.get(0), mean));
+        	var clazzName = ctr.getDeclaringClass().getSimpleName();
+        	System.out.print(String.format("%s,%s,%s,%d%n", clazzName, crcs.get(0), batchComment, mean));
         }
         else
         {
