@@ -19,48 +19,81 @@ echo "File: $1"
 echo "Warmups: $2"
 echo "Measurements: $3"
 
+JVMARGS_DEFAULT="-cp $CLASSPATH -XX:+AlwaysPreTouch"
+
+JVMARGS_LOWMEM="-Xmx50m -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC"
+JVMARGS_HIGHMEM="-Xms1g -Xmx1g "
+
+JVMARGS_LOW="$JVMARGS_DEFAULT $JVMARGS_LOWMEM"
+JVMARGS_HIGH="$JVMARGS_DEFAULT $JVMARGS_HIGHMEM"
+
+CLASSES_HIGHMEM="
+BRC01_BaselineST
+BRC02_NoGroupingST
+BRC03_NoStreamST
+BRC04_CleanupST
+BRC05_ReplaceSplitST
+BRC06_NewDoubleParsingST
+BRC07_NoCopyForDoubleST
+BRC08_GoIntST
+BRC09_NoMergeST
+BRC10_MutateST
+BRC11_SizedMapST
+BRC12_NewMapST
+BRC13_HardcodedSetST"
+CLASSES_LOWMEM="
+BRC14_ReadBytesST
+BRC15_ParseDoubleFixedST
+BRC20_UseArrayNoBufferST
+BRC21_ManualMinMaxST
+BRC22_EarlyHashCodeST
+BRC23a_NoMulSplitST
+BRC23_NoMulST
+BRC24_DifferentBranchInHashCodeST
+BRC25_SmallAddReordingST
+BRC26_MoreMapSpaceST
+BRC27_SmallPutST
+BRC28_FineTuningST
+BRC29a_ParseDoubleTuningST
+BRC29b_ParseDoubleTuning2ST
+BRC29c_ArrayCopyInMethod
+BRC29d_EqualsNotBoolean
+BRC29e_EarlyIntResolution
+BRC29f_LessDataForTempResolution
+BRC29g_FixedIntParsing
+BRC30_DangerNoEqualsST
+BRC40a_NoChannel
+BRC40b_ReturnInstead
+BRC40c_UnrollTempParsing
+BRC40d_LongLoop
+BRC40e_NoReloadSub
+BRC40f_DoWhile
+BRC40g_Put
+BRC40h_ManualMismatch
+BRC40i_SmallerSemicolonLoop
+BRC40_NoChannel
+BRC41_FixedFastHashSet
+BRC42a_WhileTrue
+BRC42b_NoReturnBranch
+BRC43_NoSubClass"
+
 alias time='/usr/bin/time -f "Elapsed: %E, Faults: %F, Minor: %R, Max RSS: %M KB, FS Input: %I, FS Output: %O, System: %S s, User: %U s, Context I/V: %c/%w"'
 
 # Read file several times to warmup cache
-echo "File Warmup 1\n"
+echo "=== Cache Warming"
+echo "File Warmup 1: "
 time wc -l $1
-echo "File Warmup 2\n"
+
+echo "File Warmup 2: "
 time cat $1 > /dev/null
 
-echo "== Measurements"
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineST $1 $2 $3 --batchMode ""
-#java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC02_NoGroupingST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC03_NoStreamST $1 $2 $3 --batchMode ""
-#java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode ""
-#java -Xms4g -Xmx4g -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode "Memory 4G"
-#java -Xms4g -Xmx4g -XX:+AlwaysPreTouch -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode "Memory 4G, touched"
-#java -Xmx100m -XX:+AlwaysPreTouch -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC04_CleanupST $1 $2 $3 --batchMode "Memory 100m, touched"
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC05_ReplaceSplitST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC06_NewDoubleParsingST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC07_NoCopyForDoubleST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC08_GoIntST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC09_NoMergeST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC10_MutateST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC11_SizedMapST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC12_NewMapST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC13_HardcodedSetST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC14_ReadBytesST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC15_ParseDoubleFixedST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC20_UseArrayNoBufferST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC21_ManualMinMaxST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC22_EarlyHashCodeST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC23_NoMulST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC24_DifferentBranchInHashCodeST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC25_SmallAddReordingST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC26_MoreMapSpaceST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC27_SmallPutST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC28_FineTuningST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC29a_ParseDoubleTuningST $1 $2 $3 --batchMode ""
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC29b_ParseDoubleTuning2ST $1 $2 $3 --batchMode ""
+echo "=== Measurements"
+for c in $CLASSES_HIGHMEM
+do
+    java $JVMARGS_HIGH org.rschwietzke.devoxxpl24.$c $1 $2 $3 --batchMode ""
+done
 
-java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC30_DangerNoEqualsST $1 $2 $3 --batchMode ""
-
-
-#java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC01_BaselineMT $1 $2 $3 --batchMode ""
-#java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC02_NoGroupingMT $1 $2 $3 --batchMode ""
-#java -cp $CLASSPATH org.rschwietzke.devoxxpl24.BRC03_NoStreamMT $1 $2 $3 --batchMode ""
+for c in $CLASSES_LOWMEM
+do
+    java $JVMARGS_LOW org.rschwietzke.devoxxpl24.$c $1 $2 $3 --batchMode ""
+done
