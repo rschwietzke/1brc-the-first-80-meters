@@ -90,10 +90,10 @@ time cat $1 > /dev/null
 echo "=== Measurements"
 for c in $CLASSES_HIGHMEM
 do
-    java $JVMARGS_HIGH org.rschwietzke.devoxxpl24.$c $1 $2 $3 --batchMode ""
+    perf stat -o $c.perf.txt java $JVMARGS_HIGH org.rschwietzke.devoxxpl24.$c $1 $2 $3 --batchMode ""
 done
 
 for c in $CLASSES_LOWMEM
 do
-    java $JVMARGS_LOW org.rschwietzke.devoxxpl24.$c $1 $2 $3 --batchMode ""
+    perf stat -o $c.perf.txt java $JVMARGS_LOW org.rschwietzke.devoxxpl24.$c $1 $2 $3 --batchMode ""
 done
