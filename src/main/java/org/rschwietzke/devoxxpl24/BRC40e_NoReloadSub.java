@@ -287,46 +287,6 @@ public class BRC40e_NoReloadSub extends Benchmark
 
     private static final int DIGITOFFSET = 48;
 
-    /**
-     * Parses a double but ends up with an int, only because we know
-     * the format of the results -99.9 to 99.9
-     */
-    public static int parseDoubleAsInt(final byte[] b, final int semicolonPos, final int newlinePos)
-    {
-        final int end = newlinePos - 1;
-        final int length = end - semicolonPos;
-
-        // we know the first three pieces already 9.9
-        int p0 = b[end];
-        int p1 = b[end - 2] * 10;
-        int value = p0 + p1 - (DIGITOFFSET + DIGITOFFSET * 10);
-
-        // we are 9.9
-        if (length == 3)
-        {
-            return value;
-        }
-
-        // ok, we are either -9.9 or 99.9 or -99.9
-        if (b[semicolonPos + 1] != (byte)'-')
-        {
-            // we are 99.9
-            value += b[end - 3] * 100 - DIGITOFFSET * 100;
-            return value;
-        }
-
-        // we are either -99.9 or -9.9
-        if (length == 4)
-        {
-            // -9.9
-            return -value;
-        }
-
-        // -99.9
-        value += b[end - 3] * 100 - DIGITOFFSET * 100;
-        return -value;
-    }
-
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
         Benchmark.run(BRC40e_NoReloadSub.class, args);

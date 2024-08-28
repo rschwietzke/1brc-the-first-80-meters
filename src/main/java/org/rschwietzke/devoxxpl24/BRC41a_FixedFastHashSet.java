@@ -27,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC41_FixedFastHashSet extends Benchmark
+public class BRC41a_FixedFastHashSet extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -106,26 +106,26 @@ public class BRC41_FixedFastHashSet extends Benchmark
         }
     }
 
-    private static int MIN_BUFFERSIZE = 500_000;
+    private static int MIN_BUFFERSIZE = 1_000_000;
     private static int REMAINING_MIN_BUFFERSIZE = 200;
 
     static class Line
     {
+        public boolean EOF = false;
+
         private final byte[] data = new byte[MIN_BUFFERSIZE];
         private final RandomAccessFile file;
 
         int pos = 0;
-        int endToReload= 0;
-        int newlinePos = -1;
         int end = 0;
+        int endToReload = 0;
 
         int lineStartPos = 0;
         int semicolonPos = -1;
+        int newlinePos = -1;
 
-        int hashCode;
+        int hashCode = -1;
         int temperature;
-
-        boolean EOF = false;
 
         public Line(final RandomAccessFile file)
         {
@@ -185,14 +185,14 @@ public class BRC41_FixedFastHashSet extends Benchmark
             {
                 i++;
 
-                final byte b1 = data[i];
-                if (b1 == ';')
+                final byte b = data[i];
+                if (b == ';')
                 {
                     break;
                 }
-                int x1 = -h + b1;
-                int y1 = (h << 5);
-                h = x1 + y1;
+                int x = -h + b;
+                int y = (h << 5);
+                h = x + y;
             }
             while (true);
 
@@ -536,6 +536,6 @@ public class BRC41_FixedFastHashSet extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC41_FixedFastHashSet.class, args);
+        Benchmark.run(BRC41a_FixedFastHashSet.class, args);
     }
 }

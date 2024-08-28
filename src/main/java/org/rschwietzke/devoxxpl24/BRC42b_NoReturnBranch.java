@@ -108,7 +108,7 @@ public class BRC42b_NoReturnBranch extends Benchmark
 
     static class Line
     {
-        private static int MIN_BUFFERSIZE = 500_000;
+        private static int MIN_BUFFERSIZE = 1_000_000;
         private static int REMAINING_MIN_BUFFERSIZE = 200;
 
         private final byte[] data = new byte[MIN_BUFFERSIZE];
@@ -184,12 +184,14 @@ public class BRC42b_NoReturnBranch extends Benchmark
             for (;;)
             {
                 i++;
-                final byte b1 = data[i];
-                if (b1 == ';')
+                final byte b = data[i];
+                if (b == ';')
                 {
                     break;
                 }
-                h = -h + b1 + (h << 5);
+                int x = -h + b;
+                int y = (h << 5);
+                h = x + y;
             }
 
             this.semicolonPos = i++;
