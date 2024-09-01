@@ -28,8 +28,10 @@ JVMARGS_LOW="$JVMARGS_DEFAULT $JVMARGS_LOWMEM"
 JVMARGS_HIGH="$JVMARGS_DEFAULT $JVMARGS_HIGHMEM"
 
 CLASSES_HIGHMEM="
+BRC01_BaselineMT
 BRC01_BaselineST
 BRC02_NoGroupingST
+BRC03_NoStreamMT
 BRC03_NoStreamST
 BRC04_CleanupST
 BRC05_ReplaceSplitST
@@ -41,8 +43,10 @@ BRC10_MutateST
 BRC11_SizedMapST
 BRC12_NewMapST
 BRC13_HardcodedSetST"
+
 CLASSES_LOWMEM="
-BRC14_ReadBytesST
+BRC14a_ReadBytesBroken
+BRC14b_ReadBytesFixed
 BRC15_ParseDoubleFixedST
 BRC20_UseArrayNoBufferST
 BRC21_ManualMinMaxST
@@ -55,7 +59,6 @@ BRC26_MoreMapSpaceST
 BRC27_SmallPutST
 BRC28_FineTuningST
 BRC29a_ParseDoubleTuningST
-BRC29b_ParseDoubleTuning2ST
 BRC29c_ArrayCopyInMethod
 BRC29d_EqualsNotBoolean
 BRC29e_EarlyIntResolution
@@ -72,10 +75,11 @@ BRC40g_Put
 BRC40h_ManualMismatch
 BRC40i_SmallerSemicolonLoop
 BRC40_NoChannel
-BRC41_FixedFastHashSet
+BRC41a_FixedFastHashSet
 BRC42a_WhileTrue
 BRC42b_NoReturnBranch
-BRC43_NoSubClass"
+BRC43_NoSubClass
+BRC45_DoubleTheSetSize"
 
 alias time='/usr/bin/time -f "Elapsed: %E, Faults: %F, Minor: %R, Max RSS: %M KB, FS Input: %I, FS Output: %O, System: %S s, User: %U s, Context I/V: %c/%w"'
 
@@ -90,10 +94,12 @@ time cat $1 > /dev/null
 echo "=== Measurements"
 for c in $CLASSES_HIGHMEM
 do
-    perf stat -o $c.perf.txt java $JVMARGS_HIGH org.rschwietzke.devoxxpl24.$c $1 $2 $3 --batchMode ""
+    #perf stat -o $c.perf.txt
+    java $JVMARGS_HIGH org.rschwietzke.devoxxpl24.$c $1 $2 $3 --batchMode ""
 done
 
 for c in $CLASSES_LOWMEM
 do
-    perf stat -o $c.perf.txt java $JVMARGS_LOW org.rschwietzke.devoxxpl24.$c $1 $2 $3 --batchMode ""
+    #perf stat -o $c.perf.txt
+    java $JVMARGS_LOW org.rschwietzke.devoxxpl24.$c $1 $2 $3 --batchMode ""
 done
