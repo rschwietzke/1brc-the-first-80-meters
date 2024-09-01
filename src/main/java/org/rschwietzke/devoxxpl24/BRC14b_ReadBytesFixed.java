@@ -28,11 +28,12 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.ParseDouble;
 
 /**
- * Parse the temperature with a trick
+ * Why do we read characters or especially a string, which we discard right
+ * away? Let's read bytes and only convert later things to unicode when needed.
  *
  * @author Rene Schwietzke
  */
-public class BRC24_DifferentBranchInHashCodeST extends Benchmark
+public class BRC14b_ReadBytesFixed extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -64,14 +65,8 @@ public class BRC24_DifferentBranchInHashCodeST extends Benchmark
 		 */
 		public void add(final int value)
 		{
-            if (value < this.min)
-            {
-                this.min = value;
-            }
-            else if (value > this.max)
-            {
-                this.max = value;
-            }
+			this.min = Math.min(this.min, value);
+			this.max = Math.max(this.max, value);
 			this.total += value;
 			this.count++;
 		}
@@ -118,8 +113,8 @@ public class BRC24_DifferentBranchInHashCodeST extends Benchmark
 	{
 		public boolean EOF = false;
 		public boolean hasNewLine = false;
-		private final ByteBuffer buffer = ByteBuffer.allocate(MIN_BUFFERSIZE);
-		private final byte[] data = buffer.array();
+		private ByteBuffer buffer = ByteBuffer.allocate(MIN_BUFFERSIZE);
+		private byte[] data = buffer.array();
 		private final FileChannel channel;
 
 		int pos = 0;
@@ -174,26 +169,19 @@ public class BRC24_DifferentBranchInHashCodeST extends Benchmark
 				throw new RuntimeException(e);
 			}
 
-			this.lineStartPos = pos;
+			lineStartPos = pos;
 
 			// look for semicolon and new line
-			// when checking for semicolon, we do the hashcode right away
-	        int h = 1;
 			int i = pos;
 			for (; i < end; i++)
 			{
 				final byte b = data[i];
-
-				// this will move the ; into the hash of the city, who cares?
-                h = (h << 5) - h + b;
-
 				if (b == ';')
 				{
-					this.semicolonPos = i;
+					semicolonPos = i;
 					break;
 				}
 			}
-			this.hashCode = h;
 
 			i++;
 			for (; i < end; i++)
@@ -201,9 +189,9 @@ public class BRC24_DifferentBranchInHashCodeST extends Benchmark
                 final byte b = data[i];
 				if (b == '\n')
 				{
-					this.newlinePos = i;
-					this.pos = i + 1;
-					this.hasNewLine = true;
+					newlinePos = i;
+					pos = i + 1;
+					hasNewLine = true;
 					return;
 				}
 			}
@@ -212,6 +200,18 @@ public class BRC24_DifferentBranchInHashCodeST extends Benchmark
 		@Override
 		public int hashCode()
 		{
+			if (hashCode == -1)
+			{
+				var p = buffer.position();
+				var l = buffer.limit();
+
+				buffer.position(lineStartPos);
+				buffer.limit(semicolonPos);
+				hashCode = buffer.hashCode();
+
+				buffer.limit(l);
+				buffer.position(p);
+			}
 			return hashCode;
 		}
 
@@ -238,7 +238,7 @@ public class BRC24_DifferentBranchInHashCodeST extends Benchmark
 
 		public boolean equals(Line line)
 		{
-			return Arrays.mismatch(data, 0, data.length, line.data, line.lineStartPos, line.semicolonPos) == -1;
+			return Arrays.mismatch(data, 0, data.length, line.buffer.array(), line.lineStartPos, line.semicolonPos) == -1;
 		}
 
 		public boolean equals(City city)
@@ -277,15 +277,15 @@ public class BRC24_DifferentBranchInHashCodeST extends Benchmark
 				if (line.hasNewLine)
 				{
 					// parse our temperature inline without an instance of a string for temperature
-					final int temperature = ParseDouble.parseIntegerFixed(line.data, line.semicolonPos + 1, line.newlinePos - 1);
+					final int temperature = ParseDouble.parseInteger(line.data, line.semicolonPos + 1, line.newlinePos - 1);
 
 					// find and update
 					cities.getPutOrUpdate(line, temperature);
 				}
-				else if (line.EOF)
-				{
-					break;
-				}
+                else if (line.EOF)
+                {
+                    break;
+                }
 			}
 		}
 
@@ -301,7 +301,7 @@ public class BRC24_DifferentBranchInHashCodeST extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(BRC24_DifferentBranchInHashCodeST.class, args);
+		Benchmark.run(BRC14b_ReadBytesFixed.class, args);
 	}
 
 	static class FastHashSet

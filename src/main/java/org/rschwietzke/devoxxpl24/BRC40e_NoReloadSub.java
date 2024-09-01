@@ -171,6 +171,10 @@ public class BRC40e_NoReloadSub extends Benchmark
             if (pos >= this.endToReload)
             {
                 this.endToReload = moveData();
+                if (pos >= end)
+                {
+                    return false;
+                }
             }
             else
             {
@@ -225,7 +229,7 @@ public class BRC40e_NoReloadSub extends Benchmark
                 this.pos = i;
                 this.temperature = negative * value;
 
-                return !EOF;
+                return true;
             }
             // was -99 or 99
             value *= 10;
@@ -242,7 +246,7 @@ public class BRC40e_NoReloadSub extends Benchmark
 
             this.temperature = negative * value;
 
-            return !this.EOF;
+            return true;
         }
 
         @Override

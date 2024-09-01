@@ -78,7 +78,7 @@ public class BRC01_BaselineMT extends Benchmark
 
                     return res;
                 }, agg -> {
-                    return new ResultRow(agg.min, (Math.round(agg.sum * 10.0) / 10.0) / agg.count, agg.max);
+                    return new ResultRow(agg.min, agg.sum / agg.count, agg.max);
                 },
                 Characteristics.CONCURRENT);
 

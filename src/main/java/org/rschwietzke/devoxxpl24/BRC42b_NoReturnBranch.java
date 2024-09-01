@@ -195,7 +195,8 @@ public class BRC42b_NoReturnBranch extends Benchmark
             }
 
             this.semicolonPos = i++;
-            this.hashCode = h;
+            // spread
+            this.hashCode = h ^ (h >>> 16);
 
             // we know for the numbers that we are very fix in length,
             // so let's read forward
@@ -279,10 +280,17 @@ public class BRC42b_NoReturnBranch extends Benchmark
             {
                 line.read();
                 cities.getPutOrUpdate(line);
+
                 if (line.EOF)
                 {
                     break;
                 }
+            }
+            // crawl to the end
+            for (; line.pos < line.end; )
+            {
+                line.read();
+                cities.getPutOrUpdate(line);
             }
         }
 
@@ -350,6 +358,10 @@ public class BRC42b_NoReturnBranch extends Benchmark
                         return;
                     }
                 }
+                else
+                {
+                    // Collision
+                }
             }
             else
             {
@@ -365,7 +377,6 @@ public class BRC42b_NoReturnBranch extends Benchmark
             }
 
             putOrUpdateSlow(line, ptr);
-
         }
 
         private void putOrUpdateSlow( final Line line, int ptr)

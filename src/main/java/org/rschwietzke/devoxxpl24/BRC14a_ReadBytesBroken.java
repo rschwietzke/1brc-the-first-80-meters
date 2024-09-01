@@ -33,7 +33,7 @@ import org.rschwietzke.util.ParseDouble;
  *
  * @author Rene Schwietzke
  */
-public class BRC14_ReadBytesST extends Benchmark
+public class BRC14a_ReadBytesBroken extends Benchmark
 {
 	/**
 	 * Holds our temperature data without the station, because the
@@ -301,7 +301,7 @@ public class BRC14_ReadBytesST extends Benchmark
 
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException
 	{
-		Benchmark.run(BRC14_ReadBytesST.class, args);
+		Benchmark.run(BRC14a_ReadBytesBroken.class, args);
 	}
 
 	static class FastHashSet

@@ -83,7 +83,7 @@ public class BRC01_BaselineST extends Benchmark {
                 },
                 agg ->
                 {
-                    return new ResultRow(agg.min, (Math.round(agg.sum * 10.0) / 10.0) / agg.count, agg.max);
+                    return new ResultRow(agg.min, agg.sum / agg.count, agg.max);
                 });
 
         var result = Files.lines(Paths.get(fileName))

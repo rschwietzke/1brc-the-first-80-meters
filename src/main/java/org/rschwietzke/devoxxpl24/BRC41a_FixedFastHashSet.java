@@ -171,6 +171,10 @@ public class BRC41a_FixedFastHashSet extends Benchmark
             if (pos >= this.endToReload)
             {
                 this.endToReload = moveData();
+                if (pos >= end)
+                {
+                    return false;
+                }
             }
             else
             {
@@ -233,7 +237,7 @@ public class BRC41a_FixedFastHashSet extends Benchmark
                 this.pos = i;
                 this.temperature = negative * value;
 
-                return !EOF;
+                return true;
             }
 
             // was -99 or 99
@@ -253,7 +257,7 @@ public class BRC41a_FixedFastHashSet extends Benchmark
 
             this.temperature = negative * value;
 
-            return !this.EOF;
+            return true;
         }
 
         @Override

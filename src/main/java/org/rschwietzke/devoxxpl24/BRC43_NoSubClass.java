@@ -259,6 +259,12 @@ public class BRC43_NoSubClass extends Benchmark
                 read();
                 cities.getPutOrUpdate(this);
             }
+            // crawl to the end
+            while (pos < end)
+            {
+                read();
+                cities.getPutOrUpdate(this);
+            }
         }
         finally
         {

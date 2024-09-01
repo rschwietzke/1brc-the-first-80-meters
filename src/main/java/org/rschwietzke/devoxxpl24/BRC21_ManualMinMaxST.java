@@ -287,7 +287,7 @@ public class BRC21_ManualMinMaxST extends Benchmark
 					// find and update
 					cities.getPutOrUpdate(line, temperature);
 				}
-				if (line.EOF)
+				else if (line.EOF)
 				{
 					break;
 				}

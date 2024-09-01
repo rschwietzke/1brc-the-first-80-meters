@@ -281,7 +281,7 @@ public class BRC15_ParseDoubleFixedST extends Benchmark
 					// find and update
 					cities.getPutOrUpdate(line, temperature);
 				}
-				if (line.EOF)
+				else if (line.EOF)
 				{
 					break;
 				}

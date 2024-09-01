@@ -279,7 +279,7 @@ public class BRC22_EarlyHashCodeST extends Benchmark
 					// find and update
 					cities.getPutOrUpdate(line, temperature);
 				}
-				if (line.EOF)
+				else if (line.EOF)
 				{
 					break;
 				}

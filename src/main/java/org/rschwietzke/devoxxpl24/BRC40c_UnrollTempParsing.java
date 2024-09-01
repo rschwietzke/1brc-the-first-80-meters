@@ -168,6 +168,10 @@ public class BRC40c_UnrollTempParsing extends Benchmark
             if (end - pos < REMAINING_MIN_BUFFERSIZE)
             {
                 moveData();
+                if (pos >= end)
+                {
+                    return false;
+                }
             }
             else
             {
@@ -222,7 +226,7 @@ public class BRC40c_UnrollTempParsing extends Benchmark
                 this.pos = i;
                 this.temperature = negative * value;
 
-                return !EOF;
+                return true;
             }
             // was -99 or 99
             value *= 10;
@@ -239,7 +243,7 @@ public class BRC40c_UnrollTempParsing extends Benchmark
 
             this.temperature = negative * value;
 
-            return !this.EOF;
+            return true;
         }
 
         @Override
