@@ -23,19 +23,18 @@ import org.rschwietzke.devoxxpl24.BRC40i_SmallerSemicolonLoop;
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 1, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
-public class Basic
+public class Basic_Benchmark
 {
     @Benchmark
     public void measure()
     {
-
         BRC40i_SmallerSemicolonLoop.main(new String[]{"measurements-100m.txt", "0", "1"});
     }
 
     public static void main(String[] args) throws RunnerException
     {
         Options opt = new OptionsBuilder()
-                .include(Basic.class.getSimpleName())
+                .include(Basic_Benchmark.class.getSimpleName())
                 .forks(1)
                 .build();
 
