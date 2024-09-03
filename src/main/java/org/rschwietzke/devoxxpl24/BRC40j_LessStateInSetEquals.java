@@ -27,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC41a_FixedFastHashSet extends Benchmark
+public class BRC40j_LessStateInSetEquals extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -189,14 +189,14 @@ public class BRC41a_FixedFastHashSet extends Benchmark
             {
                 i++;
 
-                final byte b = data[i];
-                if (b == ';')
+                final byte b1 = data[i];
+                if (b1 == ';')
                 {
                     break;
                 }
-                int x = -h + b;
-                int y = (h << 5);
-                h = x + y;
+                int x1 = -h + b1;
+                int y1 = (h << 5);
+                h = x1 + y1;
             }
             while (true);
 
@@ -360,22 +360,18 @@ public class BRC41a_FixedFastHashSet extends Benchmark
             }
             else
             {
-                // have to do a proper put to avoid filling up the map
-                // without resizing
-                put(new Temperatures(
-                        Arrays.copyOfRange(
-                                line.data,
-                                line.lineStartPos, line.semicolonPos),
-                            line.hashCode, line.temperature));
+                final int length = line.semicolonPos - line.lineStartPos;
+                final byte[] city = new byte[length];
+                System.arraycopy(line.data, line.lineStartPos, city, 0, length);
 
+                m_data[ ptr ] = new Temperatures(city, line.hashCode, line.temperature);
                 return;
             }
 
-            putOrUpdateSlow(line, ptr);
-
+            getPutOrUpdateSlow(line, line.temperature, ptr);
         }
 
-        private void putOrUpdateSlow( final Line line, int ptr)
+        private void getPutOrUpdateSlow( final Line line, int value, int ptr )
         {
             while ( true )
             {
@@ -383,14 +379,12 @@ public class BRC41a_FixedFastHashSet extends Benchmark
                 Temperatures k = m_data[ ptr ];
                 if ( k == FREE_KEY )
                 {
-                    put(new Temperatures(
-                            Arrays.copyOfRange(line.data, line.lineStartPos, line.semicolonPos),
-                            line.hashCode, line.temperature));
+                    put(new Temperatures(Arrays.copyOfRange(line.data, line.lineStartPos, line.semicolonPos), line.hashCode, value));
                     return;
                 }
                 else if (Arrays.mismatch(k.data, 0, k.data.length, line.data, line.lineStartPos, line.semicolonPos) == -1)
                 {
-                    k.add(line.temperature);
+                    k.add(value);
                     return;
                 }
             }
@@ -536,6 +530,6 @@ public class BRC41a_FixedFastHashSet extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC41a_FixedFastHashSet.class, args);
+        Benchmark.run(BRC40j_LessStateInSetEquals.class, args);
     }
 }

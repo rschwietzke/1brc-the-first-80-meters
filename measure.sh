@@ -74,8 +74,10 @@ BRC40f_DoWhile
 BRC40g_Put
 BRC40h_ManualMismatch
 BRC40i_SmallerSemicolonLoop
-BRC40_NoChannel
+BRC40j_LessStateInSetEquals
 BRC41a_FixedFastHashSet
+BRC41b_ReorderedLineFields
+BRC41c_LargerBuffer
 BRC42a_WhileTrue
 BRC42b_NoReturnBranch
 BRC43_NoSubClass

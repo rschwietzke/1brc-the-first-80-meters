@@ -27,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC41a_FixedFastHashSet extends Benchmark
+public class BRC41b_ReorderedLineFields extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -111,21 +111,21 @@ public class BRC41a_FixedFastHashSet extends Benchmark
 
     static class Line
     {
+        public boolean EOF = false;
+
         private final byte[] data = new byte[MIN_BUFFERSIZE];
         private final RandomAccessFile file;
 
         int pos = 0;
-        int endToReload= 0;
-        int newlinePos = -1;
         int end = 0;
+        int endToReload = 0;
 
         int lineStartPos = 0;
         int semicolonPos = -1;
+        int newlinePos = -1;
 
-        int hashCode;
+        int hashCode = -1;
         int temperature;
-
-        boolean EOF = false;
 
         public Line(final RandomAccessFile file)
         {
@@ -536,6 +536,6 @@ public class BRC41a_FixedFastHashSet extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC41a_FixedFastHashSet.class, args);
+        Benchmark.run(BRC41b_ReorderedLineFields.class, args);
     }
 }
