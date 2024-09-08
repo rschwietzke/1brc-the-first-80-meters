@@ -326,12 +326,15 @@ public class BRC46_TunedHashSet extends Benchmark
 
         public void putOrUpdate(final Line line)
         {
-            int ptr = line.hashCode & m_mask;
-            Temperatures k = m_data[ptr];
+            // because we add something later
+            int ptr = line.hashCode - 1;
 
             outer:
             for (;;)
             {
+                ptr = (ptr + 1) & m_mask;
+                final Temperatures k = m_data[ptr];
+
                 if (k != FREE_KEY)
                 {
                     final int l = line.semicolonPos - line.lineStartPos;
@@ -345,19 +348,16 @@ public class BRC46_TunedHashSet extends Benchmark
                         // safe to compare, same length
 
                         // iterate old fashioned
-                        int start = line.lineStartPos;
+                        final int start = line.lineStartPos;
                         int i = 0;
                         for (; i < l; i++)
                         {
-                            if (data[i] != line.data[start])
+                            if (data[i] != line.data[start + i])
                             {
                                 // get us the next position, because
                                 // this one is full already
-                                ptr = (ptr + 1) & m_mask;
-                                k = m_data[ptr];
                                 continue outer;
                             }
-                            start++;
                         }
 
                         // safe, we have i == l
@@ -368,8 +368,6 @@ public class BRC46_TunedHashSet extends Benchmark
                     else
                     {
                         // pos full and length match failed
-                        ptr = (ptr + 1) & m_mask;
-                        k = m_data[ptr];
                     }
                 }
                 else

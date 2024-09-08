@@ -108,7 +108,7 @@ public class BRC43_NoSubClass extends Benchmark
     }
 
     private static final int DIGITOFFSET = 48;
-    private static int MIN_BUFFERSIZE = 500_000;
+    private static int MIN_BUFFERSIZE = 1_000_000;
     private static int REMAINING_MIN_BUFFERSIZE = 200;
     final FastHashSet cities = new FastHashSet(2000, 0.5f);
 

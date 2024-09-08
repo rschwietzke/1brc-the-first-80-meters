@@ -83,7 +83,10 @@ BRC42b_NoReturnBranch
 BRC43_NoSubClass
 BRC45_DoubleTheSetSize
 BRC46_TunedHashSet
-BRC47_LeanerPut"
+BRC47_LeanerPut
+BRC48_FixedFactor
+BRC49_OffsetSubtraction
+BRC50_Short"
 
 alias time='/usr/bin/time -f "Elapsed: %E, Faults: %F, Minor: %R, Max RSS: %M KB, FS Input: %I, FS Output: %O, System: %S s, User: %U s, Context I/V: %c/%w"'
 

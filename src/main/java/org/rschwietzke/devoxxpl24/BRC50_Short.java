@@ -27,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC47_LeanerPut extends Benchmark
+public class BRC50_Short extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -124,7 +124,7 @@ public class BRC47_LeanerPut extends Benchmark
         int semicolonPos = -1;
 
         int hashCode;
-        int temperature;
+        short temperature;
 
         boolean EOF = false;
 
@@ -204,7 +204,7 @@ public class BRC47_LeanerPut extends Benchmark
             // we don't check if we have enough data because we have correct
             // data and we read early enough to have always a full line in the buffer
             byte b = data[i++];
-            int negative;
+            short negative;
 
             // can be - or 0..9
             if (b == '-')
@@ -219,7 +219,7 @@ public class BRC47_LeanerPut extends Benchmark
             }
 
             // ok, number for sure, -9 or 9
-            int value = b - DIGITOFFSET;
+            short value = b;
             b = data[i++];
 
             // now -99 or -9. or 99 or 9.
@@ -228,29 +228,30 @@ public class BRC47_LeanerPut extends Benchmark
                 // read again for the data after the .
                 b = data[i];
                 value *= 10;
-                value += b - DIGITOFFSET;
+                value += b;
                 this.newlinePos = i + 1;
                 this.pos = i + 2;
-                this.temperature = negative * value;
+
+                this.temperature = (short) (negative * (value - DIGITOFFSET - DIGITOFFSET * 10));
             }
             else
             {
                 // was -99 or 99
+                value *= 10;
+                value += b;
+
+                // we have seen the end now for certain
+                // skip over .
                 i++;
                 byte b2 = data[i];
 
                 value *= 10;
-                value += b - DIGITOFFSET;
-
-                // we have seen the end now for certain
-                // skip over .
-                value *= 10;
-                value += b2 - DIGITOFFSET;
+                value += b2;
 
                 this.newlinePos = i + 1;
                 this.pos = i + 2;
 
-                this.temperature = negative * value;
+                this.temperature = (short) (negative * (value - DIGITOFFSET - DIGITOFFSET * 10 - DIGITOFFSET * 100));
             }
         }
 
@@ -271,7 +272,7 @@ public class BRC47_LeanerPut extends Benchmark
     public String run(final String fileName) throws IOException
     {
         // our cities with temperatures, assume we get about 400, so we get us decent space
-        final FastHashSet cities = new FastHashSet(4096, 0.5f);
+        final FastHashSet cities = new FastHashSet(4096);
 
         try (var raf = new RandomAccessFile(fileName, "r"))
         {
@@ -304,26 +305,25 @@ public class BRC47_LeanerPut extends Benchmark
     {
         // we need only the reference, not the content
         private static final Temperatures FREE_KEY = null;
-        /** Fill factor, must be between (0 and 1) */
-        private static final float m_fillFactor = 0.5f;
+
+        /** Mask to calculate the original position */
+        private int m_mask;
 
         /** Keys and values */
         private Temperatures[] m_data;
 
         /** Current map size */
         private int m_size;
-        /** Mask to calculate the original position */
-        private int m_mask;
         /** We will resize a map once it reaches this size */
         private int m_threshold;
 
-        public FastHashSet( final int size, final float fillFactor )
+        public FastHashSet(final int size)
         {
-            final int capacity = arraySize(size, fillFactor);
+            final int capacity = arraySize(size, 0.5f);
             m_mask = capacity - 1;
 
             m_data = new Temperatures[capacity];
-            m_threshold = (int) (capacity * fillFactor);
+            m_threshold = (int) (capacity * 0.5f);
         }
 
         public void putOrUpdate(final Line line)
@@ -377,12 +377,13 @@ public class BRC47_LeanerPut extends Benchmark
                     line.hashCode, line.temperature));
         }
 
-        private void putOrUpdateSlow( final Line line, int ptr)
+        private void putOrUpdateSlow(final Line line, int ptr)
         {
-            while ( true )
+            while (true)
             {
                 ptr = (ptr + 1) & m_mask; //that's next index
                 Temperatures k = m_data[ ptr ];
+
                 if ( k == FREE_KEY )
                 {
                     put(new Temperatures(
@@ -449,7 +450,7 @@ public class BRC47_LeanerPut extends Benchmark
 
         private void rehash( final int newcapacity )
         {
-            m_threshold = (int) (newcapacity * m_fillFactor);
+            m_threshold = (int) (newcapacity * 0.5f);
             m_mask = newcapacity - 1;
 
             final int oldcapacity = m_data.length;
@@ -538,6 +539,6 @@ public class BRC47_LeanerPut extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC47_LeanerPut.class, args);
+        Benchmark.run(BRC50_Short.class, args);
     }
 }
