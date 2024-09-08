@@ -68,7 +68,7 @@ public abstract class Benchmark
     private static void printError()
     {
         System.err.println("Where are the arguments?");
-        System.err.println("Usage: <file> [warmUpCount] [measurementCount] [--batchmode <comment>]");
+        System.err.println("Usage: <file> [warmUpCount] [measurementCount] [--batchmode <comment>] [-o <filename>]");
     }
 
     /**
