@@ -40,7 +40,7 @@ public class BRC05_ReplaceSplitST extends Benchmark
         private final double min;
         private final double max;
         private final double total;
-        private final long count;
+        private final int count;
 
         public Temperatures(final double value)
         {
@@ -50,7 +50,7 @@ public class BRC05_ReplaceSplitST extends Benchmark
             this.count = 1;
         }
 
-        private Temperatures(double min, double max, double total, long count)
+        private Temperatures(double min, double max, double total, int count)
         {
             this.min = min;
             this.max = max;
@@ -84,7 +84,8 @@ public class BRC05_ReplaceSplitST extends Benchmark
          */
         public String toString()
         {
-            return round(min) + "," + round(total / count) + "," + round(max);
+            final double mean = this.total / (double)this.count;
+            return round(min) + "/" + round(mean) + "/" + round(max);
         }
     }
 

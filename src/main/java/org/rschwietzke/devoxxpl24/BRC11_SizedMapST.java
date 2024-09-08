@@ -40,7 +40,7 @@ public class BRC11_SizedMapST extends Benchmark
 	{
 		private int min;
 		private int max;
-		private int total;
+		private long total;
 		private int count;
 
 		public Temperatures(final int value)
@@ -78,9 +78,10 @@ public class BRC11_SizedMapST extends Benchmark
 		 * Our final printing format
 		 */
 		public String toString()
-		{
-			return round(min) + "," + round(((double)total / (double)count)) + "," + round(max);
-		}
+        {
+            final double mean = (double)this.total / (double)this.count;
+            return round(min) + "/" + round(mean) + "/" + round(max);
+        }
 	}
 
     @Override

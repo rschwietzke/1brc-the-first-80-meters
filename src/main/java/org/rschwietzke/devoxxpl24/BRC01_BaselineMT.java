@@ -15,14 +15,12 @@
  */
 package org.rschwietzke.devoxxpl24;
 
-import static java.util.stream.Collectors.groupingBy;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.TreeMap;
 import java.util.stream.Collector;
-import java.util.stream.Collector.Characteristics;
+import java.util.stream.Collectors;
 
 import org.rschwietzke.Benchmark;
 
@@ -44,7 +42,7 @@ public class BRC01_BaselineMT extends Benchmark
     {
         public String toString()
         {
-            return round(min) + "," + round(mean) + "," + round(max);
+            return round(min) + "/" + round(mean) + "/" + round(max);
         }
 
         private double round(double value)
@@ -57,8 +55,8 @@ public class BRC01_BaselineMT extends Benchmark
     {
         private double min = Double.POSITIVE_INFINITY;
         private double max = Double.NEGATIVE_INFINITY;
-        private double sum;
-        private long count;
+        private double total;
+        private int count;
     }
 
     @Override
@@ -67,26 +65,25 @@ public class BRC01_BaselineMT extends Benchmark
                 (agg, m) -> {
                     agg.min = Math.min(agg.min, m.value);
                     agg.max = Math.max(agg.max, m.value);
-                    agg.sum += m.value;
+                    agg.total += m.value;
                     agg.count++;
                 }, (agg1, agg2) -> {
                     var res = new MeasurementAggregator();
                     res.min = Math.min(agg1.min, agg2.min);
                     res.max = Math.max(agg1.max, agg2.max);
-                    res.sum = agg1.sum + agg2.sum;
+                    res.total = agg1.total + agg2.total;
                     res.count = agg1.count + agg2.count;
 
                     return res;
                 }, agg -> {
-                    return new ResultRow(agg.min, agg.sum / agg.count, agg.max);
-                },
-                Characteristics.CONCURRENT);
+                    return new ResultRow(agg.min, agg.total / (double)agg.count, agg.max);
+                });
 
         var result = Files.lines(Paths.get(fileName))
         		.parallel()
         		.map(l -> l.split(";"))
                 .map(l -> new Measurement(l))
-                .collect(groupingBy(m -> m.station(), collector));
+                .collect(Collectors.groupingBy(m -> m.station(), collector));
 
         return new TreeMap<>(result).toString();
     }

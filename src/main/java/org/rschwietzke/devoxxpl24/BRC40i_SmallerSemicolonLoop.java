@@ -37,7 +37,7 @@ public class BRC40i_SmallerSemicolonLoop extends Benchmark
     {
         private int min;
         private int max;
-        private int total;
+        private long total;
         private int count;
         private final byte[] data;
         private final int hashCode;
@@ -102,7 +102,8 @@ public class BRC40i_SmallerSemicolonLoop extends Benchmark
          */
         public String toString()
         {
-            return round(min) + "," + round(((double)total / (double)count)) + "," + round(max);
+            final double mean = (double)this.total / (double)this.count;
+            return round(min) + "/" + round(mean) + "/" + round(max);
         }
     }
 

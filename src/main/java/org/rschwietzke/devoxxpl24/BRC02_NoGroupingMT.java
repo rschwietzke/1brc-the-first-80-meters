@@ -41,21 +41,21 @@ public class BRC02_NoGroupingMT extends Benchmark {
 	{
 		private double min = Double.POSITIVE_INFINITY;
 		private double max = Double.NEGATIVE_INFINITY;
-		private double sum;
-		private long count;
+		private double total;
+		private int count;
 
 		public MeasurementAggregator(final Measurement m)
 		{
 			this.min = m.value;
 			this.max = m.value;
-			this.sum = m.value;
+			this.total = m.value;
 			this.count = 1;
 		}
 
 		public String toString()
 		{
-			var mean = Math.round(this.sum * 10.0) / 10.0 / this.count;
-			return round(min) + "," + round(mean) + "," + round(max);
+			final double mean = this.total / (double)this.count;
+			return round(min) + "/" + round(mean) + "/" + round(max);
 		}
 
 		private double round(double value)
@@ -71,7 +71,7 @@ public class BRC02_NoGroupingMT extends Benchmark {
 		final BiFunction<MeasurementAggregator, MeasurementAggregator, MeasurementAggregator> collector = (agg1, agg2) -> {
 			agg1.min = Math.min(agg1.min, agg2.min);
 			agg1.max = Math.max(agg1.max, agg2.max);
-			agg1.sum = agg1.sum + agg2.sum;
+			agg1.total = agg1.total + agg2.total;
 			agg1.count = agg1.count + agg2.count;
 
 			return agg1;

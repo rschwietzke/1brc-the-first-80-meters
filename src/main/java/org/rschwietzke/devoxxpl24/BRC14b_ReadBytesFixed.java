@@ -43,7 +43,7 @@ public class BRC14b_ReadBytesFixed extends Benchmark
 	{
 		private int min;
 		private int max;
-		private int total;
+		private long total;
 		private int count;
 		private final City city;
 		private final int hashCode;
@@ -101,9 +101,10 @@ public class BRC14b_ReadBytesFixed extends Benchmark
 		 * Our final printing format
 		 */
 		public String toString()
-		{
-			return round(min) + "," + round(((double)total / (double)count)) + "," + round(max);
-		}
+        {
+            final double mean = (double)this.total / (double)this.count;
+            return round(min) + "/" + round(mean) + "/" + round(max);
+        }
 	}
 
 	private static int MIN_BUFFERSIZE = 102400;
