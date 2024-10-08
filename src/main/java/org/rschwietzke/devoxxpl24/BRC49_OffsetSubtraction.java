@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.devoxxpl24.BRC60_49inMT.Temperatures;
 
 /**
  * Giving up on the BRC46 idea and just remove an branch from the putOrUpdate
@@ -69,6 +70,25 @@ public class BRC49_OffsetSubtraction extends Benchmark
             }
             this.total += value;
             this.count++;
+        }
+
+        /**
+         * Merge two temperatures
+         *
+         * @param value the temperature to add
+         */
+        public void merge(final Temperatures t)
+        {
+            if (t.min < this.min)
+            {
+                this.min = t.min;
+            }
+            else if (t.max > this.max)
+            {
+                this.max = t.max;
+            }
+            this.total += t.total;
+            this.count += t.count;
         }
 
         @Override
@@ -196,7 +216,6 @@ public class BRC49_OffsetSubtraction extends Benchmark
             }
 
             this.semicolonPos = i++;
-            // spread
             this.hashCode = h;
 
             // we know for the numbers that we are very fix in length,

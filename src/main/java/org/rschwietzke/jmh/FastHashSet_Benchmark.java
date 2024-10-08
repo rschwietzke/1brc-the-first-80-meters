@@ -1,5 +1,6 @@
 package org.rschwietzke.jmh;
 
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 import java.util.random.RandomGeneratorFactory;
 
@@ -19,12 +20,13 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.rschwietzke.jmh.FHS42b.FHS42b_FastHashSet;
 import org.rschwietzke.jmh.FHS42b.Line;
+import org.rschwietzke.jmh.FHS42bV2.FHS42bV2_FastHashSet;
 
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 1, time = 1, timeUnit = TimeUnit.SECONDS)
+@Warmup(iterations = 5, time = 2, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class FastHashSet_Benchmark
 {
@@ -44,20 +46,23 @@ public class FastHashSet_Benchmark
         int temperature;
     }
 
-    TestData[] data = new TestData[20000];
+    TestData[] data = new TestData[50000];
     Line line;
+    int count;
 
     @Setup
     public void setup()
     {
         var r = RandomGeneratorFactory.of("Xoroshiro128PlusPlus").create(4711L);
 
+        var set = new HashSet<>();
         line = new Line();
         int offset = 0;
 
         for (int i = 0; i < data.length; i++)
         {
-            offset = line.add(cities[r.nextInt(cities.length)] + ";11.7", offset) + 1;
+            var city = cities[r.nextInt(cities.length)];
+            offset = line.add(city + ";11.7\\n", offset) + 1;
 
             var d = new TestData();
             d.end = line.end;
@@ -70,14 +75,19 @@ public class FastHashSet_Benchmark
             d.temperature = line.temperature;
 
             data[i] = d;
+
+            // test it
+            set.add(city);
         }
+
+        this.count = set.size();
     }
 
 
     @Benchmark
-    public FHS42b_FastHashSet measure()
+    public FHS42b_FastHashSet original()
     {
-        var h = new FHS42b_FastHashSet(2000, 0.5f);
+        var h = new FHS42b_FastHashSet(2048, 0.5f);
         var line = this.line;
 
         for (int i = 0; i < data.length; i++)
@@ -95,6 +105,40 @@ public class FastHashSet_Benchmark
             h.putOrUpdate(line);
         }
 
+        if (h.size() != this.count)
+        {
+            throw new RuntimeException("Expected different size: " + this.count + "/" + h.size());
+        }
+
+        return h;
+    }
+
+    @Benchmark
+    public FHS42bV2_FastHashSet v2()
+    {
+        var h = new FHS42bV2_FastHashSet(2048);
+        var line = this.line;
+
+        for (int i = 0; i < data.length; i++)
+        {
+            var d = data[i];
+            line.end = d.end;
+            line.endToReload = d.endToReload;
+            line.newlinePos = d.newlinePos;
+            line.pos = d.pos;
+            line.lineStartPos = d.lineStartPos;
+            line.semicolonPos = d.semicolonPos;
+            line.hashCode = d.hashCode;
+            line.temperature = d.temperature;
+
+            h.putOrUpdate(line);
+        }
+
+        if (h.size() != this.count)
+        {
+            throw new RuntimeException("Expected different size: " + this.count + "/" + h.size());
+        }
+
         return h;
     }
 
@@ -103,6 +147,7 @@ public class FastHashSet_Benchmark
         Options opt = new OptionsBuilder()
                 .include(FastHashSet_Benchmark.class.getSimpleName())
                 .forks(0)
+                .warmupIterations(1)
                 .build();
 
         new Runner(opt).run();

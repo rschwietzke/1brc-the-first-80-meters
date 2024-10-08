@@ -31,12 +31,12 @@ public class FHS42b
      */
     static class Temperatures
     {
-        private int min;
-        private int max;
-        private int total;
-        private int count;
-        private final byte[] data;
-        private final int hashCode;
+        int min;
+        int max;
+        int total;
+        int count;
+        final byte[] data;
+        final int hashCode;
 
         public Temperatures(final byte[] city, final int hashCode, final int value)
         {
@@ -109,7 +109,7 @@ public class FHS42b
     {
         private static int MIN_BUFFERSIZE = 1_000_000;
 
-        private final byte[] data = new byte[MIN_BUFFERSIZE];
+        final byte[] data = new byte[MIN_BUFFERSIZE];
 
         int pos = 0;
         int endToReload= 0;
@@ -125,16 +125,16 @@ public class FHS42b
         boolean EOF = false;
 
         /**
-        *
-        * @param s the data to use
-        * @param offset into the buffer
-        * @param hashCode to overwrite for testing
-        */
-       public Line(final String s, int offset, int hashCode)
-       {
-           add(s, offset);
-           this.hashCode = hashCode;
-       }
+         *
+         * @param s the data to use
+         * @param offset into the buffer
+         * @param hashCode to overwrite for testing
+         */
+        public Line(final String s, int offset, int hashCode)
+        {
+            add(s, offset);
+            this.hashCode = hashCode;
+        }
 
         /**
          *
@@ -147,10 +147,10 @@ public class FHS42b
         }
 
         /**
-        */
-       public Line()
-       {
-       }
+         */
+        public Line()
+        {
+        }
 
         /**
          * Add a string, it is up to you to also supply a newline
@@ -168,6 +168,7 @@ public class FHS42b
 
             // find ;
             int i = 0;
+            this.hashCode = 0;
             for (i = 0; i < b.length; i++)
             {
                 if (b[i] == ';')
@@ -185,6 +186,7 @@ public class FHS42b
             // temperature
             i++;
             int multiplier = 1;
+            temperature = 0;
             for (; i < b.length - 1; i++)
             {
                 if (b[i] == '-')
@@ -255,7 +257,10 @@ public class FHS42b
                 byte[] data = k.data;
 
                 // was
-                // if (Arrays.equals(data, 0, data.length, line.data, line.lineStartPos, line.semicolonPos))
+//                if (Arrays.equals(data, 0, data.length, line.data, line.lineStartPos, line.semicolonPos))
+//                {
+//                    k.add(line.temperature);
+//                }
                 // replaced to have less checks in the mix
 
                 // check length first
@@ -268,14 +273,15 @@ public class FHS42b
                     {
                         if (data[i] != line.data[start + i])
                         {
-                            break;
+                            putOrUpdateSlow(line, ptr);
+                            return;
                         }
                     }
-                    if (i == l)
-                    {
-                        k.add(line.temperature);
-                        return;
-                    }
+                    k.add(line.temperature);
+                }
+                else
+                {
+                    putOrUpdateSlow(line, ptr);
                 }
             }
             else
@@ -290,9 +296,6 @@ public class FHS42b
 
                 return;
             }
-
-            putOrUpdateSlow(line, ptr);
-
         }
 
         private void putOrUpdateSlow( final Line line, int ptr)
@@ -431,10 +434,10 @@ public class FHS42b
             x--;
             x |= x >> 1;
             x |= x >> 2;
-                x |= x >> 4;
-                x |= x >> 8;
-                x |= x >> 16;
-                return ( x | x >> 32 ) + 1;
+            x |= x >> 4;
+            x |= x >> 8;
+            x |= x >> 16;
+            return ( x | x >> 32 ) + 1;
         }
 
         /** Returns the least power of two smaller than or equal to 2<sup>30</sup> and larger than or equal to <code>Math.ceil( expected / f )</code>.

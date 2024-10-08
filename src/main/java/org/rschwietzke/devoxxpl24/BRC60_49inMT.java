@@ -17,20 +17,26 @@ package org.rschwietzke.devoxxpl24;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.rschwietzke.Benchmark;
-import org.rschwietzke.devoxxpl24.BRC60_49inMT.Temperatures;
 
 /**
- * Trying to store less data by doing min and max as well as temperature as
- * short instead of int... but that does not really do much.
+ * Giving up on the BRC46 idea and just remove an branch from the putOrUpdate
  *
  * @author Rene Schwietzke
  */
-public class BRC50_Short extends Benchmark
+public class BRC60_49inMT extends Benchmark
 {
+    private static final int DIGITOFFSET = 48;
+
     /**
      * Holds our temperature data without the station, because the
      * map already knows that
@@ -55,7 +61,7 @@ public class BRC50_Short extends Benchmark
         }
 
         /**
-         * Combine two temperatures
+         * Simply add another temperature value to this one
          *
          * @param value the temperature to add
          */
@@ -98,6 +104,11 @@ public class BRC50_Short extends Benchmark
             return hashCode;
         }
 
+        /**
+         * Return -1 if equals
+         * @param other
+         * @return -1 of equals otherwise the pos where it differs
+         */
         public int customEquals(final byte[] other)
         {
             return Arrays.mismatch(data, 0, data.length, other, 0, other.length);
@@ -145,13 +156,26 @@ public class BRC50_Short extends Benchmark
         int semicolonPos = -1;
 
         int hashCode;
-        short temperature;
+        int temperature;
+
+        final long from;
+        final long to;
 
         boolean EOF = false;
 
-        public Line(final RandomAccessFile file)
+        public Line(final RandomAccessFile file, long from, long to)
         {
             this.file = file;
+            this.from = from;
+            this.to = to;
+        }
+
+        public void forward()
+        {
+            if (from != 0)
+            {
+
+            }
         }
 
         private int moveData()
@@ -225,7 +249,7 @@ public class BRC50_Short extends Benchmark
             // we don't check if we have enough data because we have correct
             // data and we read early enough to have always a full line in the buffer
             byte b = data[i++];
-            short negative;
+            int negative;
 
             // can be - or 0..9
             if (b == '-')
@@ -240,7 +264,7 @@ public class BRC50_Short extends Benchmark
             }
 
             // ok, number for sure, -9 or 9
-            short value = b;
+            int value = b;
             b = data[i++];
 
             // now -99 or -9. or 99 or 9.
@@ -253,7 +277,7 @@ public class BRC50_Short extends Benchmark
                 this.newlinePos = i + 1;
                 this.pos = i + 2;
 
-                this.temperature = (short) (negative * (value - DIGITOFFSET - DIGITOFFSET * 10));
+                this.temperature = negative * (value - DIGITOFFSET - DIGITOFFSET * 10);
             }
             else
             {
@@ -272,7 +296,7 @@ public class BRC50_Short extends Benchmark
                 this.newlinePos = i + 1;
                 this.pos = i + 2;
 
-                this.temperature = (short) (negative * (value - DIGITOFFSET - DIGITOFFSET * 10 - DIGITOFFSET * 100));
+                this.temperature = negative * (value - DIGITOFFSET - DIGITOFFSET * 10 - DIGITOFFSET * 100);
             }
         }
 
@@ -288,39 +312,6 @@ public class BRC50_Short extends Benchmark
             return new String(data);
         }
     }
-
-    @Override
-    public String run(final String fileName) throws IOException
-    {
-        // our cities with temperatures, assume we get about 400, so we get us decent space
-        final FastHashSet cities = new FastHashSet(4096);
-
-        try (var raf = new RandomAccessFile(fileName, "r"))
-        {
-            final Line line = new Line(raf);
-
-            for (;;)
-            {
-                line.read();
-                cities.putOrUpdate(line);
-
-                if (line.EOF)
-                {
-                    break;
-                }
-            }
-            // crawl to the end
-            for (; line.pos < line.end; )
-            {
-                line.read();
-                cities.putOrUpdate(line);
-            }
-        }
-
-        return cities.toTreeMap().toString();
-    }
-
-    private static final int DIGITOFFSET = 48;
 
     static class FastHashSet
     {
@@ -418,6 +409,24 @@ public class BRC50_Short extends Benchmark
                     return;
                 }
             }
+        }
+
+        /**
+         * Add another set to this one
+         * @param set
+         */
+        public void add(FastHashSet set)
+        {
+            final int length = set.m_data.length;
+            for (int i = 0; i < length; i++)
+            {
+                final Temperatures t = set.m_data[i];
+                if (t != FREE_KEY)
+                {
+                    this.put(t);
+                }
+            }
+
         }
 
         private void put(final Temperatures key)
@@ -561,11 +570,92 @@ public class BRC50_Short extends Benchmark
         }
     }
 
+    static class LineTask implements Callable<FastHashSet>
+    {
+        String fileName;
+        long from;
+        long to;
+
+        public LineTask(String fileName, long from, long to)
+        {
+            this.from = from;
+            this.to = to;
+            this.fileName = fileName;
+        }
+
+        @Override
+        public FastHashSet call() throws Exception
+        {
+            // our cities with temperatures, assume we get about 400, so we get us decent space
+            final FastHashSet cities = new FastHashSet(4096);
+
+            try (var raf = new RandomAccessFile(this.fileName, "r"))
+            {
+                final Line line = new Line(raf, from, to);
+
+                // ok, if needed, forward first
+                line.forward();
+
+                for (;;)
+                {
+                    line.read();
+                    cities.putOrUpdate(line);
+
+                    if (line.EOF)
+                    {
+                        break;
+                    }
+                }
+                // crawl to the end
+                for (; line.pos < line.end; )
+                {
+                    line.read();
+                    cities.putOrUpdate(line);
+                }
+            }
+
+            return cities;
+        }
+    }
+
+    @Override
+    public String run(final String fileName) throws IOException
+    {
+        var threads = Runtime.getRuntime().availableProcessors();
+        var service = new ExecutorCompletionService<FastHashSet>(Executors.newFixedThreadPool(threads));
+
+        var futures = new ArrayList<Future<FastHashSet>>(threads);
+        for (int i = 0; i < threads; i++)
+        {
+            futures.add(service.submit(new LineTask(fileName, 0, 1)));
+        }
+
+        var totalSet = new FastHashSet(4096);
+        for (var future : futures)
+        {
+            try
+            {
+                var set = future.get();
+                totalSet.add(set);
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
+            }
+            catch (ExecutionException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return totalSet.toString();
+    }
+
     /**
      * Just to run our benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC50_Short.class, args);
+        Benchmark.run(BRC60_49inMT.class, args);
     }
 }

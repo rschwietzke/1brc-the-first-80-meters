@@ -433,7 +433,7 @@ public class BRC40i_FastHashSet
      * @throws IllegalArgumentException if the necessary size is larger than 2<sup>30</sup>.
      */
     public static int arraySize( final int expected, final float f ) {
-        final long s = Math.max( 2, nextPowerOfTwo( (long)Math.ceil( expected / f ) ) );
+        final long s = Math.max( 2, nextPowerOfTwo(expected));
         if ( s > (1 << 30) )
         {
             throw new IllegalArgumentException( "Too large (" + expected + " expected elements with load factor " + f + ")" );

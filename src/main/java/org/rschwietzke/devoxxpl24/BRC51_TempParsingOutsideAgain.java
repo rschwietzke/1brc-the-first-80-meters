@@ -24,12 +24,12 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.devoxxpl24.BRC60_49inMT.Temperatures;
 
 /**
- * Trying to store less data by doing min and max as well as temperature as
- * short instead of int... but that does not really do much.
+ * Bring back the external parse method because it is faster in
+ * microbenchmarks.
  *
  * @author Rene Schwietzke
  */
-public class BRC50_Short extends Benchmark
+public class BRC51_TempParsingOutsideAgain extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -145,7 +145,7 @@ public class BRC50_Short extends Benchmark
         int semicolonPos = -1;
 
         int hashCode;
-        short temperature;
+        int temperature;
 
         boolean EOF = false;
 
@@ -217,7 +217,6 @@ public class BRC50_Short extends Benchmark
             }
 
             this.semicolonPos = i++;
-            // spread
             this.hashCode = h;
 
             // we know for the numbers that we are very fix in length,
@@ -225,7 +224,7 @@ public class BRC50_Short extends Benchmark
             // we don't check if we have enough data because we have correct
             // data and we read early enough to have always a full line in the buffer
             byte b = data[i++];
-            short negative;
+            int negative;
 
             // can be - or 0..9
             if (b == '-')
@@ -240,7 +239,7 @@ public class BRC50_Short extends Benchmark
             }
 
             // ok, number for sure, -9 or 9
-            short value = b;
+            int value = b;
             b = data[i++];
 
             // now -99 or -9. or 99 or 9.
@@ -253,7 +252,7 @@ public class BRC50_Short extends Benchmark
                 this.newlinePos = i + 1;
                 this.pos = i + 2;
 
-                this.temperature = (short) (negative * (value - DIGITOFFSET - DIGITOFFSET * 10));
+                this.temperature = negative * (value - DIGITOFFSET - DIGITOFFSET * 10);
             }
             else
             {
@@ -272,7 +271,7 @@ public class BRC50_Short extends Benchmark
                 this.newlinePos = i + 1;
                 this.pos = i + 2;
 
-                this.temperature = (short) (negative * (value - DIGITOFFSET - DIGITOFFSET * 10 - DIGITOFFSET * 100));
+                this.temperature = negative * (value - DIGITOFFSET - DIGITOFFSET * 10 - DIGITOFFSET * 100);
             }
         }
 
@@ -420,7 +419,7 @@ public class BRC50_Short extends Benchmark
             }
         }
 
-        private void put(final Temperatures key)
+        private Temperatures put(final Temperatures key)
         {
             final int hash = key.hashCode();
             int ptr = hash & m_mask;
@@ -430,19 +429,16 @@ public class BRC50_Short extends Benchmark
             {
                 m_data[ ptr ] = key;
                 if ( m_size >= m_threshold )
-                {
                     rehash( m_data.length * 2 ); //size is set inside
-                }
                 else
-                {
                     ++m_size;
-                }
-                return;
+                return null;
             }
             else if (k.customEquals( key.data ) == -1)
             {
-                k.merge(key);
-                return;
+                final Temperatures ret = m_data[ptr];
+                m_data[ptr] = key;
+                return ret;
             }
 
             while ( true )
@@ -453,19 +449,16 @@ public class BRC50_Short extends Benchmark
                 {
                     m_data[ ptr ] = key;
                     if ( m_size >= m_threshold )
-                    {
                         rehash( m_data.length * 2 ); //size is set inside
-                    }
                     else
-                    {
                         ++m_size;
-                    }
-                    return;
+                    return null;
                 }
                 else if ( k.customEquals( key.data ) == -1)
                 {
-                    k.merge(key);
-                    return;
+                    final Temperatures ret = m_data[ptr];
+                    m_data[ptr] = key;
+                    return ret;
                 }
             }
         }
@@ -566,6 +559,6 @@ public class BRC50_Short extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC50_Short.class, args);
+        Benchmark.run(BRC51_TempParsingOutsideAgain.class, args);
     }
 }
