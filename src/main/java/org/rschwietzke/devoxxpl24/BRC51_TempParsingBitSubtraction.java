@@ -28,7 +28,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC51_TempParsingOutsideAgain extends Benchmark
+public class BRC51_TempParsingBitSubtraction extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -240,7 +240,7 @@ public class BRC51_TempParsingOutsideAgain extends Benchmark
                     // got no . so 9[9].9
                     value = value * 10 + dot;
 
-                    // skip .
+                    // skip the coming dot
                     i++;
                 }
                 else
@@ -568,6 +568,6 @@ public class BRC51_TempParsingOutsideAgain extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC51_TempParsingOutsideAgain.class, args);
+        Benchmark.run(BRC51_TempParsingBitSubtraction.class, args);
     }
 }

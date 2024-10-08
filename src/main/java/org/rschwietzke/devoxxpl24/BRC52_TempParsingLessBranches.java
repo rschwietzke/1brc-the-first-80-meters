@@ -23,11 +23,12 @@ import java.util.TreeMap;
 import org.rschwietzke.Benchmark;
 
 /**
- * Giving up on the BRC46 idea and just remove an branch from the putOrUpdate
+ * Bring back the external parse method because it is faster in
+ * microbenchmarks.
  *
  * @author Rene Schwietzke
  */
-public class BRC49_OffsetSubtraction extends Benchmark
+public class BRC52_TempParsingLessBranches extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -221,56 +222,66 @@ public class BRC49_OffsetSubtraction extends Benchmark
             // so let's read forward
             // we don't check if we have enough data because we have correct
             // data and we read early enough to have always a full line in the buffer
-            byte b = data[i++];
-            int negative;
+
+            // could be 9 or -
+            int value = data[i++];
 
             // can be - or 0..9
-            if (b == '-')
+            if (value == '-')
             {
-                negative = -1;
-                // read number again
-                b = data[i++];
-            }
+                // got a - so it is -[9]9.9 or -[9].9
+                // next is a number, overwrite value
+                value = data[i++] ^ DIGITOFFSET;
+
+                // next is -9[9].9 or -9[.]9
+                var dot = data[i++];
+                if (dot >= '0')
+                {
+                    // got no . so 9[9].9
+                    value = value * 10 + (dot ^ DIGITOFFSET);
+
+                    // skip .
+                    i++;
+                }
+                else
+                {
+                    // drop . read
+                }
+
+                // next is -99[.]9 or -9.[9]
+                value = value * 10 + (data[i++] ^ DIGITOFFSET);
+
+                this.temperature = -value;
+                this.pos = i + 1;
+                this.newlinePos = i;            }
             else
             {
-                negative = 1;
-            }
+                // [9]9.9 or [9].9
+                // already read one number
+                // just make this a number
+                value = value ^ DIGITOFFSET;
 
-            // ok, number for sure, -9 or 9
-            int value = b;
-            b = data[i++];
+                // next is 9[9].9 or 9[.]9
+                var dot = data[i++];
+                if (dot >= '0')
+                {
+                    // got no . so read 9[9].9
+                    value = value * 10 + (dot ^ DIGITOFFSET);
 
-            // now -99 or -9. or 99 or 9.
-            if (b == '.')
-            {
-                // read again for the data after the .
-                b = data[i];
-                value *= 10;
-                value += b;
-                this.newlinePos = i + 1;
-                this.pos = i + 2;
+                    // skip .
+                    i++;
+                }
+                else
+                {
+                    // drop . read
+                }
 
-                this.temperature = negative * (value - DIGITOFFSET - DIGITOFFSET * 10);
-            }
-            else
-            {
-                // was -99 or 99
-                value *= 10;
-                value += b;
+                // next is 99[.]9 or 9.[9]
+                value = value * 10 + (data[i++] ^ DIGITOFFSET);
 
-                // we have seen the end now for certain
-                // skip over .
-                i++;
-                byte b2 = data[i];
-
-                value *= 10;
-                value += b2;
-
-                this.newlinePos = i + 1;
-                this.pos = i + 2;
-
-                this.temperature = negative * (value - DIGITOFFSET - DIGITOFFSET * 10 - DIGITOFFSET * 100);
-            }
+                this.temperature = value;
+                this.pos = i + 1;
+                this.newlinePos = i;            }
         }
 
         @Override
@@ -557,6 +568,6 @@ public class BRC49_OffsetSubtraction extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC49_OffsetSubtraction.class, args);
+        Benchmark.run(BRC52_TempParsingLessBranches.class, args);
     }
 }
