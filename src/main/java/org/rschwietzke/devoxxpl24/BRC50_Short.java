@@ -217,7 +217,6 @@ public class BRC50_Short extends Benchmark
             }
 
             this.semicolonPos = i++;
-            // spread
             this.hashCode = h;
 
             // we know for the numbers that we are very fix in length,

@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
-import org.rschwietzke.devoxxpl24.BRC60_49inMT.Temperatures;
 
 /**
  * Bring back the external parse method because it is faster in
@@ -223,55 +222,65 @@ public class BRC51_TempParsingOutsideAgain extends Benchmark
             // so let's read forward
             // we don't check if we have enough data because we have correct
             // data and we read early enough to have always a full line in the buffer
-            byte b = data[i++];
-            int negative;
+
+            // could be 9 or -
+            int value = data[i++] - DIGITOFFSET;
 
             // can be - or 0..9
-            if (b == '-')
+            if (value < 0)
             {
-                negative = -1;
-                // read number again
-                b = data[i++];
+                // got a - so it is -[9]9.9 or -[9].9
+                // next is a number, overwrite value
+                value = data[i++] - DIGITOFFSET;
+
+                // next is -9[9].9 or -9[.]9
+                var dot = data[i++] - DIGITOFFSET;
+                if (dot >= 0)
+                {
+                    // got no . so 9[9].9
+                    value = value * 10 + dot;
+
+                    // skip .
+                    i++;
+                }
+                else
+                {
+                    // drop . read
+                }
+
+                // next is -99[.]9 or -9.[9]
+                value = value * 10 + data[i++] - DIGITOFFSET;
+
+                this.temperature = -value;
+                this.pos = i + 1;
+                this.newlinePos = i;
             }
             else
             {
-                negative = 1;
-            }
+                // [9]9.9 or [9].9
+                // already read one number
 
-            // ok, number for sure, -9 or 9
-            int value = b;
-            b = data[i++];
+                // next is 9[9].9 or 9[.]9
+                var dot = data[i++] - DIGITOFFSET;
+                if (dot >= 0)
+                {
+                    // got no . so read 9[9].9
+                    value = value * 10 + dot;
 
-            // now -99 or -9. or 99 or 9.
-            if (b == '.')
-            {
-                // read again for the data after the .
-                b = data[i];
-                value *= 10;
-                value += b;
-                this.newlinePos = i + 1;
-                this.pos = i + 2;
+                    // skip .
+                    i++;
+                }
+                else
+                {
+                    // drop . read
+                }
 
-                this.temperature = negative * (value - DIGITOFFSET - DIGITOFFSET * 10);
-            }
-            else
-            {
-                // was -99 or 99
-                value *= 10;
-                value += b;
+                // next is 99[.]9 or 9.[9]
+                value = value * 10 + data[i++] - DIGITOFFSET;
 
-                // we have seen the end now for certain
-                // skip over .
-                i++;
-                byte b2 = data[i];
-
-                value *= 10;
-                value += b2;
-
-                this.newlinePos = i + 1;
-                this.pos = i + 2;
-
-                this.temperature = negative * (value - DIGITOFFSET - DIGITOFFSET * 10 - DIGITOFFSET * 100);
+                this.temperature = value;
+                this.pos = i + 1;
+                this.newlinePos = i;
             }
         }
 
