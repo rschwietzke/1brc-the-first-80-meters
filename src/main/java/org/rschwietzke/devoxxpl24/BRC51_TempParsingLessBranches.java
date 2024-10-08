@@ -28,7 +28,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC52_TempParsingLessBranches extends Benchmark
+public class BRC51_TempParsingLessBranches extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -224,23 +224,23 @@ public class BRC52_TempParsingLessBranches extends Benchmark
             // data and we read early enough to have always a full line in the buffer
 
             // could be 9 or -
-            int value = data[i++];
+            int value = data[i++] - DIGITOFFSET;
 
             // can be - or 0..9
-            if (value == '-')
+            if (value < 0)
             {
                 // got a - so it is -[9]9.9 or -[9].9
                 // next is a number, overwrite value
-                value = data[i++] ^ DIGITOFFSET;
+                value = data[i++] - DIGITOFFSET;
 
                 // next is -9[9].9 or -9[.]9
-                var dot = data[i++];
-                if (dot >= '0')
+                var dot = data[i++] - DIGITOFFSET;
+                if (dot >= 0)
                 {
                     // got no . so 9[9].9
-                    value = value * 10 + (dot ^ DIGITOFFSET);
+                    value = value * 10 + dot;
 
-                    // skip .
+                    // skip the coming dot
                     i++;
                 }
                 else
@@ -249,24 +249,23 @@ public class BRC52_TempParsingLessBranches extends Benchmark
                 }
 
                 // next is -99[.]9 or -9.[9]
-                value = value * 10 + (data[i++] ^ DIGITOFFSET);
+                value = value * 10 + data[i++] - DIGITOFFSET;
 
                 this.temperature = -value;
                 this.pos = i + 1;
-                this.newlinePos = i;            }
+                this.newlinePos = i;
+            }
             else
             {
                 // [9]9.9 or [9].9
                 // already read one number
-                // just make this a number
-                value = value ^ DIGITOFFSET;
 
                 // next is 9[9].9 or 9[.]9
-                var dot = data[i++];
-                if (dot >= '0')
+                var dot = data[i++] - DIGITOFFSET;
+                if (dot >= 0)
                 {
                     // got no . so read 9[9].9
-                    value = value * 10 + (dot ^ DIGITOFFSET);
+                    value = value * 10 + dot;
 
                     // skip .
                     i++;
@@ -277,11 +276,12 @@ public class BRC52_TempParsingLessBranches extends Benchmark
                 }
 
                 // next is 99[.]9 or 9.[9]
-                value = value * 10 + (data[i++] ^ DIGITOFFSET);
+                value = value * 10 + data[i++] - DIGITOFFSET;
 
                 this.temperature = value;
                 this.pos = i + 1;
-                this.newlinePos = i;            }
+                this.newlinePos = i;
+            }
         }
 
         @Override
@@ -568,6 +568,6 @@ public class BRC52_TempParsingLessBranches extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC52_TempParsingLessBranches.class, args);
+        Benchmark.run(BRC51_TempParsingLessBranches.class, args);
     }
 }
