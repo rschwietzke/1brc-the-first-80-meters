@@ -78,7 +78,7 @@ public class CreateExtendedMeasurements
 
         // read all stations
         final List<String> cities = Files.lines(
-                Path.of(CreateOriginalMeasurements.class.getResource("/cities.txt").toURI()))
+                Path.of(CreateExtendedMeasurements.class.getResource("/cities.txt").toURI()))
                 .filter(c -> !c.trim().startsWith("#"))
                 .sorted()
                 .collect(Collectors.toList());
