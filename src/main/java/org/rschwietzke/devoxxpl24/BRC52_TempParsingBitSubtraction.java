@@ -23,8 +23,7 @@ import java.util.TreeMap;
 import org.rschwietzke.Benchmark;
 
 /**
- * Bring back the external parse method because it is faster in
- * microbenchmarks.
+ *
  *
  * @author Rene Schwietzke
  */
