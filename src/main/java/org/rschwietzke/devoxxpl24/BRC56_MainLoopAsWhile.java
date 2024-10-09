@@ -27,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC55_SimplerPutCall extends Benchmark
+public class BRC56_MainLoopAsWhile extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -306,16 +306,12 @@ public class BRC55_SimplerPutCall extends Benchmark
         {
             final Line line = new Line(raf);
 
-            for (;;)
+            while (!line.EOF)
             {
                 line.read();
                 cities.putOrUpdate(line);
-
-                if (line.EOF)
-                {
-                    break;
-                }
             }
+
             // crawl to the end
             for (; line.pos < line.end; )
             {
@@ -572,6 +568,6 @@ public class BRC55_SimplerPutCall extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC55_SimplerPutCall.class, args);
+        Benchmark.run(BRC56_MainLoopAsWhile.class, args);
     }
 }
