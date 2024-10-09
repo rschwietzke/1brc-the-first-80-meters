@@ -404,6 +404,7 @@ public class BRC55_SimplerPutCall extends Benchmark
 
         private void putOrUpdateSlow(final Line line, int ptr)
         {
+            outer:
             while (true)
             {
                 ptr = (ptr + 1) & m_mask; //that's next index
@@ -415,9 +416,9 @@ public class BRC55_SimplerPutCall extends Benchmark
                     put(line);
                     return;
                 }
+                // we do the slower mismatch here, rare, don't care at the moment
                 else
                 {
-                    // ok, this next one is taken, so check if this is what we are looking for
                     final int l = line.semicolonPos - line.lineStartPos;
 
                     // check length first
@@ -425,12 +426,13 @@ public class BRC55_SimplerPutCall extends Benchmark
                     {
                         // iterate old fashioned
                         int start = line.lineStartPos;
-                        for (int i = 0; i < l; i++)
+                        int i = 0;
+                        for (; i < l; i++)
                         {
                             if (k.data[i] != line.data[start + i])
                             {
                                 // no match, look again
-                                continue;
+                                continue outer;
                             }
                         }
 
@@ -444,45 +446,33 @@ public class BRC55_SimplerPutCall extends Benchmark
 
         private Temperatures put(final Temperatures key)
         {
-            final int hash = key.hashCode();
-            int ptr = hash & m_mask;
-            Temperatures k = m_data[ptr];
-
-            if ( k == FREE_KEY ) //end of chain already
-            {
-                m_data[ ptr ] = key;
-                if ( m_size >= m_threshold )
-                    rehash( m_data.length * 2 ); //size is set inside
-                else
-                    ++m_size;
-                return null;
-            }
-            else if (k.customEquals( key.data ) == -1)
-            {
-                final Temperatures ret = m_data[ptr];
-                m_data[ptr] = key;
-                return ret;
-            }
+            int ptr = key.hashCode();
 
             while ( true )
             {
-                ptr = (ptr + 1) & m_mask; //that's next index calculation
-                k = m_data[ ptr ];
+                ptr = ptr & m_mask; //that's next index calculation
+                final Temperatures k = m_data[ptr];
+
                 if ( k == FREE_KEY )
                 {
-                    m_data[ ptr ] = key;
+                    m_data[ptr] = key;
                     if ( m_size >= m_threshold )
+                    {
                         rehash( m_data.length * 2 ); //size is set inside
+                    }
                     else
+                    {
                         ++m_size;
+                    }
                     return null;
                 }
-                else if ( k.customEquals( key.data ) == -1)
+                else if (k.customEquals( key.data ) == -1)
                 {
                     final Temperatures ret = m_data[ptr];
                     m_data[ptr] = key;
                     return ret;
                 }
+                ptr++;
             }
         }
 
@@ -557,10 +547,10 @@ public class BRC55_SimplerPutCall extends Benchmark
             x--;
             x |= x >> 1;
             x |= x >> 2;
-                x |= x >> 4;
-                x |= x >> 8;
-                x |= x >> 16;
-                return ( x | x >> 32 ) + 1;
+            x |= x >> 4;
+            x |= x >> 8;
+            x |= x >> 16;
+            return ( x | x >> 32 ) + 1;
         }
 
         /** Returns the least power of two smaller than or equal to 2<sup>30</sup> and larger than or equal to <code>Math.ceil( expected / f )</code>.
