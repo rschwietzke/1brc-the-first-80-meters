@@ -184,12 +184,12 @@ public class BRC48_FixedFactor extends Benchmark
             int i = pos;
             for (;;)
             {
-                i++;
                 final byte b = data[i];
                 if (b == ';')
                 {
                     break;
                 }
+                i++;
                 var x = h << 5;
                 var y = -h + b;
                 h = x + y;
