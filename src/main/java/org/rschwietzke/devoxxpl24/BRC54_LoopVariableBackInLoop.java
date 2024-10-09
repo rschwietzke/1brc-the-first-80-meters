@@ -375,6 +375,7 @@ public class BRC54_LoopVariableBackInLoop extends Benchmark
                             putOrUpdateSlow(line, ptr);
                             return;
                         }
+
                     }
 
                     k.add(line.temperature);
