@@ -42,8 +42,13 @@ public class CreateExtendedMeasurements
 
         double measurement()
         {
-            final double m = r.nextGaussian(meanTemperature, 10);
-            return Math.round(m * 10.0) / 10.0;
+            var result = 10000d;
+            while (result >= 100 || result <= -100)
+            {
+                double m = r.nextGaussian(meanTemperature, 10);
+                result = Math.round(m * 10.0) / 10.0;
+            }
+            return result;
         }
     }
 
@@ -95,6 +100,7 @@ public class CreateExtendedMeasurements
                 WeatherStation station = stations.get(r.nextInt(stations.size()));
                 bw.write(station.id);
                 bw.write(";" + station.measurement());
+
                 bw.write('\n');
             }
         }
