@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
-import org.rschwietzke.devoxxpl24.BRC60_49inMT.Temperatures;
 
 /**
  * Trying to store less data by doing min and max as well as temperature as
