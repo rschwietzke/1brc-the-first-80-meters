@@ -407,19 +407,37 @@ public class BRC55_SimplerPutCall extends Benchmark
             while (true)
             {
                 ptr = (ptr + 1) & m_mask; //that's next index
-                Temperatures k = m_data[ ptr ];
+                final Temperatures k = m_data[ptr];
 
-                if ( k == FREE_KEY )
+                if (k == FREE_KEY)
                 {
                     // proper put
                     put(line);
                     return;
                 }
-                // we do the slower mismatch here, rate
-                else if (Arrays.mismatch(k.data, 0, k.data.length, line.data, line.lineStartPos, line.semicolonPos) == -1)
+                else
                 {
-                    k.add(line.temperature);
-                    return;
+                    // ok, this next one is taken, so check if this is what we are looking for
+                    final int l = line.semicolonPos - line.lineStartPos;
+
+                    // check length first
+                    if (l == k.data.length)
+                    {
+                        // iterate old fashioned
+                        int start = line.lineStartPos;
+                        for (int i = 0; i < l; i++)
+                        {
+                            if (k.data[i] != line.data[start + i])
+                            {
+                                // no match, look again
+                                continue;
+                            }
+                        }
+
+                        // matched
+                        k.add(line.temperature);
+                        return;
+                    }
                 }
             }
         }
