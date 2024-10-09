@@ -27,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC53_SetEqualsLoopChanged extends Benchmark
+public class BRC53_SetEqualsNoLocalAssignment extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -566,6 +566,6 @@ public class BRC53_SetEqualsLoopChanged extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC53_SetEqualsLoopChanged.class, args);
+        Benchmark.run(BRC53_SetEqualsNoLocalAssignment.class, args);
     }
 }
