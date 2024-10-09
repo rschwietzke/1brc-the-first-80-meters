@@ -27,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC57_SimplerHashing extends Benchmark
+public class BRC58 extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -209,7 +209,9 @@ public class BRC57_SimplerHashing extends Benchmark
                 {
                     break;
                 }
-                h ^= b + (h << 5);
+                var x = h << 5;
+                var y = b - h;
+                h = x + y;
             }
 
             this.semicolonPos = i++;
@@ -298,7 +300,7 @@ public class BRC57_SimplerHashing extends Benchmark
     public String run(final String fileName) throws IOException
     {
         // our cities with temperatures, assume we get about 400, so we get us decent space
-        final FastHashSet cities = new FastHashSet(4096 << 1);
+        final FastHashSet cities = new FastHashSet(4096);
 
         try (var raf = new RandomAccessFile(fileName, "r"))
         {
@@ -341,9 +343,11 @@ public class BRC57_SimplerHashing extends Benchmark
 
         public FastHashSet(final int size)
         {
-            m_mask = size - 1;
-            m_data = new Temperatures[size];
-            m_threshold = (int) (size * 0.5f);
+            final int capacity = arraySize(size, 0.5f);
+            m_mask = capacity - 1;
+
+            m_data = new Temperatures[capacity];
+            m_threshold = (int) (capacity * 0.5f);
         }
 
         public void putOrUpdate(final Line line)
@@ -516,6 +520,47 @@ public class BRC57_SimplerHashing extends Benchmark
 
             return result;
         }
+
+        /**
+         * Clears the map, reuses the data structure by clearing it out.
+         * It won't shrink the underlying array!
+         */
+        public void clear()
+        {
+            this.m_size = 0;
+            Arrays.fill(m_data, FREE_KEY);
+        }
+
+        /** Return the least power of two greater than or equal to the specified value.
+         *
+         * <p>Note that this function will return 1 when the argument is 0.
+         *
+         * @param x a long integer smaller than or equal to 2<sup>62</sup>.
+         * @return the least power of two greater than or equal to the specified value.
+         */
+        public static long nextPowerOfTwo( long x ) {
+            if ( x == 0 ) return 1;
+            x--;
+            x |= x >> 1;
+            x |= x >> 2;
+            x |= x >> 4;
+            x |= x >> 8;
+            x |= x >> 16;
+            return ( x | x >> 32 ) + 1;
+        }
+
+        /** Returns the least power of two smaller than or equal to 2<sup>30</sup> and larger than or equal to <code>Math.ceil( expected / f )</code>.
+         *
+         * @param expected the expected number of elements in a hash table.
+         * @param f the load factor.
+         * @return the minimum possible size for a backing array.
+         * @throws IllegalArgumentException if the necessary size is larger than 2<sup>30</sup>.
+         */
+        public static int arraySize( final int expected, final float f ) {
+            final long s = Math.max( 2, nextPowerOfTwo( (long)Math.ceil( expected / f ) ) );
+            if ( s > (1 << 30) ) throw new IllegalArgumentException( "Too large (" + expected + " expected elements with load factor " + f + ")" );
+            return (int)s;
+        }
     }
 
     /**
@@ -523,6 +568,6 @@ public class BRC57_SimplerHashing extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC57_SimplerHashing.class, args);
+        Benchmark.run(BRC58.class, args);
     }
 }

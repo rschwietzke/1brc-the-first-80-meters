@@ -194,13 +194,13 @@ public class BRC56_MainLoopAsWhile extends Benchmark
             }
             else
             {
-                lineStartPos = pos;
+                this.lineStartPos = this.pos;
             }
 
             // look for semicolon and new line
             // when checking for semicolon, we do the hashcode right away
             int h = 0;
-            int i = pos;
+            int i = this.pos;
             for (;;)
             {
                 i++;
