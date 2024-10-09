@@ -298,7 +298,7 @@ public class BRC57_SimplerHashing extends Benchmark
     public String run(final String fileName) throws IOException
     {
         // our cities with temperatures, assume we get about 400, so we get us decent space
-        final FastHashSet cities = new FastHashSet(4096);
+        final FastHashSet cities = new FastHashSet(4096 << 1);
 
         try (var raf = new RandomAccessFile(fileName, "r"))
         {
