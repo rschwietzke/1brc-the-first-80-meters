@@ -203,7 +203,6 @@ public class BRC58 extends Benchmark
             int i = this.pos;
             for (;;)
             {
-                i++;
                 final byte b = data[i];
                 if (b == ';')
                 {
@@ -212,6 +211,8 @@ public class BRC58 extends Benchmark
                 var x = h << 5;
                 var y = b - h;
                 h = x + y;
+
+                i++;
             }
 
             this.semicolonPos = i++;
