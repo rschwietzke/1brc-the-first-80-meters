@@ -27,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC61_BitShiftMul10 extends Benchmark
+public class BRC61_BitShiftMul10Void extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -584,6 +584,6 @@ public class BRC61_BitShiftMul10 extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC61_BitShiftMul10.class, args);
+        Benchmark.run(BRC61_BitShiftMul10Void.class, args);
     }
 }
