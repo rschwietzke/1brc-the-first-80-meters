@@ -214,6 +214,8 @@ public class BRC60_FeedCPUUnrollSemicolonLoop extends Benchmark
 
                 i++;
 
+                // we can safely do that because we know there will be more afterwards aka
+                // numbers
                 final byte b2 = data[i];
                 if (b2 == ';')
                 {
@@ -222,6 +224,17 @@ public class BRC60_FeedCPUUnrollSemicolonLoop extends Benchmark
                 var x2 = h << 5;
                 var y2 = b2 - h;
                 h = x2 + y2;
+
+                i++;
+
+                final byte b3 = data[i];
+                if (b3 == ';')
+                {
+                    break;
+                }
+                var x3 = h << 5;
+                var y3 = b3 - h;
+                h = x3 + y3;
 
                 i++;
             }
