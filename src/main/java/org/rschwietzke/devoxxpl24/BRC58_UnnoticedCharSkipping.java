@@ -27,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC58 extends Benchmark
+public class BRC58_UnnoticedCharSkipping extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -569,6 +569,6 @@ public class BRC58 extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC58.class, args);
+        Benchmark.run(BRC58_UnnoticedCharSkipping.class, args);
     }
 }
