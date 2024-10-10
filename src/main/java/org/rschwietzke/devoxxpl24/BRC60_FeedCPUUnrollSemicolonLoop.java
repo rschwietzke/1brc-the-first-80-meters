@@ -27,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC60_LargerBuffer extends Benchmark
+public class BRC60_FeedCPUUnrollSemicolonLoop extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -128,7 +128,7 @@ public class BRC60_LargerBuffer extends Benchmark
 
     static class Line
     {
-        private static int MIN_BUFFERSIZE = 10_000_000;
+        private static int MIN_BUFFERSIZE = 1_000_000;
         private static int REMAINING_MIN_BUFFERSIZE = 200;
 
         private final byte[] data = new byte[MIN_BUFFERSIZE];
@@ -211,6 +211,17 @@ public class BRC60_LargerBuffer extends Benchmark
                 var x = h << 5;
                 var y = b - h;
                 h = x + y;
+
+                i++;
+
+                final byte b2 = data[i];
+                if (b2 == ';')
+                {
+                    break;
+                }
+                var x2 = h << 5;
+                var y2 = b2 - h;
+                h = x2 + y2;
 
                 i++;
             }
@@ -569,6 +580,6 @@ public class BRC60_LargerBuffer extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC60_LargerBuffer.class, args);
+        Benchmark.run(BRC60_FeedCPUUnrollSemicolonLoop.class, args);
     }
 }
