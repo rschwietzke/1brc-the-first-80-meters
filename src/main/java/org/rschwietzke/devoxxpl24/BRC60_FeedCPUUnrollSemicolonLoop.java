@@ -226,17 +226,6 @@ public class BRC60_FeedCPUUnrollSemicolonLoop extends Benchmark
                 h = x2 + y2;
 
                 i++;
-
-                final byte b3 = data[i];
-                if (b3 == ';')
-                {
-                    break;
-                }
-                var x3 = h << 5;
-                var y3 = b3 - h;
-                h = x3 + y3;
-
-                i++;
             }
 
             this.semicolonPos = i++;
@@ -277,7 +266,8 @@ public class BRC60_FeedCPUUnrollSemicolonLoop extends Benchmark
 
                 this.temperature = -value;
                 this.pos = i + 1;
-                this.newlinePos = i;            }
+                this.newlinePos = i;
+            }
             else
             {
                 // [9]9.9 or [9].9
@@ -305,7 +295,8 @@ public class BRC60_FeedCPUUnrollSemicolonLoop extends Benchmark
 
                 this.temperature = value;
                 this.pos = i + 1;
-                this.newlinePos = i;            }
+                this.newlinePos = i;
+            }
         }
 
         @Override
