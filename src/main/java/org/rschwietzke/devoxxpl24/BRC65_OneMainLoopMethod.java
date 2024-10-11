@@ -413,7 +413,6 @@ public class BRC65_OneMainLoopMethod extends Benchmark
 
                     // we got a collision
                     ptr = (ptr + 1) & m_mask; //that's next index
-                    continue;
                 }
                 else
                 {
