@@ -359,7 +359,8 @@ public class BRC63_Equals extends Benchmark
 
         public FastHashSet(final int size)
         {
-            final int capacity = arraySize(size, 0.5f);
+            // no check for power of 2, so be careful
+            final int capacity = size;
             m_mask = capacity - 1;
 
             m_data = new Temperatures[capacity];
@@ -470,7 +471,7 @@ public class BRC63_Equals extends Benchmark
                     m_data[ptr] = key;
                     if ( m_size >= m_threshold )
                     {
-                        rehash( m_data.length * 2 ); //size is set inside
+                        rehash( m_data.length << 2 ); //size is set inside
                     }
                     else
                     {
@@ -493,22 +494,21 @@ public class BRC63_Equals extends Benchmark
             return m_size;
         }
 
-        private void rehash( final int newcapacity )
+        private void rehash(final int newcapacity)
         {
-            m_threshold = (int) (newcapacity * 0.5f);
-            m_mask = newcapacity - 1;
+            this.m_threshold = (int) (newcapacity * 0.5f);
+            this.m_mask = newcapacity - 1;
 
-            final int oldcapacity = m_data.length;
-            final Temperatures[] oldData = m_data;
+            final int oldcapacity = this.m_data.length;
+            final Temperatures[] oldData = this.m_data;
 
-            m_data = new Temperatures[newcapacity];
+            this.m_data = new Temperatures[newcapacity];
+            this.m_size = 0;
 
-            m_size = 0;
-
-            for ( int i = 0; i < oldcapacity; i++ )
+            for (int i = 0; i < oldcapacity; i++)
             {
-                final Temperatures oldKey = oldData[ i ];
-                if( oldKey != FREE_KEY)
+                final Temperatures oldKey = oldData[i];
+                if (oldKey != FREE_KEY)
                 {
                     put(oldKey);
                 }
@@ -535,47 +535,6 @@ public class BRC63_Equals extends Benchmark
             }
 
             return result;
-        }
-
-        /**
-         * Clears the map, reuses the data structure by clearing it out.
-         * It won't shrink the underlying array!
-         */
-        public void clear()
-        {
-            this.m_size = 0;
-            Arrays.fill(m_data, FREE_KEY);
-        }
-
-        /** Return the least power of two greater than or equal to the specified value.
-         *
-         * <p>Note that this function will return 1 when the argument is 0.
-         *
-         * @param x a long integer smaller than or equal to 2<sup>62</sup>.
-         * @return the least power of two greater than or equal to the specified value.
-         */
-        public static long nextPowerOfTwo( long x ) {
-            if ( x == 0 ) return 1;
-            x--;
-            x |= x >> 1;
-            x |= x >> 2;
-                    x |= x >> 4;
-                x |= x >> 8;
-                x |= x >> 16;
-                return ( x | x >> 32 ) + 1;
-        }
-
-        /** Returns the least power of two smaller than or equal to 2<sup>30</sup> and larger than or equal to <code>Math.ceil( expected / f )</code>.
-         *
-         * @param expected the expected number of elements in a hash table.
-         * @param f the load factor.
-         * @return the minimum possible size for a backing array.
-         * @throws IllegalArgumentException if the necessary size is larger than 2<sup>30</sup>.
-         */
-        public static int arraySize( final int expected, final float f ) {
-            final long s = Math.max( 2, nextPowerOfTwo( (long)Math.ceil( expected / f ) ) );
-            if ( s > (1 << 30) ) throw new IllegalArgumentException( "Too large (" + expected + " expected elements with load factor " + f + ")" );
-            return (int)s;
         }
     }
 
