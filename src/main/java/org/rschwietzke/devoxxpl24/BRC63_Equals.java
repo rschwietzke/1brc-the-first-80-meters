@@ -373,26 +373,29 @@ public class BRC63_Equals extends Benchmark
 
             if ( k != FREE_KEY )
             {
-                int l = Math.min(line.semicolonPos - line.lineStartPos, k.data.length);
-
-                // iterate old fashioned
-                int start = line.lineStartPos;
-                var isEquals = l == k.data.length;
-
-                for (int i = 0; i < l; i++)
-                {
-                    isEquals &= k.data[i] == line.data[start + i];
-                }
+                final int newLength = line.semicolonPos - line.lineStartPos;
+                var isEquals = newLength == k.data.length;
 
                 if (isEquals)
                 {
-                    k.add(line.temperature);
+                    // iterate old fashioned
+                    int start = line.lineStartPos;
+                    for (int i = 0; i < newLength; i++)
+                    {
+                        // unrolling does not help here, tried that
+                        isEquals &= k.data[i] == line.data[start + i];
+                    }
+
+                    if (isEquals)
+                    {
+                        k.add(line.temperature);
+                    }
+                    return;
                 }
-                else
-                {
-                    // we got a collision
-                    putOrUpdateSlow(line, ptr);
-                }
+
+                // we got a collision
+                putOrUpdateSlow(line, ptr);
+                return;
             }
             else
             {
@@ -414,43 +417,43 @@ public class BRC63_Equals extends Benchmark
         private void putOrUpdateSlow(final Line line, int ptr)
         {
             outer:
-            while (true)
-            {
-                ptr = (ptr + 1) & m_mask; //that's next index
-                final Temperatures k = m_data[ptr];
-
-                if (k == FREE_KEY)
+                while (true)
                 {
-                    // proper put
-                    put(line);
-                    return;
-                }
-                // we do the slower mismatch here, rare, don't care at the moment
-                else
-                {
-                    final int l = line.semicolonPos - line.lineStartPos;
+                    ptr = (ptr + 1) & m_mask; //that's next index
+                    final Temperatures k = m_data[ptr];
 
-                    // check length first
-                    if (l == k.data.length)
+                    if (k == FREE_KEY)
                     {
-                        // iterate old fashioned
-                        int start = line.lineStartPos;
-                        int i = 0;
-                        for (; i < l; i++)
-                        {
-                            if (k.data[i] != line.data[start + i])
-                            {
-                                // no match, look again
-                                continue outer;
-                            }
-                        }
-
-                        // matched
-                        k.add(line.temperature);
+                        // proper put
+                        put(line);
                         return;
                     }
+                    // we do the slower mismatch here, rare, don't care at the moment
+                    else
+                    {
+                        final int l = line.semicolonPos - line.lineStartPos;
+
+                        // check length first
+                        if (l == k.data.length)
+                        {
+                            // iterate old fashioned
+                            int start = line.lineStartPos;
+                            int i = 0;
+                            for (; i < l; i++)
+                            {
+                                if (k.data[i] != line.data[start + i])
+                                {
+                                    // no match, look again
+                                    continue outer;
+                                }
+                            }
+
+                            // matched
+                            k.add(line.temperature);
+                            return;
+                        }
+                    }
                 }
-            }
         }
 
         private Temperatures put(final Temperatures key)
@@ -556,10 +559,10 @@ public class BRC63_Equals extends Benchmark
             x--;
             x |= x >> 1;
             x |= x >> 2;
-            x |= x >> 4;
-            x |= x >> 8;
-            x |= x >> 16;
-            return ( x | x >> 32 ) + 1;
+                    x |= x >> 4;
+                x |= x >> 8;
+                x |= x >> 16;
+                return ( x | x >> 32 ) + 1;
         }
 
         /** Returns the least power of two smaller than or equal to 2<sup>30</sup> and larger than or equal to <code>Math.ceil( expected / f )</code>.
