@@ -27,7 +27,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC62_IsEqualsViaUnrolledLoop extends Benchmark
+public class BRC62_IsEqualsWithADifferentBranchApproach extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -583,6 +583,6 @@ public class BRC62_IsEqualsViaUnrolledLoop extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC62_IsEqualsViaUnrolledLoop.class, args);
+        Benchmark.run(BRC62_IsEqualsWithADifferentBranchApproach.class, args);
     }
 }
