@@ -379,7 +379,7 @@ public class BRC65_OneMainLoopMethod extends Benchmark
             // first index
             int ptr = line.hashCode & m_mask;
 
-            for (;;)
+            while (true)
             {
                 final Temperatures k = m_data[ptr];
 
