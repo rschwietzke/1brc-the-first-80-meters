@@ -181,8 +181,9 @@ public class BRC63b_Equals_MainLoop extends Benchmark
             return end - REMAINING_MIN_BUFFERSIZE;
         }
 
-        public void run(final FastHashSet cities)
+        public FastHashSet run()
         {
+            final FastHashSet cities = new FastHashSet(4096);
             while (!EOF)
             {
                 read();
@@ -190,11 +191,13 @@ public class BRC63b_Equals_MainLoop extends Benchmark
             }
 
             // crawl to the end
-            for (; pos < end; )
+            while (pos < end)
             {
                 read();
                 cities.putOrUpdate(this);
             }
+
+            return cities;
         }
 
         /**
@@ -332,12 +335,12 @@ public class BRC63b_Equals_MainLoop extends Benchmark
     public String run(final String fileName) throws IOException
     {
         // our cities with temperatures, assume we get about 400, so we get us decent space
-        final FastHashSet cities = new FastHashSet(4096);
+        final FastHashSet cities;
 
         try (var raf = new RandomAccessFile(fileName, "r"))
         {
             final Line line = new Line(raf);
-            line.run(cities);
+            cities = line.run();
         }
 
         return cities.toTreeMap().toString();
@@ -350,11 +353,11 @@ public class BRC63b_Equals_MainLoop extends Benchmark
         // we need only the reference, not the content
         private static final Temperatures FREE_KEY = null;
 
-        /** Mask to calculate the original position */
-        private int m_mask;
-
         /** Keys and values */
         private Temperatures[] m_data;
+
+        /** Mask to calculate the original position */
+        private int m_mask;
 
         /** Current map size */
         private int m_size;
