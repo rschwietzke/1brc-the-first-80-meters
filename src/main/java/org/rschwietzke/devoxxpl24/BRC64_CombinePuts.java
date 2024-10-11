@@ -375,7 +375,7 @@ public class BRC64_CombinePuts extends Benchmark
             // first index
             int ptr = line.hashCode & m_mask;
 
-            while (true)
+            do
             {
                 final Temperatures k = m_data[ptr];
 
@@ -409,6 +409,7 @@ public class BRC64_CombinePuts extends Benchmark
 
                     // we got a collision
                     ptr = (ptr + 1) & m_mask; //that's next index
+                    continue;
                 }
                 else
                 {
@@ -420,6 +421,7 @@ public class BRC64_CombinePuts extends Benchmark
                     return;
                 }
             }
+            while (true);
         }
 
         private void put(final Line line)
