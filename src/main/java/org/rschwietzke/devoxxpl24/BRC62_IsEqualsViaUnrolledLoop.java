@@ -381,27 +381,20 @@ public class BRC62_IsEqualsViaUnrolledLoop extends Benchmark
                     // iterate old fashioned
                     int start = line.lineStartPos;
                     boolean notEquals = false;
+
                     for (int i = 0; i < l; i++)
                     {
                         notEquals |= k.data[i] != line.data[start + i];
                     }
 
-                    if (notEquals)
-                    {
-                        putOrUpdateSlow(line, ptr);
-                        return;
-                    }
-                    else
+                    if (!notEquals)
                     {
                         k.add(line.temperature);
                         return;
                     }
                 }
-                else
-                {
-                    // we got a collision
-                    putOrUpdateSlow(line, ptr);
-                }
+                // we got a collision
+                putOrUpdateSlow(line, ptr);
             }
             else
             {
