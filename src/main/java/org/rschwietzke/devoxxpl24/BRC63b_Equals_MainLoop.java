@@ -133,6 +133,7 @@ public class BRC63b_Equals_MainLoop extends Benchmark
 
         private final byte[] data = new byte[MIN_BUFFERSIZE];
         private final RandomAccessFile file;
+        private final FastHashSet cities = new FastHashSet(4096);
 
         int pos = 0;
         int endToReload= 0;
@@ -183,18 +184,15 @@ public class BRC63b_Equals_MainLoop extends Benchmark
 
         public FastHashSet run()
         {
-            final FastHashSet cities = new FastHashSet(4096);
             while (!EOF)
             {
                 read();
-                cities.putOrUpdate(this);
             }
 
             // crawl to the end
             while (pos < end)
             {
                 read();
-                cities.putOrUpdate(this);
             }
 
             return cities;
@@ -316,6 +314,7 @@ public class BRC63b_Equals_MainLoop extends Benchmark
                 this.pos = i + 1;
                 this.newlinePos = i;
             }
+            cities.putOrUpdate(this);
         }
 
         @Override
