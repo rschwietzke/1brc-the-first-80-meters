@@ -31,7 +31,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC66_BothEqualsTheSameFrom63 extends Benchmark
+public class BRC66_HashCode extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -150,6 +150,7 @@ public class BRC66_BothEqualsTheSameFrom63 extends Benchmark
         private static int REMAINING_MIN_BUFFERSIZE = 200;
 
         private final byte[] data = new byte[MIN_BUFFERSIZE];
+        private final RandomAccessFile file;
 
         // we are not using a ByteBuffer, too expensive too
         // call it for each byte
@@ -165,8 +166,6 @@ public class BRC66_BothEqualsTheSameFrom63 extends Benchmark
         int temperature;
 
         boolean EOF = false;
-
-        private final RandomAccessFile file;
 
         public Line(final RandomAccessFile file)
         {
@@ -453,42 +452,44 @@ public class BRC66_BothEqualsTheSameFrom63 extends Benchmark
          */
         private void putOrUpdateSlow(final Line line, int ptr)
         {
-            while (true)
-            {
-                ptr = (ptr + 1) & m_mask; //that's next index
-                final Temperatures k = m_data[ptr];
-
-                if (k == FREE_KEY)
+            outer:
+                while (true)
                 {
-                    // proper put, with a chance to grow
-                    put(line);
-                    return; // all done
-                }
-                // we do the slower mismatch here, rare, don't care at the moment
-                else
-                {
-                    final int newLength = line.semicolonPos - line.lineStartPos;
-                    var isEquals = newLength == k.data.length;
+                    ptr = (ptr + 1) & m_mask; //that's next index
+                    final Temperatures k = m_data[ptr];
 
-                    if (isEquals)
+                    if (k == FREE_KEY)
                     {
-                        // iterate old fashioned
-                        final int start = line.lineStartPos;
-                        for (int i = 0; i < newLength; i++)
-                        {
-                            // unrolling does not help here, tried that
-                            isEquals &= k.data[i] == line.data[start + i];
-                        }
+                        // proper put, with a chance to grow
+                        put(line);
+                        return; // all done
+                    }
+                    // we do the slower mismatch here, rare, don't care at the moment
+                    else
+                    {
+                        final int l = line.semicolonPos - line.lineStartPos;
 
-                        // all data matched
-                        if (isEquals)
+                        // check length first
+                        if (l == k.data.length)
                         {
+                            // iterate old fashioned
+                            int start = line.lineStartPos;
+                            int i = 0;
+                            for (; i < l; i++)
+                            {
+                                if (k.data[i] != line.data[start + i])
+                                {
+                                    // no match, look again, next pos
+                                    continue outer;
+                                }
+                            }
+
+                            // matched
                             k.add(line.temperature);
                             return;
                         }
                     }
                 }
-            }
         }
 
         private Temperatures put(final Temperatures key)
@@ -577,6 +578,6 @@ public class BRC66_BothEqualsTheSameFrom63 extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC66_BothEqualsTheSameFrom63.class, args);
+        Benchmark.run(BRC66_HashCode.class, args);
     }
 }
