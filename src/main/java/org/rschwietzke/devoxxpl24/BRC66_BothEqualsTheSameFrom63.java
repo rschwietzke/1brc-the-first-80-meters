@@ -23,11 +23,15 @@ import java.util.TreeMap;
 import org.rschwietzke.Benchmark;
 
 /**
+ * This continues 63 because all other optimizations
+ * went slower despite less instructions to run but due to
+ * more branch misses.
  *
+ * Maybe we will come back to that
  *
  * @author Rene Schwietzke
  */
-public class BRC63_Equals extends Benchmark
+public class BRC66_BothEqualsTheSameFrom63 extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -73,8 +77,6 @@ public class BRC63_Equals extends Benchmark
 
         /**
          * Merge two temperatures
-         *
-         * @param value the temperature to add
          */
         public void merge(final Temperatures t)
         {
@@ -96,9 +98,25 @@ public class BRC63_Equals extends Benchmark
             return hashCode;
         }
 
+        /**
+         * We only use that path for our grow and put of the set
+         * @param other
+         * @return
+         */
         public int customEquals(final byte[] other)
         {
             return Arrays.mismatch(data, 0, data.length, other, 0, other.length);
+        }
+
+        /**
+         * We have a custom equals WHERE we need it, this here
+         * is not used and we prevent us from making mistakes.
+         */
+        @Override
+        public boolean equals(final Object o)
+        {
+            // just to filter long nights out
+            throw new RuntimeException("Equals is not supported");
         }
 
         /**
@@ -132,8 +150,9 @@ public class BRC63_Equals extends Benchmark
         private static int REMAINING_MIN_BUFFERSIZE = 200;
 
         private final byte[] data = new byte[MIN_BUFFERSIZE];
-        private final RandomAccessFile file;
 
+        // we are not using a ByteBuffer, too expensive too
+        // call it for each byte
         int pos = 0;
         int endToReload= 0;
         int newlinePos = -1;
@@ -147,6 +166,8 @@ public class BRC63_Equals extends Benchmark
 
         boolean EOF = false;
 
+        private final RandomAccessFile file;
+
         public Line(final RandomAccessFile file)
         {
             this.file = file;
@@ -154,6 +175,7 @@ public class BRC63_Equals extends Benchmark
 
         private int moveData()
         {
+            // ok, move the remaining data first
             System.arraycopy(this.data, this.pos, this.data, 0, this.data.length - this.pos);
             this.end = this.end - this.pos;
             this.lineStartPos = this.pos = 0;
@@ -188,6 +210,8 @@ public class BRC63_Equals extends Benchmark
         private void read()
         {
             // do we near the end of the buffer?
+            // this branch is likely one of the expensive ones
+            // but a loop on the array would not be any better
             if (pos >= this.endToReload)
             {
                 this.endToReload = moveData();
@@ -204,27 +228,29 @@ public class BRC63_Equals extends Benchmark
             for (;;)
             {
                 final byte b = data[i];
+                // do the calc before the jump so the CPU
+                // can safely run them with suffering from
+                // mispredictions
+                final var x = h << 5;
+                final var y = b - h;
                 if (b == ';')
                 {
                     break;
                 }
-                var x = h << 5;
-                var y = b - h;
+                // only know we can use it
                 h = x + y;
-
                 i++;
 
                 // we can safely do that because we know there will be more afterwards aka
                 // numbers
                 final byte b2 = data[i];
+                final var x2 = h << 5;
+                final var y2 = b2 - h;
                 if (b2 == ';')
                 {
                     break;
                 }
-                var x2 = h << 5;
-                var y2 = b2 - h;
                 h = x2 + y2;
-
                 i++;
             }
 
@@ -369,6 +395,10 @@ public class BRC63_Equals extends Benchmark
 
         public void putOrUpdate(final Line line)
         {
+            // having the while loop here is slower due to
+            // more branch misses, don't know yet exactly
+            // why it turns out that way
+
             final int ptr = line.hashCode & m_mask;
             final Temperatures k = m_data[ptr];
 
@@ -380,7 +410,7 @@ public class BRC63_Equals extends Benchmark
                 if (isEquals)
                 {
                     // iterate old fashioned
-                    int start = line.lineStartPos;
+                    final int start = line.lineStartPos;
                     for (int i = 0; i < newLength; i++)
                     {
                         // unrolling does not help here, tried that
@@ -415,46 +445,50 @@ public class BRC63_Equals extends Benchmark
                     line.hashCode, line.temperature));
         }
 
+        /**
+         * The rare path when we have a collision
+         *
+         * @param line
+         * @param ptr the last position
+         */
         private void putOrUpdateSlow(final Line line, int ptr)
         {
-            outer:
-                while (true)
+            while (true)
+            {
+                ptr = (ptr + 1) & m_mask; //that's next index
+                final Temperatures k = m_data[ptr];
+
+                if (k == FREE_KEY)
                 {
-                    ptr = (ptr + 1) & m_mask; //that's next index
-                    final Temperatures k = m_data[ptr];
+                    // proper put, with a chance to grow
+                    put(line);
+                    return; // all done
+                }
+                // we do the slower mismatch here, rare, don't care at the moment
+                else
+                {
+                    final int newLength = line.semicolonPos - line.lineStartPos;
+                    var isEquals = newLength == k.data.length;
 
-                    if (k == FREE_KEY)
+                    if (isEquals)
                     {
-                        // proper put
-                        put(line);
-                        return;
-                    }
-                    // we do the slower mismatch here, rare, don't care at the moment
-                    else
-                    {
-                        final int l = line.semicolonPos - line.lineStartPos;
-
-                        // check length first
-                        if (l == k.data.length)
+                        // iterate old fashioned
+                        final int start = line.lineStartPos;
+                        for (int i = 0; i < newLength; i++)
                         {
-                            // iterate old fashioned
-                            int start = line.lineStartPos;
-                            int i = 0;
-                            for (; i < l; i++)
-                            {
-                                if (k.data[i] != line.data[start + i])
-                                {
-                                    // no match, look again, next pos
-                                    continue outer;
-                                }
-                            }
+                            // unrolling does not help here, tried that
+                            isEquals &= k.data[i] == line.data[start + i];
+                        }
 
-                            // matched
+                        // all data matched
+                        if (isEquals)
+                        {
                             k.add(line.temperature);
                             return;
                         }
                     }
                 }
+            }
         }
 
         private Temperatures put(final Temperatures key)
@@ -543,6 +577,6 @@ public class BRC63_Equals extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC63_Equals.class, args);
+        Benchmark.run(BRC66_BothEqualsTheSameFrom63.class, args);
     }
 }
