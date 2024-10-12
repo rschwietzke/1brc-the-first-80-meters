@@ -230,8 +230,8 @@ public class BRC66_HashCode extends Benchmark
                 // do the calc before the jump so the CPU
                 // can safely run them with suffering from
                 // mispredictions
-                var x = h << 4;
-                var y = b + h;
+                var x = h << 5;
+                var y = b - h;
                 if (b == ';')
                 {
                     break;
@@ -243,8 +243,8 @@ public class BRC66_HashCode extends Benchmark
                 // we can safely do that because we know there will be more afterwards aka
                 // numbers
                 b = data[i];
-                x = h << 4;
-                y = b + h;
+                x = h << 5;
+                y = b - h;
                 if (b == ';')
                 {
                     break;
