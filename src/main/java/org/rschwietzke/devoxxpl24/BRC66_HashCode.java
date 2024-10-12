@@ -226,12 +226,12 @@ public class BRC66_HashCode extends Benchmark
             int i = this.pos;
             for (;;)
             {
-                final byte b = data[i];
+                byte b = data[i];
                 // do the calc before the jump so the CPU
                 // can safely run them with suffering from
                 // mispredictions
-                final var x = h << 5;
-                final var y = b - h;
+                var x = h << 4;
+                var y = b + h;
                 if (b == ';')
                 {
                     break;
@@ -242,14 +242,14 @@ public class BRC66_HashCode extends Benchmark
 
                 // we can safely do that because we know there will be more afterwards aka
                 // numbers
-                final byte b2 = data[i];
-                final var x2 = h << 5;
-                final var y2 = b2 - h;
-                if (b2 == ';')
+                b = data[i];
+                x = h << 4;
+                y = b + h;
+                if (b == ';')
                 {
                     break;
                 }
-                h = x2 + y2;
+                h = x + y;
                 i++;
             }
 

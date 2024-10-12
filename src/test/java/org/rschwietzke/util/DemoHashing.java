@@ -17,7 +17,7 @@ public class DemoHashing
         var h = 0;
         for (int i = 0; i < b.length; i++)
         {
-            h = h * 17 + b[i];
+            h = h * 31 + b[i];
         }
 
         return h;
@@ -30,7 +30,7 @@ public class DemoHashing
         var h = 0;
         for (int i = 0; i < b.length; i++)
         {
-            h ^= b[i] + (h << 5);
+            h = b[i] + (h << 4) + h;
         }
 
         return h;
@@ -38,7 +38,7 @@ public class DemoHashing
 
     static void run(List<String> cities, Function<String, Integer> f)
     {
-        int SIZE = 2048;
+        int SIZE = 4096;
         int[] counters = new int[SIZE];
         for (String city : cities)
         {
