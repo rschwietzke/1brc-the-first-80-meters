@@ -12,7 +12,7 @@ Please pay attention to the `org.rschwietzke.devoxxpl24` package. It contains al
 
 You can of course build all with `mvn compile`.
 
-### Create Data
+### Create Data - 413 Cities
 
 You first need data before you can measure anything. The data files can be created like this:
 
@@ -36,6 +36,17 @@ So if you want to different files, change the hardcoded seed:
 ```
 var r = RandomGeneratorFactory.of("Xoroshiro128PlusPlus").create(424242L);
 ```
+### Create Data - 10k Cities
+
+If you want a more challenging set of data that draws from 10k different cities, you can run the extended data generator like that:
+
+```
+java -cp target/classes/ dev.morling.onebrc.CreateMeasurements 10000 10000000 measurements-10m.txt
+```
+
+The parameters have been extended to give you the option to specify the count of cities you want to use, upper limit is 10k.
+
+`create_extended_measurements.sh <city count> <number of records to create> <filename>`
 
 ### Measure
 
