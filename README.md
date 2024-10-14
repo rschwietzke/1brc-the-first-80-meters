@@ -1,4 +1,4 @@
-# 1BRC, the first 80% of the Way
+# 1BRC - The First 80% of the Way
 
 ## Presentation
 
