@@ -23,19 +23,15 @@ import java.util.TreeMap;
 import org.rschwietzke.Benchmark;
 
 /**
- * This continues 63 because all other optimizations
- * went slower despite less instructions to run but due to
- * more branch misses.
- *
- * Maybe we will come back to that
+ * We keep the array length extra to avoid some null checks
+ * in the asm code before we really need the array.
  *
  * @author Rene Schwietzke
  */
 public class BRC67_StoreArrayLength extends Benchmark
 {
     /**
-     * Holds our temperature data without the station, because the
-     * map already knows that
+     * Hold the city and temp data, everything as int
      */
     static class Temperatures
     {
