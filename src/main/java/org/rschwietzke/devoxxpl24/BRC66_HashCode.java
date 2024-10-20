@@ -229,7 +229,7 @@ public class BRC66_HashCode extends Benchmark
                 byte b = data[i];
                 // do the calc before the jump so the CPU
                 // can safely run them with suffering from
-                // mispredictions
+                // mispredictions, does not help by the way
                 var x = h << 5;
                 var y = b - h;
                 if (b == ';')
