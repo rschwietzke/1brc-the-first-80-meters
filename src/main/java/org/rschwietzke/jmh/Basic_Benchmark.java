@@ -15,7 +15,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.rschwietzke.devoxxpl24.BRC66_HashCode;
+import org.rschwietzke.devoxxpl24.BRC67_StoreArrayLength;
 
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
@@ -28,7 +28,7 @@ public class Basic_Benchmark
     @Benchmark
     public void measure()
     {
-        BRC66_HashCode.main(new String[]{"data-100m.txt", "0", "1"});
+        BRC67_StoreArrayLength.main(new String[]{"data-100m.txt", "0", "1"});
     }
 
     public static void main(String[] args) throws RunnerException
