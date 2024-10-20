@@ -23,16 +23,14 @@ import java.util.TreeMap;
 import org.rschwietzke.Benchmark;
 
 /**
- * Let's try to make our buffer a better sliding window
- * and especially reduce the amount of checks against it
- * or
+ * REmove some data not needed
  *
  * @author Rene Schwietzke
  */
-public class BRC68_SlidingWIndow extends Benchmark
+public class BRC68_RemoveNewLinePos extends Benchmark
 {
     /**
-     * Holds our temperature data and the station.
+     * Hold the city and temp data, everything as int
      */
     static class Temperatures
     {
@@ -41,15 +39,17 @@ public class BRC68_SlidingWIndow extends Benchmark
         private long total;
         private int count;
         private final byte[] city;
+        private final int length;
         private final int hashCode;
 
-        public Temperatures(final byte[] city, final int hashCode, final int temperatureAsInt)
+        public Temperatures(final byte[] city, final int hashCode, final int value)
         {
             this.city = city;
+            this.length = city.length;
             this.hashCode = hashCode;
-            this.min = temperatureAsInt;
-            this.max = temperatureAsInt;
-            this.total = temperatureAsInt;
+            this.min = value;
+            this.max = value;
+            this.total = value;
             this.count = 1;
         }
 
@@ -153,7 +153,6 @@ public class BRC68_SlidingWIndow extends Benchmark
         // call it for each byte
         int pos = 0;
         int endToReload= 0;
-        int newlinePos = -1;
         int end = 0;
 
         int lineStartPos = 0;
@@ -288,7 +287,6 @@ public class BRC68_SlidingWIndow extends Benchmark
 
                 this.temperature = -value;
                 this.pos = i + 1;
-                this.newlinePos = i;
             }
             else
             {
@@ -317,7 +315,6 @@ public class BRC68_SlidingWIndow extends Benchmark
 
                 this.temperature = value;
                 this.pos = i + 1;
-                this.newlinePos = i;
             }
         }
 
@@ -401,7 +398,9 @@ public class BRC68_SlidingWIndow extends Benchmark
             if ( k != FREE_KEY )
             {
                 final int newLength = line.semicolonPos - line.lineStartPos;
-                var isEquals = newLength == k.city.length;
+                // we keep the array length in our own variable to avoid
+                // a null check against k.city
+                var isEquals = newLength == k.length;
 
                 if (isEquals)
                 {
@@ -467,7 +466,7 @@ public class BRC68_SlidingWIndow extends Benchmark
                         final int l = line.semicolonPos - line.lineStartPos;
 
                         // check length first
-                        if (l == k.city.length)
+                        if (l == k.length)
                         {
                             // iterate old fashioned
                             int start = line.lineStartPos;
@@ -489,33 +488,40 @@ public class BRC68_SlidingWIndow extends Benchmark
                 }
         }
 
-        private Temperatures put(final Temperatures key)
+        /**
+         * We don't need the return value because
+         * we either sink the key alreay and merge
+         * it with the other data.
+         * @param key the city and its temperature data
+         */
+        private void put(final Temperatures key)
         {
             int ptr = key.hashCode();
 
             while ( true )
             {
-                ptr = ptr & m_mask; //that's next index calculation
+                ptr = ptr & m_mask;
                 final Temperatures k = m_data[ptr];
 
                 if ( k == FREE_KEY )
                 {
                     m_data[ptr] = key;
-                    if ( m_size >= m_threshold )
+                    if (m_size >= m_threshold)
                     {
                         rehash( m_data.length << 2 ); //size is set inside
                     }
                     else
                     {
-                        ++m_size;
+                        m_size++;
                     }
-                    return null;
+                    return;
                 }
-                else if (k.customEquals( key.city ) == -1)
+                else if (k.customEquals(key.city) == -1)
                 {
-                    final Temperatures ret = m_data[ptr];
-                    m_data[ptr] = key;
-                    return ret;
+                    // ok, we already have that city here
+                    // put things together
+                    k.merge(key);
+                    return;
                 }
                 ptr++;
             }
@@ -528,7 +534,7 @@ public class BRC68_SlidingWIndow extends Benchmark
 
         private void rehash(final int newcapacity)
         {
-            this.m_threshold = (int) (newcapacity * 0.5f);
+            this.m_threshold = newcapacity / 2;
             this.m_mask = newcapacity - 1;
 
             final int oldcapacity = this.m_data.length;
@@ -575,6 +581,6 @@ public class BRC68_SlidingWIndow extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC68_SlidingWIndow.class, args);
+        Benchmark.run(BRC68_RemoveNewLinePos.class, args);
     }
 }
