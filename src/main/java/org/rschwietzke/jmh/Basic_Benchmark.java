@@ -16,6 +16,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.rschwietzke.devoxxpl24.BRC67_StoreArrayLength;
+import org.rschwietzke.devoxxpl24.BRC68_RemoveNewLinePos;
 
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
@@ -26,9 +27,15 @@ import org.rschwietzke.devoxxpl24.BRC67_StoreArrayLength;
 public class Basic_Benchmark
 {
     @Benchmark
-    public void measure()
+    public void measure67()
     {
-        BRC67_StoreArrayLength.main(new String[]{"data-100m.txt", "0", "1"});
+        BRC67_StoreArrayLength.main(new String[]{"data-1000m.txt", "0", "1"});
+    }
+
+    @Benchmark
+    public void measure68()
+    {
+        BRC68_RemoveNewLinePos.main(new String[]{"data-1000m.txt", "0", "1"});
     }
 
     public static void main(String[] args) throws RunnerException
