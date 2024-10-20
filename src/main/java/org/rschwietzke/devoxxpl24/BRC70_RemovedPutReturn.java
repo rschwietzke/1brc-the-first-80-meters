@@ -17,25 +17,25 @@ package org.rschwietzke.devoxxpl24;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 
 import org.rschwietzke.Benchmark;
 
 /**
- * Introduces Multithreading
+ * Remove some data not needed
+ *
+ * Result: Saved 2 billion instructions but
+ * gained 115k branched, missed from 2.8 to 3.0%
+ * Bummer! That cannot be right... where do the branches
+ * come from?
  *
  * @author Rene Schwietzke
  */
-public class BRC70_MultiThreading extends Benchmark
+public class BRC70_RemovedPutReturn extends Benchmark
 {
     /**
-     * Holds our temperature data without the station, because the
-     * map already knows that
+     * Hold the city and temp data, everything as int
      */
     static class Temperatures
     {
@@ -43,12 +43,14 @@ public class BRC70_MultiThreading extends Benchmark
         private int max;
         private long total;
         private int count;
-        private final byte[] data;
+        private final byte[] city;
+        private final int length;
         private final int hashCode;
 
         public Temperatures(final byte[] city, final int hashCode, final int value)
         {
-            this.data = city;
+            this.city = city;
+            this.length = city.length;
             this.hashCode = hashCode;
             this.min = value;
             this.max = value;
@@ -59,19 +61,19 @@ public class BRC70_MultiThreading extends Benchmark
         /**
          * Combine two temperatures
          *
-         * @param value the temperature to add
+         * @param temperatureAsInt the temperature to add
          */
-        public void add(final int value)
+        public void add(final int temperatureAsInt)
         {
-            if (value < this.min)
+            if (temperatureAsInt < this.min)
             {
-                this.min = value;
+                this.min = temperatureAsInt;
             }
-            else if (value > this.max)
+            else if (temperatureAsInt > this.max)
             {
-                this.max = value;
+                this.max = temperatureAsInt;
             }
-            this.total += value;
+            this.total += temperatureAsInt;
             this.count++;
         }
 
@@ -105,7 +107,7 @@ public class BRC70_MultiThreading extends Benchmark
          */
         public int customEquals(final byte[] other)
         {
-            return Arrays.mismatch(data, 0, data.length, other, 0, other.length);
+            return Arrays.mismatch(city, 0, city.length, other, 0, other.length);
         }
 
         /**
@@ -131,7 +133,7 @@ public class BRC70_MultiThreading extends Benchmark
 
         public String getCity()
         {
-            return new String(data, 0, data.length);
+            return new String(city, 0, city.length);
         }
 
         /**
@@ -144,21 +146,18 @@ public class BRC70_MultiThreading extends Benchmark
         }
     }
 
-    /**
-     * This runnable is a home made Callable
-     */
-    static class Reader implements Callable<FastHashSet>
+    static class Line
     {
         private static int MIN_BUFFERSIZE = 1_000_000;
         private static int REMAINING_MIN_BUFFERSIZE = 200;
 
         private final byte[] data = new byte[MIN_BUFFERSIZE];
+        private final RandomAccessFile file;
 
         // we are not using a ByteBuffer, too expensive too
         // call it for each byte
         int pos = 0;
         int endToReload= 0;
-        int newlinePos = -1;
         int end = 0;
 
         int lineStartPos = 0;
@@ -167,154 +166,38 @@ public class BRC70_MultiThreading extends Benchmark
         int hashCode;
         int temperature;
 
-        final long from;
-        final long to;
-
         boolean EOF = false;
-        RandomAccessFile file;
 
-        // our cities with temperatures, assume we get about 400, so we get us decent space
-        final FastHashSet cities = new FastHashSet(4096);
-
-        public Reader(final String fileName, long from, long to) throws IOException
+        public Line(final RandomAccessFile file)
         {
-            this.file = new RandomAccessFile(fileName, "r");
-            this.from = from;
-            this.to = to;
-
-            // jump
-            this.file.seek(this.from);
-        }
-
-        @Override
-        public FastHashSet call()
-        {
-            // do we have to go to the next full line first?
-            if (from > 0)
-            {
-                try
-                {
-                    while (file.read() != '\n');
-                    // one more to get the first legit char
-                    file.read();
-                }
-                catch (IOException e)
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-
-            try
-            {
-                while (!EOF)
-                {
-                    read();
-//                    System.out.println(this.toString());
-                    cities.putOrUpdate(this);
-                }
-
-                // crawl to the end
-                for (; pos < end; )
-                {
-                    read();
-//                    System.out.println(this.toString());
-                    cities.putOrUpdate(this);
-                }
-            }
-            finally
-            {
-                try
-                {
-                    file.close();
-                }
-                catch (IOException e)
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-
-            return cities;
+            this.file = file;
         }
 
         private int moveData()
         {
-            // TO DO
-//            Make sure we go to the real and and not ignoring the end between two streams
-//            or better when we move forward initially, we have to adjust things
-//
-//            Create a new ST version that does not use EOF anymore but rather uses a sliding
-//            window as the buffer and we count pos also absolute as well as see the end
-//            always abolsute too.
-//
-//            Additional performane idea. If the buffer is big enough, do check the buffer again
-//            and again, instead, use  loop that runs that without the first check (partially unrolled)
+            // ok, move the remaining data first
+            System.arraycopy(this.data, this.pos, this.data, 0, this.data.length - this.pos);
+            this.end = this.end - this.pos;
+            this.lineStartPos = this.pos = 0;
 
-            if (!EOF)
+            // fill the buffer up
+            try
             {
-                // ok, move the remaining data first, if any
-                if (this.pos > 0)
+                final int readBytes = file.read(this.data, this.end, MIN_BUFFERSIZE - this.end);
+                if (readBytes == -1)
                 {
-                    System.arraycopy(this.data, this.pos, this.data, 0, this.data.length - this.pos);
+                    this.EOF = true;
                 }
-
-                this.end = this.end - this.pos;
-                var nextLengthToRead = MIN_BUFFERSIZE - this.end;
-
-                // where are we
-                try
+                else
                 {
-                    var current = this.file.getFilePointer();
-                    var rest = this.to - current;
-                    if (nextLengthToRead > rest)
-                    {
-                        nextLengthToRead = (int) rest;
-                    }
-                    if (rest <= 0)
-                    {
-                        this.EOF = true;
-                        nextLengthToRead = 0;
-                    }
-                }
-                catch (IOException e)
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-                this.lineStartPos = this.pos = 0;
-
-                // fill the buffer up
-                try
-                {
-                    var s = file.getFilePointer();
-                    final int readBytes = file.read(this.data, this.end, nextLengthToRead);
-                    var e = file.getFilePointer();
-
-//                    System.out.printf(Locale.US, "Read from %,d to %,d (%,d)%n", s, e, this.to);
-
-                    if (readBytes == -1)
-                    {
-                        this.EOF = true;
-                    }
-                    else
-                    {
-                        this.end += readBytes;
-                    }
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                    EOF = true;
-                    throw new RuntimeException(e);
+                    this.end += readBytes;
                 }
             }
-            else
+            catch (IOException e)
             {
-                // we are EOF but came here due to the bad
-                // end code
-                this.lineStartPos = this.pos;
+                e.printStackTrace();
+                EOF = true;
+                throw new RuntimeException(e);
             }
 
             return end - REMAINING_MIN_BUFFERSIZE;
@@ -354,7 +237,7 @@ public class BRC70_MultiThreading extends Benchmark
                 {
                     break;
                 }
-                // only when we know we can use it
+                // only know we can use it
                 h = x + y;
                 i++;
 
@@ -405,11 +288,10 @@ public class BRC70_MultiThreading extends Benchmark
                 }
 
                 // next is -99[.]9 or -9.[9]
-                value = value * 10 + (data[i++] ^ DIGITOFFSET);
+                value = value * 10 + (data[i] ^ DIGITOFFSET);
 
                 this.temperature = -value;
-                this.pos = i + 1;
-                this.newlinePos = i;
+                this.pos = i + 2;
             }
             else
             {
@@ -434,11 +316,10 @@ public class BRC70_MultiThreading extends Benchmark
                 }
 
                 // next is 99[.]9 or 9.[9]
-                value = value * 10 + (data[i++] ^ DIGITOFFSET);
+                value = value * 10 + (data[i] ^ DIGITOFFSET);
 
                 this.temperature = value;
-                this.pos = i + 1;
-                this.newlinePos = i;
+                this.pos = i + 2;
             }
         }
 
@@ -451,60 +332,35 @@ public class BRC70_MultiThreading extends Benchmark
         @Override
         public String toString()
         {
-            var city = Arrays.copyOfRange(
-                    data,
-                    lineStartPos,
-                    semicolonPos);
-            return new String(city) + ";" + temperature;
+            return new String(data);
         }
     }
 
     @Override
     public String run(final String fileName) throws IOException
     {
-        // run cpu count threads
-        final var cpus = 8;//Runtime.getRuntime().availableProcessors();
+        // our cities with temperatures, assume we get about 400, so we get us decent space
+        final FastHashSet cities = new FastHashSet(4096);
 
-        // determine filesize and jungs
-        var fileSize = 0l;
-        var chunkSize = 0l;
-        try (var f = new RandomAccessFile(fileName, "r"))
+        try (var raf = new RandomAccessFile(fileName, "r"))
         {
-            fileSize = f.length();
-            chunkSize = fileSize / cpus;
-        }
+            final Line line = new Line(raf);
 
-        final var executor = Executors.newFixedThreadPool(cpus);
-
-        final var readers = new ArrayList<Reader>(cpus);
-        for (int i = 0; i < cpus; i++)
-        {
-            readers.add(new Reader(fileName,
-                    i * chunkSize,
-                    i + 1 == cpus ? fileSize : (i + 1) * chunkSize));
-        }
-
-        try
-        {
-            final var futures = executor.invokeAll(readers);
-
-            var finalCities = new FastHashSet(4096);
-            for (int i = 0; i < futures.size(); i++)
+            while (!line.EOF)
             {
-                var cities = futures.get(i).get();
-                finalCities.addAll(cities);
+                line.read();
+                cities.putOrUpdate(line);
             }
 
-            return finalCities.toTreeMap().toString();
+            // crawl to the end
+            for (; line.pos < line.end; )
+            {
+                line.read();
+                cities.putOrUpdate(line);
+            }
         }
-        catch(InterruptedException|ExecutionException e)
-        {
-            throw new RuntimeException("Darn", e);
-        }
-        finally
-        {
-            executor.shutdown();
-        }
+
+        return cities.toTreeMap().toString();
     }
 
     private static final int DIGITOFFSET = 48;
@@ -535,7 +391,7 @@ public class BRC70_MultiThreading extends Benchmark
             m_threshold = (int) (capacity * 0.5f);
         }
 
-        public void putOrUpdate(final Reader line)
+        public void putOrUpdate(final Line line)
         {
             // having the while loop here is slower due to
             // more branch misses, don't know yet exactly
@@ -547,7 +403,9 @@ public class BRC70_MultiThreading extends Benchmark
             if ( k != FREE_KEY )
             {
                 final int newLength = line.semicolonPos - line.lineStartPos;
-                var isEquals = newLength == k.data.length;
+                // we keep the array length in our own variable to avoid
+                // a null check against k.city
+                var isEquals = newLength == k.length;
 
                 if (isEquals)
                 {
@@ -556,7 +414,7 @@ public class BRC70_MultiThreading extends Benchmark
                     for (int i = 0; i < newLength; i++)
                     {
                         // unrolling does not help here, tried that
-                        isEquals &= k.data[i] == line.data[start + i];
+                        isEquals &= k.city[i] == line.data[start + i];
                     }
 
                     if (isEquals)
@@ -578,7 +436,7 @@ public class BRC70_MultiThreading extends Benchmark
             }
         }
 
-        private void put(final Reader line)
+        private void put(final Line line)
         {
             put(new Temperatures(
                     Arrays.copyOfRange(
@@ -593,7 +451,7 @@ public class BRC70_MultiThreading extends Benchmark
          * @param line
          * @param ptr the last position
          */
-        private void putOrUpdateSlow(final Reader line, int ptr)
+        private void putOrUpdateSlow(final Line line, int ptr)
         {
             outer:
                 while (true)
@@ -613,14 +471,14 @@ public class BRC70_MultiThreading extends Benchmark
                         final int l = line.semicolonPos - line.lineStartPos;
 
                         // check length first
-                        if (l == k.data.length)
+                        if (l == k.length)
                         {
                             // iterate old fashioned
                             int start = line.lineStartPos;
                             int i = 0;
                             for (; i < l; i++)
                             {
-                                if (k.data[i] != line.data[start + i])
+                                if (k.city[i] != line.data[start + i])
                                 {
                                     // no match, look again, next pos
                                     continue outer;
@@ -635,30 +493,38 @@ public class BRC70_MultiThreading extends Benchmark
                 }
         }
 
-        public void put(final Temperatures key)
+        /**
+         * We don't need the return value because
+         * we either sink the key alreay and merge
+         * it with the other data.
+         * @param key the city and its temperature data
+         */
+        private void put(final Temperatures key)
         {
             int ptr = key.hashCode();
 
             while ( true )
             {
-                ptr = ptr & m_mask; //that's next index calculation
+                ptr = ptr & m_mask;
                 final Temperatures k = m_data[ptr];
 
                 if ( k == FREE_KEY )
                 {
                     m_data[ptr] = key;
-                    if ( m_size >= m_threshold )
+                    if (m_size >= m_threshold)
                     {
                         rehash( m_data.length << 2 ); //size is set inside
                     }
                     else
                     {
-                        ++m_size;
+                        m_size++;
                     }
                     return;
                 }
-                else if (k.customEquals( key.data ) == -1)
+                else if (k.customEquals(key.city) == -1)
                 {
+                    // ok, we already have that city here
+                    // put things together
                     k.merge(key);
                     return;
                 }
@@ -671,22 +537,9 @@ public class BRC70_MultiThreading extends Benchmark
             return m_size;
         }
 
-        public void addAll(final FastHashSet data)
-        {
-            for (int i = 0; i < data.m_data.length; i++)
-            {
-                final Temperatures temp = data.m_data[i];
-                if (temp != FREE_KEY)
-                {
-                    put(temp);
-                }
-            }
-
-        }
-
         private void rehash(final int newcapacity)
         {
-            this.m_threshold = (int) (newcapacity * 0.5f);
+            this.m_threshold = newcapacity / 2;
             this.m_mask = newcapacity - 1;
 
             final int oldcapacity = this.m_data.length;
@@ -733,6 +586,6 @@ public class BRC70_MultiThreading extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC70_MultiThreading.class, args);
+        Benchmark.run(BRC70_RemovedPutReturn.class, args);
     }
 }

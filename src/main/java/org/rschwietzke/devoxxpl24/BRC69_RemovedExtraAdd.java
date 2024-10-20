@@ -32,7 +32,7 @@ import org.rschwietzke.Benchmark;
  *
  * @author Rene Schwietzke
  */
-public class BRC69_RemovedPutReturn extends Benchmark
+public class BRC69_RemovedExtraAdd extends Benchmark
 {
     /**
      * Hold the city and temp data, everything as int
@@ -61,19 +61,19 @@ public class BRC69_RemovedPutReturn extends Benchmark
         /**
          * Combine two temperatures
          *
-         * @param temperatureAsInt the temperature to add
+         * @param value the temperature to add
          */
-        public void add(final int temperatureAsInt)
+        public void add(final int value)
         {
-            if (temperatureAsInt < this.min)
+            if (value < this.min)
             {
-                this.min = temperatureAsInt;
+                this.min = value;
             }
-            else if (temperatureAsInt > this.max)
+            else if (value > this.max)
             {
-                this.max = temperatureAsInt;
+                this.max = value;
             }
-            this.total += temperatureAsInt;
+            this.total += value;
             this.count++;
         }
 
@@ -288,10 +288,10 @@ public class BRC69_RemovedPutReturn extends Benchmark
                 }
 
                 // next is -99[.]9 or -9.[9]
-                value = value * 10 + (data[i++] ^ DIGITOFFSET);
+                value = value * 10 + (data[i] ^ DIGITOFFSET);
 
                 this.temperature = -value;
-                this.pos = i + 1;
+                this.pos = i + 2;
             }
             else
             {
@@ -316,10 +316,10 @@ public class BRC69_RemovedPutReturn extends Benchmark
                 }
 
                 // next is 99[.]9 or 9.[9]
-                value = value * 10 + (data[i++] ^ DIGITOFFSET);
+                value = value * 10 + (data[i] ^ DIGITOFFSET);
 
                 this.temperature = value;
-                this.pos = i + 1;
+                this.pos = i + 2;
             }
         }
 
@@ -493,40 +493,33 @@ public class BRC69_RemovedPutReturn extends Benchmark
                 }
         }
 
-        /**
-         * We don't need the return value because
-         * we either sink the key alreay and merge
-         * it with the other data.
-         * @param key the city and its temperature data
-         */
-        private void put(final Temperatures key)
+        private Temperatures put(final Temperatures key)
         {
             int ptr = key.hashCode();
 
             while ( true )
             {
-                ptr = ptr & m_mask;
+                ptr = ptr & m_mask; //that's next index calculation
                 final Temperatures k = m_data[ptr];
 
                 if ( k == FREE_KEY )
                 {
                     m_data[ptr] = key;
-                    if (m_size >= m_threshold)
+                    if ( m_size >= m_threshold )
                     {
                         rehash( m_data.length << 2 ); //size is set inside
                     }
                     else
                     {
-                        m_size++;
+                        ++m_size;
                     }
-                    return;
+                    return null;
                 }
                 else if (k.customEquals(key.city) == -1)
                 {
-                    // ok, we already have that city here
-                    // put things together
-                    k.merge(key);
-                    return;
+                    final Temperatures ret = m_data[ptr];
+                    m_data[ptr] = key;
+                    return ret;
                 }
                 ptr++;
             }
@@ -539,7 +532,7 @@ public class BRC69_RemovedPutReturn extends Benchmark
 
         private void rehash(final int newcapacity)
         {
-            this.m_threshold = newcapacity / 2;
+            this.m_threshold = (int) (newcapacity * 0.5f);
             this.m_mask = newcapacity - 1;
 
             final int oldcapacity = this.m_data.length;
@@ -586,6 +579,6 @@ public class BRC69_RemovedPutReturn extends Benchmark
      */
     public static void main(String[] args)
     {
-        Benchmark.run(BRC69_RemovedPutReturn.class, args);
+        Benchmark.run(BRC69_RemovedExtraAdd.class, args);
     }
 }
