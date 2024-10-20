@@ -21,7 +21,7 @@ import org.rschwietzke.devoxxpl24.BRC68_RemoveNewLinePos;
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+@Warmup(iterations = 1, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 1, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class Basic_Benchmark
