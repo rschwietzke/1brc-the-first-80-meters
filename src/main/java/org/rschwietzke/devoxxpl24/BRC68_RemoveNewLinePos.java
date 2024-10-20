@@ -23,7 +23,12 @@ import java.util.TreeMap;
 import org.rschwietzke.Benchmark;
 
 /**
- * REmove some data not needed
+ * Remove some data not needed
+ *
+ * Result: Saved 2 billion instructions but
+ * gained 115k branched, missed from 2.8 to 3.0%
+ * Bummer! That cannot be right... where do the branches
+ * come from?
  *
  * @author Rene Schwietzke
  */
@@ -56,19 +61,19 @@ public class BRC68_RemoveNewLinePos extends Benchmark
         /**
          * Combine two temperatures
          *
-         * @param temperatureAsInt the temperature to add
+         * @param value the temperature to add
          */
-        public void add(final int temperatureAsInt)
+        public void add(final int value)
         {
-            if (temperatureAsInt < this.min)
+            if (value < this.min)
             {
-                this.min = temperatureAsInt;
+                this.min = value;
             }
-            else if (temperatureAsInt > this.max)
+            else if (value > this.max)
             {
-                this.max = temperatureAsInt;
+                this.max = value;
             }
-            this.total += temperatureAsInt;
+            this.total += value;
             this.count++;
         }
 
@@ -488,40 +493,33 @@ public class BRC68_RemoveNewLinePos extends Benchmark
                 }
         }
 
-        /**
-         * We don't need the return value because
-         * we either sink the key alreay and merge
-         * it with the other data.
-         * @param key the city and its temperature data
-         */
-        private void put(final Temperatures key)
+        private Temperatures put(final Temperatures key)
         {
             int ptr = key.hashCode();
 
             while ( true )
             {
-                ptr = ptr & m_mask;
+                ptr = ptr & m_mask; //that's next index calculation
                 final Temperatures k = m_data[ptr];
 
                 if ( k == FREE_KEY )
                 {
                     m_data[ptr] = key;
-                    if (m_size >= m_threshold)
+                    if ( m_size >= m_threshold )
                     {
                         rehash( m_data.length << 2 ); //size is set inside
                     }
                     else
                     {
-                        m_size++;
+                        ++m_size;
                     }
-                    return;
+                    return null;
                 }
                 else if (k.customEquals(key.city) == -1)
                 {
-                    // ok, we already have that city here
-                    // put things together
-                    k.merge(key);
-                    return;
+                    final Temperatures ret = m_data[ptr];
+                    m_data[ptr] = key;
+                    return ret;
                 }
                 ptr++;
             }
@@ -534,7 +532,7 @@ public class BRC68_RemoveNewLinePos extends Benchmark
 
         private void rehash(final int newcapacity)
         {
-            this.m_threshold = newcapacity / 2;
+            this.m_threshold = (int) (newcapacity * 0.5f);
             this.m_mask = newcapacity - 1;
 
             final int oldcapacity = this.m_data.length;
