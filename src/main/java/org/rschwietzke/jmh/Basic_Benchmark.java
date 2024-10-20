@@ -15,7 +15,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.rschwietzke.devoxxpl24.BRC40i_SmallerSemicolonLoop;
+import org.rschwietzke.devoxxpl24.BRC66_HashCode;
 
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
@@ -28,7 +28,7 @@ public class Basic_Benchmark
     @Benchmark
     public void measure()
     {
-        BRC40i_SmallerSemicolonLoop.main(new String[]{"measurements-100m.txt", "0", "1"});
+        BRC66_HashCode.main(new String[]{"data-100m.txt", "0", "1"});
     }
 
     public static void main(String[] args) throws RunnerException
