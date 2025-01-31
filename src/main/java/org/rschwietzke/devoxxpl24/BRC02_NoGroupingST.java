@@ -18,8 +18,8 @@ package org.rschwietzke.devoxxpl24;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 import org.rschwietzke.Benchmark;
@@ -66,7 +66,7 @@ public class BRC02_NoGroupingST extends Benchmark {
 
 	@Override
 	public String run(final String fileName) throws IOException {
-		final var map = new ConcurrentHashMap<String, MeasurementAggregator>();
+		final var map = new HashMap<String, MeasurementAggregator>();
 
 		final BiFunction<MeasurementAggregator, MeasurementAggregator, MeasurementAggregator> collector = (agg1, agg2) -> {
 			agg1.min = Math.min(agg1.min, agg2.min);

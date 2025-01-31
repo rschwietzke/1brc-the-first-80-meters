@@ -25,8 +25,7 @@ import java.util.stream.Collectors;
 import org.rschwietzke.Benchmark;
 
 /**
- * This is a rewritten version to expand every step a little to make it more clear
- * and have a better handle on tuning.
+ * Our original version as mult-threaded parallel stream. Does not scale well.
  */
 public class BRC01_BaselineMT extends Benchmark
 {
@@ -67,7 +66,8 @@ public class BRC01_BaselineMT extends Benchmark
                     agg.max = Math.max(agg.max, m.value);
                     agg.total += m.value;
                     agg.count++;
-                }, (agg1, agg2) -> {
+                },
+                (agg1, agg2) -> {
                     var res = new MeasurementAggregator();
                     res.min = Math.min(agg1.min, agg2.min);
                     res.max = Math.max(agg1.max, agg2.max);
@@ -75,7 +75,8 @@ public class BRC01_BaselineMT extends Benchmark
                     res.count = agg1.count + agg2.count;
 
                     return res;
-                }, agg -> {
+                },
+                agg -> {
                     return new ResultRow(agg.min, agg.total / (double)agg.count, agg.max);
                 });
 
