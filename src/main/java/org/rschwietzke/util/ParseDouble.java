@@ -52,6 +52,39 @@ public final class ParseDouble
     }
 
     /**
+     * In contrast to parseDouble, we can only do the XX.X format.
+     *
+     * @param s
+     *            the characters to parse
+     * @return the converted string as double
+     * @throws java.lang.NumberFormatException
+     */
+    public static double parseDouble2(final String s, final int offset, final int end)
+    {
+        final int negative = s.charAt(offset) == '-' ? offset + 1 : offset;
+
+        long value = 0;
+        int decimalPos = end;
+
+        for (int i = negative; i <= end; i++)
+        {
+            final int d = s.charAt(i);
+            if (d == '.')
+            {
+                decimalPos = i;
+                continue;
+            }
+            final int v = d - DIGITOFFSET;
+            value = ((value << 3) + (value << 1));
+            value += v;
+        }
+
+        // adjust the decimal places
+        value = negative != offset ? -value : value;
+        return value * 0.1d;
+    }
+
+    /**
      * Parses a double but ends up with an int, only because we know
      * the format of the results -99.9 to 99.9
      */
@@ -236,5 +269,13 @@ public final class ParseDouble
     public static double parseDouble(final String s)
     {
     	return parseDouble(s, 0, s.length() - 1);
+    }
+
+    /**
+     * In case we want to parse the full string
+     */
+    public static double parseDouble2(final String s)
+    {
+        return parseDouble2(s, 0, s.length() - 1);
     }
 }

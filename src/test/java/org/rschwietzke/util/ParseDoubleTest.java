@@ -31,7 +31,7 @@ public class ParseDoubleTest
     // Double
 
     @Test
-    public void doubleHappyPath()
+    public void parseDouble()
     {
         String s = "";
 

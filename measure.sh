@@ -38,6 +38,7 @@ BRC03_NoStreamST
 BRC04_CleanupST
 BRC05_ReplaceSplitST
 BRC06_NewDoubleParsingST
+BRC06b_NewDoubleParsingST
 BRC07_NoCopyForDoubleST
 BRC08_GoIntST
 BRC09_NoMergeST
