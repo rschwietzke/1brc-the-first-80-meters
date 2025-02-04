@@ -31,6 +31,7 @@ CLASSES_HIGHMEM="
 BRC00_Empty
 BRC00_Gemini
 BRC00_Claude
+BRC00_Claude2
 BRC01_BaselineMT
 BRC01_BaselineST
 BRC02_NoGroupingMT

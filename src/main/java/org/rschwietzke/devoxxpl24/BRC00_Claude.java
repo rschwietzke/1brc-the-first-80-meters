@@ -34,7 +34,7 @@ public class BRC00_Claude extends Benchmark
         TreeMap<String, ArrayList<Double>> cityData = new TreeMap<>();
 
         // Read the file
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("temperatures.csv"))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(";");
@@ -59,15 +59,15 @@ public class BRC00_Claude extends Benchmark
             double max = temperatures.stream().mapToDouble(d -> d).max().getAsDouble();
             double avg = temperatures.stream().mapToDouble(d -> d).average().getAsDouble();
 
-            finalResult.put(city, (outputString(min, max, avg)));
+            finalResult.put(city, outputString(min, max, avg));
         }
 
         return finalResult.toString();
     }
 
-    public static String outputString(double min, double max, double avg)
+    public static String outputString(double min, double max, double mean)
     {
-        return round(min) + "/" + round(avg) + "/" + round(max);
+        return round(min) + "/" + round(mean) + "/" + round(max);
     }
 
     private static double round(double value)
