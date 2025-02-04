@@ -50,6 +50,8 @@ BRC13_HardcodedSetST"
 CLASSES_LOWMEM="
 BRC14a_ReadBytesBroken
 BRC14b_ReadBytesFixed
+BRC14c_ReadBytesObjects
+BRC14d_ReadBytesFixedImproved
 BRC15_ParseDoubleFixedST
 BRC20_UseArrayNoBufferST
 BRC21_ManualMinMaxST
