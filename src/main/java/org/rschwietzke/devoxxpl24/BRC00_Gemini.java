@@ -40,7 +40,7 @@ public class BRC00_Gemini extends Benchmark
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(";");
                 String city = parts[0].trim();
-                double temperature = Double.parseDouble(parts[1]); // No try-catch
+                double temperature = Double.parseDouble(parts[1].replace(",", "."));
                 TemperatureData data = cityTemperatures.computeIfAbsent(city, k -> new TemperatureData());
                 data.addTemperature(temperature);
             }
