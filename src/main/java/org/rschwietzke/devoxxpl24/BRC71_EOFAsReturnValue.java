@@ -25,7 +25,10 @@ import org.rschwietzke.util.MathUtil;
 
 /**
  * Readline returns EOF now, so we are writing less
- * object state and reading hopefully registers only
+ * object state and reading hopefully registers only.
+ *
+ * Well, it moves the needle into the wrong direction as it seems.
+ * Keeping it for demo.
  *
  * @author Rene Schwietzke
  */
