@@ -34,11 +34,8 @@ BRC00_Claude
 BRC00_Claude2
 BRC01_BaselineMT
 BRC01_BaselineST
-BRC02_NoGroupingMT
-BRC02_NoGroupingST
 BRC03_NoStreamMT
 BRC03_NoStreamST
-BRC04_CleanupST
 BRC05_ReplaceSplitST
 BRC06_NewDoubleParsingST
 BRC06b_NewDoubleParsingST
@@ -48,12 +45,12 @@ BRC09_NoMergeST
 BRC10_MutateST
 BRC11_SizedMapST
 BRC12_NewMapST
-BRC13_HardcodedSetST"
+BRC13_HardcodedSetST
+BRC14c_ReadBytesObjects"
 
 CLASSES_LOWMEM="
 BRC14a_ReadBytesBroken
 BRC14b_ReadBytesFixed
-BRC14c_ReadBytesObjects
 BRC14d_ReadBytesFixedImproved
 BRC15_ParseDoubleFixedST
 BRC20_UseArrayNoBufferST
@@ -116,7 +113,8 @@ BRC66_HashCode
 BRC67_StoreArrayLength
 BRC68_RemoveNewLinePos
 BRC69_RemovedExtraAdd
-BRC70_RemovedPutReturn"
+BRC70_RemovedPutReturn
+BRC71_EOFAsReturnValue"
 
 alias time='/usr/bin/time -f "Elapsed: %E, Faults: %F, Minor: %R, Max RSS: %M KB, FS Input: %I, FS Output: %O, System: %S s, User: %U s, Context I/V: %c/%w"'
 
