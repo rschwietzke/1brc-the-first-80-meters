@@ -37,11 +37,11 @@ public class BRC01_BaselineMT extends Benchmark
         }
     }
 
-    private static record ResultRow(double min, double mean, double max)
+    private static record ResultRow(int count, double min, double mean, double max)
     {
         public String toString()
         {
-            return round(min) + "/" + round(mean) + "/" + round(max);
+            return count + "/" + round(min) + "/" + round(mean) + "/" + round(max);
         }
 
         private double round(double value)
@@ -77,7 +77,7 @@ public class BRC01_BaselineMT extends Benchmark
                     return res;
                 },
                 agg -> {
-                    return new ResultRow(agg.min, agg.total / (double)agg.count, agg.max);
+                    return new ResultRow(agg.count, agg.min, agg.total / (double)agg.count, agg.max);
                 });
 
         var result = Files.lines(Paths.get(fileName))

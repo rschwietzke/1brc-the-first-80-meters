@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 
 /**
  * This is our first Example. It will use a regular Java approach
@@ -59,11 +60,6 @@ public class BRC03_NoStreamMT extends Benchmark
 			this.count = count;
 		}
 
-		private double round(double value)
-		{
-			return Math.round(value * 10.0) / 10.0;
-		}
-
 		public Temperatures merge(final Temperatures other)
 		{
 			return new Temperatures(Math.min(min, other.min), Math.max(max, other.max), total + other.total, count + other.count);
@@ -71,8 +67,7 @@ public class BRC03_NoStreamMT extends Benchmark
 
 		public String toString()
 		{
-            final double mean = this.total / (double)this.count;
-            return round(min) + "/" + round(mean) + "/" + round(max);
+            return MathUtil.toString(total, count, min, max);
         }
 	}
 

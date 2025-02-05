@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.ParseDouble;
 
 /**
@@ -92,23 +93,12 @@ public class BRC25_SmallAddReordingST extends Benchmark
 			return this.city.equals(c);
 		}
 
-		/**
-		 * 1BRC wants to have one decimal digits
-		 * @param value the value to transform
-		 * @return the rounded value
-		 */
-		private double round(double value)
-		{
-			return Math.round(value) / 10.0;
-		}
-
-		/**
-		 * Our final printing format
-		 */
-		public String toString()
+        /**
+         * Our final printing format
+         */
+        public String toString()
         {
-            final double mean = (double)this.total / (double)this.count;
-            return round(min) + "/" + round(mean) + "/" + round(max);
+            return MathUtil.toString(total, count, min, max);
         }
 	}
 

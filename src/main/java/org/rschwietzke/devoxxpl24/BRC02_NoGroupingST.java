@@ -23,6 +23,7 @@ import java.util.TreeMap;
 import java.util.function.BiFunction;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 
 /**
  * Control the grouping yourselves
@@ -54,13 +55,7 @@ public class BRC02_NoGroupingST extends Benchmark {
 
 		public String toString()
 		{
-            final double mean = this.total / (double)this.count;
-            return round(min) + "/" + round(mean) + "/" + round(max);
-        }
-
-		private double round(double value)
-		{
-			return Math.round(value * 10.0) / 10.0;
+            return MathUtil.toString(total, count, min, max);
 		}
 	}
 

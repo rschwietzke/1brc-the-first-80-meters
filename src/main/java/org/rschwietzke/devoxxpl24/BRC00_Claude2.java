@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 
 /**
  * This is an empty shell to check the framework overhead.
@@ -71,7 +72,7 @@ public class BRC00_Claude2 extends Benchmark
         double min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
         double sum = 0;
-        long count = 0;
+        int count = 0;
 
         void update(double value) {
             min = Math.min(min, value);
@@ -87,8 +88,7 @@ public class BRC00_Claude2 extends Benchmark
 
         public String toString()
         {
-            final double mean = this.sum / (double)this.count;
-            return round(min) + "/" + round(mean) + "/" + round(max);
+            return MathUtil.toString(sum, count, min, max);
         }
     }
 

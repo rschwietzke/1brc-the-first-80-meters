@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 
 /**
  * We are tuning the single threaded performance first, because
@@ -65,15 +66,9 @@ public class BRC03_NoStreamST extends Benchmark
 			return new Temperatures(Math.min(min, other.min), Math.max(max, other.max), total + other.total, count + other.count);
 		}
 
-        private double round(double value)
-        {
-            return Math.round(value * 10.0) / 10.0;
-        }
-
 		public String toString()
 		{
-            final double mean = this.total / (double)this.count;
-            return round(min) + "/" + round(mean) + "/" + round(max);
+            return MathUtil.toString(total, count, min, max);
         }
 	}
 

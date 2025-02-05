@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 
 /**
  * This continues 63 because all other optimizations
@@ -41,7 +42,7 @@ public class BRC66_HashCode extends Benchmark
     {
         private int min;
         private int max;
-        private long total;
+        private int total;
         private int count;
         private final byte[] data;
         private final int hashCode;
@@ -119,16 +120,6 @@ public class BRC66_HashCode extends Benchmark
             throw new RuntimeException("Equals is not supported");
         }
 
-        /**
-         * 1BRC wants to have one decimal digits
-         * @param value the value to transform
-         * @return the rounded value
-         */
-        private double round(double value)
-        {
-            return Math.round(value) / 10.0;
-        }
-
         public String getCity()
         {
             return new String(data, 0, data.length);
@@ -139,8 +130,7 @@ public class BRC66_HashCode extends Benchmark
          */
         public String toString()
         {
-            final double mean = (double)this.total / (double)this.count;
-            return round(min) + "/" + round(mean) + "/" + round(max);
+            return MathUtil.toString(total, count, min, max);
         }
     }
 

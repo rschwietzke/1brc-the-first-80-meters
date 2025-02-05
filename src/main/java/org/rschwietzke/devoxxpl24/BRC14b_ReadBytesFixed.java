@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.ParseDouble;
 
 /**
@@ -35,477 +36,466 @@ import org.rschwietzke.util.ParseDouble;
  */
 public class BRC14b_ReadBytesFixed extends Benchmark
 {
-	/**
-	 * Holds our temperature data without the station, because the
-	 * map already knows that
-	 */
-	private static class Temperatures
-	{
-		private int min;
-		private int max;
-		private long total;
-		private int count;
-		private final City city;
-		private final int hashCode;
+    /**
+     * Holds our temperature data without the station, because the
+     * map already knows that
+     */
+    private static class Temperatures
+    {
+        private int min;
+        private int max;
+        private int total;
+        private int count;
+        private final City city;
+        private final int hashCode;
 
-		public Temperatures(final City city, final int value)
-		{
-			this.city = city;
-			this.hashCode = city.hashCode();
-			this.min = value;
-			this.max = value;
-			this.total = value;
-			this.count = 1;
-		}
-
-		/**
-		 * Combine two temperatures
-		 *
-		 * @param value the temperature to add
-		 */
-		public void add(final int value)
-		{
-			this.min = Math.min(this.min, value);
-			this.max = Math.max(this.max, value);
-			this.total += value;
-			this.count++;
-		}
-
-		@Override
-		public int hashCode()
-		{
-			return hashCode;
-		}
-
-		public boolean equals(final Line l)
-		{
-			return this.city.equals(l);
-		}
-
-		public boolean equals(final City c)
-		{
-			return this.city.equals(c);
-		}
-
-		/**
-		 * 1BRC wants to have one decimal digits
-		 * @param value the value to transform
-		 * @return the rounded value
-		 */
-		private double round(double value)
-		{
-			return Math.round(value) / 10.0;
-		}
-
-		/**
-		 * Our final printing format
-		 */
-		public String toString()
+        public Temperatures(final City city, final int value)
         {
-            final double mean = (double)this.total / (double)this.count;
-            return round(min) + "/" + round(mean) + "/" + round(max);
+            this.city = city;
+            this.hashCode = city.hashCode();
+            this.min = value;
+            this.max = value;
+            this.total = value;
+            this.count = 1;
         }
-	}
 
-	private static int MIN_BUFFERSIZE = 102400;
-	private static int REMAINING_MIN_BUFFERSIZE = 200;
+        /**
+         * Combine two temperatures
+         *
+         * @param value the temperature to add
+         */
+        public void add(final int value)
+        {
+            this.min = Math.min(this.min, value);
+            this.max = Math.max(this.max, value);
+            this.total += value;
+            this.count++;
+        }
 
-	static class Line
-	{
-		public boolean EOF = false;
-		public boolean hasNewLine = false;
-		private ByteBuffer buffer = ByteBuffer.allocate(MIN_BUFFERSIZE);
-		private byte[] data = buffer.array();
-		private final FileChannel channel;
+        @Override
+        public int hashCode()
+        {
+            return hashCode;
+        }
 
-		int pos = 0;
-		int end = 0;
+        public boolean equals(final Line l)
+        {
+            return this.city.equals(l);
+        }
 
-		int lineStartPos = 0;
-		int semicolonPos = -1;
-		int newlinePos = -1;
+        public boolean equals(final City c)
+        {
+            return this.city.equals(c);
+        }
 
-		int hashCode = -1;
+        /**
+         * Our final printing format
+         */
+        public String toString()
+        {
+            return MathUtil.toString(total, count, min, max);
+        }
+    }
 
-		public Line(final FileChannel channel)
-		{
-			this.channel = channel;
-		}
+    private static int MIN_BUFFERSIZE = 102400;
+    private static int REMAINING_MIN_BUFFERSIZE = 200;
 
-		/**
-		 * @param channel the channel to read from
-		 * @param buffer the buffer to fill
-		 */
-		private void readFromChannel()
-		{
-			hashCode = -1;
+    static class Line
+    {
+        public boolean EOF = false;
+        public boolean hasNewLine = false;
+        private ByteBuffer buffer = ByteBuffer.allocate(MIN_BUFFERSIZE);
+        private byte[] data = buffer.array();
+        private final FileChannel channel;
+
+        int pos = 0;
+        int end = 0;
+
+        int lineStartPos = 0;
+        int semicolonPos = -1;
+        int newlinePos = -1;
+
+        int hashCode = -1;
+
+        public Line(final FileChannel channel)
+        {
+            this.channel = channel;
+        }
+
+        /**
+         * @param channel the channel to read from
+         * @param buffer the buffer to fill
+         */
+        private void readFromChannel()
+        {
+            hashCode = -1;
             hasNewLine = false;
 
-			try
-			{
-			    // do we near the end of the buffer?
-				if (end - pos < REMAINING_MIN_BUFFERSIZE)
-				{
-				    // we move the buffer indirectly, because the ByteBuffer just
-				    // wraps our array, nothing for the tenderhearted
-					System.arraycopy(data, pos, data, 0, data.length - pos);
-					end = end - pos;
-					pos = 0;
-					buffer.position(end);
+            try
+            {
+                // do we near the end of the buffer?
+                if (end - pos < REMAINING_MIN_BUFFERSIZE)
+                {
+                    // we move the buffer indirectly, because the ByteBuffer just
+                    // wraps our array, nothing for the tenderhearted
+                    System.arraycopy(data, pos, data, 0, data.length - pos);
+                    end = end - pos;
+                    pos = 0;
+                    buffer.position(end);
 
-					// fill the buffer up
-					final int readBytes = channel.read(buffer);
-					if (readBytes == -1)
-					{
-						EOF = true;
-					}
+                    // fill the buffer up
+                    final int readBytes = channel.read(buffer);
+                    if (readBytes == -1)
+                    {
+                        EOF = true;
+                    }
 
-					end = buffer.position();
-				}
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-				EOF = true;
-				throw new RuntimeException(e);
-			}
+                    end = buffer.position();
+                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                EOF = true;
+                throw new RuntimeException(e);
+            }
 
-			lineStartPos = pos;
+            lineStartPos = pos;
 
-			// look for semicolon and new line
-			int i = pos;
-			for (; i < end; i++)
-			{
-				final byte b = data[i];
-				if (b == ';')
-				{
-					semicolonPos = i;
-					break;
-				}
-			}
-
-			i++;
-			for (; i < end; i++)
-			{
+            // look for semicolon and new line
+            int i = pos;
+            for (; i < end; i++)
+            {
                 final byte b = data[i];
-				if (b == '\n')
-				{
-					newlinePos = i;
-					pos = i + 1;
-					hasNewLine = true;
-					return;
-				}
-			}
-       	}
+                if (b == ';')
+                {
+                    semicolonPos = i;
+                    break;
+                }
+            }
 
-		@Override
-		public int hashCode()
-		{
-			if (hashCode == -1)
-			{
-				var p = buffer.position();
-				var l = buffer.limit();
+            i++;
+            for (; i < end; i++)
+            {
+                final byte b = data[i];
+                if (b == '\n')
+                {
+                    newlinePos = i;
+                    pos = i + 1;
+                    hasNewLine = true;
+                    return;
+                }
+            }
+        }
 
-				buffer.position(lineStartPos);
-				buffer.limit(semicolonPos);
-				hashCode = buffer.hashCode();
+        @Override
+        public int hashCode()
+        {
+            if (hashCode == -1)
+            {
+                var p = buffer.position();
+                var l = buffer.limit();
 
-				buffer.limit(l);
-				buffer.position(p);
-			}
-			return hashCode;
-		}
+                buffer.position(lineStartPos);
+                buffer.limit(semicolonPos);
+                hashCode = buffer.hashCode();
 
-		public City getCity()
-		{
-			var c = new City();
-			c.data = Arrays.copyOfRange(data, lineStartPos, semicolonPos);
-			c.hashCode = hashCode();
+                buffer.limit(l);
+                buffer.position(p);
+            }
+            return hashCode;
+        }
 
-			return c;
-		}
+        public City getCity()
+        {
+            var c = new City();
+            c.data = Arrays.copyOfRange(data, lineStartPos, semicolonPos);
+            c.hashCode = hashCode();
 
-		@Override
-		public String toString()
-		{
-			return new String(data);
-		}
-	}
+            return c;
+        }
 
-	static class City
-	{
-		byte[] data;
-		int hashCode = -1;
+        @Override
+        public String toString()
+        {
+            return new String(data);
+        }
+    }
 
-		public boolean equals(Line line)
-		{
-			return Arrays.mismatch(data, 0, data.length, line.buffer.array(), line.lineStartPos, line.semicolonPos) == -1;
-		}
+    static class City
+    {
+        byte[] data;
+        int hashCode = -1;
 
-		public boolean equals(City city)
-		{
-			return Arrays.mismatch(data, 0, data.length, city.data, 0, city.data.length) == -1;
-		}
+        public boolean equals(Line line)
+        {
+            return Arrays.mismatch(data, 0, data.length, line.buffer.array(), line.lineStartPos, line.semicolonPos) == -1;
+        }
 
-		@Override
-		public int hashCode()
-		{
-			return hashCode;
-		}
+        public boolean equals(City city)
+        {
+            return Arrays.mismatch(data, 0, data.length, city.data, 0, city.data.length) == -1;
+        }
 
-		@Override
-		public String toString()
-		{
-			return new String(data, 0, data.length);
-		}
-	}
+        @Override
+        public int hashCode()
+        {
+            return hashCode;
+        }
 
-	@Override
-	public String run(final String fileName) throws IOException
-	{
-		// our cities with temperatures, assume we get about 400, so we get us decent space
-		final FastHashSet cities = new FastHashSet(2023, 0.5f);
+        @Override
+        public String toString()
+        {
+            return new String(data, 0, data.length);
+        }
+    }
 
-		try (var raf = new RandomAccessFile(fileName, "r");
-				var channel = raf.getChannel();)
-		{
-			final Line line = new Line(channel);
+    @Override
+    public String run(final String fileName) throws IOException
+    {
+        // our cities with temperatures, assume we get about 400, so we get us decent space
+        final FastHashSet cities = new FastHashSet(2023, 0.5f);
 
-			while (true)
-			{
-				line.readFromChannel();
+        try (var raf = new RandomAccessFile(fileName, "r");
+                var channel = raf.getChannel();)
+        {
+            final Line line = new Line(channel);
 
-				if (line.hasNewLine)
-				{
-					// parse our temperature inline without an instance of a string for temperature
-					final int temperature = ParseDouble.parseInteger(line.data, line.semicolonPos + 1, line.newlinePos - 1);
+            while (true)
+            {
+                line.readFromChannel();
 
-					// find and update
-					cities.getPutOrUpdate(line, temperature);
-				}
+                if (line.hasNewLine)
+                {
+                    // parse our temperature inline without an instance of a string for temperature
+                    final int temperature = ParseDouble.parseInteger(line.data, line.semicolonPos + 1, line.newlinePos - 1);
+
+                    // find and update
+                    cities.getPutOrUpdate(line, temperature);
+                }
                 else if (line.EOF)
                 {
                     break;
                 }
-			}
-		}
+            }
+        }
 
-		// ok, we got everything, now we need to order it and print it
-		final var result = new TreeMap<String, Temperatures>();
-		// the simple set is not a standard collection class, so we go manual
-		for (Temperatures t : cities.keys())
-		{
-			result.put(t.city.toString(), t);
-		}
-		return result.toString();
-	}
+        // ok, we got everything, now we need to order it and print it
+        final var result = new TreeMap<String, Temperatures>();
+        // the simple set is not a standard collection class, so we go manual
+        for (Temperatures t : cities.keys())
+        {
+            result.put(t.city.toString(), t);
+        }
+        return result.toString();
+    }
 
-	public static void main(String[] args) throws NoSuchMethodException, SecurityException
-	{
-		Benchmark.run(BRC14b_ReadBytesFixed.class, args);
-	}
+    public static void main(String[] args) throws NoSuchMethodException, SecurityException
+    {
+        Benchmark.run(BRC14b_ReadBytesFixed.class, args);
+    }
 
-	static class FastHashSet
-	{
-		// we need only the reference, not the content
-		private static final Temperatures FREE_KEY = null;
+    static class FastHashSet
+    {
+        // we need only the reference, not the content
+        private static final Temperatures FREE_KEY = null;
 
-		/** Keys and values */
-		private Temperatures[] m_data;
+        /** Keys and values */
+        private Temperatures[] m_data;
 
-		/** Fill factor, must be between (0 and 1) */
-		private final float m_fillFactor;
-		/** We will resize a map once it reaches this size */
-		private int m_threshold;
-		/** Current map size */
-		private int m_size;
-		/** Mask to calculate the original position */
-		private int m_mask;
+        /** Fill factor, must be between (0 and 1) */
+        private final float m_fillFactor;
+        /** We will resize a map once it reaches this size */
+        private int m_threshold;
+        /** Current map size */
+        private int m_size;
+        /** Mask to calculate the original position */
+        private int m_mask;
 
-		public FastHashSet()
-		{
-			this(13, 0.5f);
-		}
+        public FastHashSet()
+        {
+            this(13, 0.5f);
+        }
 
-		public FastHashSet( final int size, final float fillFactor )
-		{
-			final int capacity = arraySize(size, fillFactor);
-			m_mask = capacity - 1;
-			m_fillFactor = fillFactor;
+        public FastHashSet( final int size, final float fillFactor )
+        {
+            final int capacity = arraySize(size, fillFactor);
+            m_mask = capacity - 1;
+            m_fillFactor = fillFactor;
 
-			m_data = new Temperatures[capacity];
-			m_threshold = (int) (capacity * fillFactor);
-		}
+            m_data = new Temperatures[capacity];
+            m_threshold = (int) (capacity * fillFactor);
+        }
 
-		public void getPutOrUpdate( final Line line, int value )
-		{
-			final int hash = line.hashCode();
+        public void getPutOrUpdate( final Line line, int value )
+        {
+            final int hash = line.hashCode();
 
-			int ptr = hash & m_mask;
-			Temperatures k = m_data[ ptr ];
+            int ptr = hash & m_mask;
+            Temperatures k = m_data[ ptr ];
 
-			if ( k == FREE_KEY )
-			{
-				put(new Temperatures(line.getCity(), value));
-				return;
-			}
+            if ( k == FREE_KEY )
+            {
+                put(new Temperatures(line.getCity(), value));
+                return;
+            }
 
-			if ( k.hashCode() == hash && k.equals( line ) )
-			{
-				k.add(value);
-				return;
-			}
+            if ( k.hashCode() == hash && k.equals( line ) )
+            {
+                k.add(value);
+                return;
+            }
 
-			while ( true )
-			{
-				ptr = (ptr + 1) & m_mask; //that's next index
-				k = m_data[ ptr ];
-				if ( k == FREE_KEY )
-				{
-					put(new Temperatures(line.getCity(), value));
-					return;
-				}
-				if (k.hashCode() == hash && k.equals( line ))
-				{
-					k.add(value);
-					return;
-				}
-			}
-		}
+            while ( true )
+            {
+                ptr = (ptr + 1) & m_mask; //that's next index
+                k = m_data[ ptr ];
+                if ( k == FREE_KEY )
+                {
+                    put(new Temperatures(line.getCity(), value));
+                    return;
+                }
+                if (k.hashCode() == hash && k.equals( line ))
+                {
+                    k.add(value);
+                    return;
+                }
+            }
+        }
 
-		private Temperatures put(final Temperatures key)
-		{
-			final int hash = key.hashCode();
-			int ptr = hash & m_mask;
-			Temperatures k = m_data[ptr];
+        private Temperatures put(final Temperatures key)
+        {
+            final int hash = key.hashCode();
+            int ptr = hash & m_mask;
+            Temperatures k = m_data[ptr];
 
-			if ( k == FREE_KEY ) //end of chain already
-			{
-				m_data[ ptr ] = key;
-				if ( m_size >= m_threshold )
-					rehash( m_data.length * 2 ); //size is set inside
-				else
-					++m_size;
-				return null;
-			}
-			else if (k.hashCode() == hash && k.equals( key.city ))
-			{
-				final Temperatures ret = m_data[ptr];
-				m_data[ptr] = key;
-				return ret;
-			}
+            if ( k == FREE_KEY ) //end of chain already
+            {
+                m_data[ ptr ] = key;
+                if ( m_size >= m_threshold )
+                    rehash( m_data.length * 2 ); //size is set inside
+                else
+                    ++m_size;
+                return null;
+            }
+            else if (k.hashCode() == hash && k.equals( key.city ))
+            {
+                final Temperatures ret = m_data[ptr];
+                m_data[ptr] = key;
+                return ret;
+            }
 
-			while ( true )
-			{
-				ptr = (ptr + 1) & m_mask; //that's next index calculation
-				k = m_data[ ptr ];
-				if ( k == FREE_KEY )
-				{
-					m_data[ ptr ] = key;
-					if ( m_size >= m_threshold )
-						rehash( m_data.length * 2 ); //size is set inside
-						else
-							++m_size;
-					return null;
-				}
-				else if ( k.hashCode() == hash && k.equals( key.city ) )
-				{
-					final Temperatures ret = m_data[ptr];
-					m_data[ptr] = key;
-					return ret;
-				}
-			}
-		}
+            while ( true )
+            {
+                ptr = (ptr + 1) & m_mask; //that's next index calculation
+                k = m_data[ ptr ];
+                if ( k == FREE_KEY )
+                {
+                    m_data[ ptr ] = key;
+                    if ( m_size >= m_threshold )
+                        rehash( m_data.length * 2 ); //size is set inside
+                    else
+                        ++m_size;
+                    return null;
+                }
+                else if ( k.hashCode() == hash && k.equals( key.city ) )
+                {
+                    final Temperatures ret = m_data[ptr];
+                    m_data[ptr] = key;
+                    return ret;
+                }
+            }
+        }
 
-		public int size()
-		{
-			return m_size;
-		}
+        public int size()
+        {
+            return m_size;
+        }
 
-		private void rehash( final int newcapacity )
-		{
-			m_threshold = (int) (newcapacity * m_fillFactor);
-			m_mask = newcapacity - 1;
+        private void rehash( final int newcapacity )
+        {
+            m_threshold = (int) (newcapacity * m_fillFactor);
+            m_mask = newcapacity - 1;
 
-			final int oldcapacity = m_data.length;
-			final Temperatures[] oldData = m_data;
+            final int oldcapacity = m_data.length;
+            final Temperatures[] oldData = m_data;
 
-			m_data = new Temperatures[newcapacity];
+            m_data = new Temperatures[newcapacity];
 
-			m_size = 0;
+            m_size = 0;
 
-			for ( int i = 0; i < oldcapacity; i++ )
-			{
-				final Temperatures oldKey = oldData[ i ];
-				if( oldKey != FREE_KEY)
-				{
-					put(oldKey);
-				}
-			}
-		}
+            for ( int i = 0; i < oldcapacity; i++ )
+            {
+                final Temperatures oldKey = oldData[ i ];
+                if( oldKey != FREE_KEY)
+                {
+                    put(oldKey);
+                }
+            }
+        }
 
-		/**
-		 * Returns a list of all values
-		 *
-		 * @return
-		 */
-		public List<Temperatures> keys()
-		{
-			final List<Temperatures> result = new ArrayList<>(this.m_size);
+        /**
+         * Returns a list of all values
+         *
+         * @return
+         */
+        public List<Temperatures> keys()
+        {
+            final List<Temperatures> result = new ArrayList<>(this.m_size);
 
-			final int length = m_data.length;
-			for (int i = 0; i < length; i++)
-			{
-				final Temperatures o = m_data[i];
-				if (o != FREE_KEY)
-				{
-					result.add(o);
-				}
-			}
+            final int length = m_data.length;
+            for (int i = 0; i < length; i++)
+            {
+                final Temperatures o = m_data[i];
+                if (o != FREE_KEY)
+                {
+                    result.add(o);
+                }
+            }
 
-			return result;
-		}
+            return result;
+        }
 
-		/**
-		 * Clears the map, reuses the data structure by clearing it out.
-		 * It won't shrink the underlying array!
-		 */
-		public void clear()
-		{
-			this.m_size = 0;
-			Arrays.fill(m_data, FREE_KEY);
-		}
+        /**
+         * Clears the map, reuses the data structure by clearing it out.
+         * It won't shrink the underlying array!
+         */
+        public void clear()
+        {
+            this.m_size = 0;
+            Arrays.fill(m_data, FREE_KEY);
+        }
 
-		/** Return the least power of two greater than or equal to the specified value.
-		 *
-		 * <p>Note that this function will return 1 when the argument is 0.
-		 *
-		 * @param x a long integer smaller than or equal to 2<sup>62</sup>.
-		 * @return the least power of two greater than or equal to the specified value.
-		 */
-		public static long nextPowerOfTwo( long x ) {
-			if ( x == 0 ) return 1;
-			x--;
-			x |= x >> 1;
-			x |= x >> 2;
-			x |= x >> 4;
-			x |= x >> 8;
-			x |= x >> 16;
-			return ( x | x >> 32 ) + 1;
-		}
+        /** Return the least power of two greater than or equal to the specified value.
+         *
+         * <p>Note that this function will return 1 when the argument is 0.
+         *
+         * @param x a long integer smaller than or equal to 2<sup>62</sup>.
+         * @return the least power of two greater than or equal to the specified value.
+         */
+        public static long nextPowerOfTwo( long x ) {
+            if ( x == 0 ) return 1;
+            x--;
+            x |= x >> 1;
+            x |= x >> 2;
+                x |= x >> 4;
+                x |= x >> 8;
+                x |= x >> 16;
+                return ( x | x >> 32 ) + 1;
+        }
 
-		/** Returns the least power of two smaller than or equal to 2<sup>30</sup> and larger than or equal to <code>Math.ceil( expected / f )</code>.
-		 *
-		 * @param expected the expected number of elements in a hash table.
-		 * @param f the load factor.
-		 * @return the minimum possible size for a backing array.
-		 * @throws IllegalArgumentException if the necessary size is larger than 2<sup>30</sup>.
-		 */
-		public static int arraySize( final int expected, final float f ) {
-			final long s = Math.max( 2, nextPowerOfTwo( (long)Math.ceil( expected / f ) ) );
-			if ( s > (1 << 30) ) throw new IllegalArgumentException( "Too large (" + expected + " expected elements with load factor " + f + ")" );
-			return (int)s;
-		}
-	}
+        /** Returns the least power of two smaller than or equal to 2<sup>30</sup> and larger than or equal to <code>Math.ceil( expected / f )</code>.
+         *
+         * @param expected the expected number of elements in a hash table.
+         * @param f the load factor.
+         * @return the minimum possible size for a backing array.
+         * @throws IllegalArgumentException if the necessary size is larger than 2<sup>30</sup>.
+         */
+        public static int arraySize( final int expected, final float f ) {
+            final long s = Math.max( 2, nextPowerOfTwo( (long)Math.ceil( expected / f ) ) );
+            if ( s > (1 << 30) ) throw new IllegalArgumentException( "Too large (" + expected + " expected elements with load factor " + f + ")" );
+            return (int)s;
+        }
+    }
 
 }

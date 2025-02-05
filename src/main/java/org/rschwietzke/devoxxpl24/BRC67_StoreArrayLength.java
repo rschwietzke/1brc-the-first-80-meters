@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 
 /**
  * We keep the array length extra to avoid some null checks
@@ -37,7 +38,7 @@ public class BRC67_StoreArrayLength extends Benchmark
     {
         private int min;
         private int max;
-        private long total;
+        private int total;
         private int count;
         private final byte[] city;
         private final int length;
@@ -117,16 +118,6 @@ public class BRC67_StoreArrayLength extends Benchmark
             throw new RuntimeException("Equals is not supported");
         }
 
-        /**
-         * 1BRC wants to have one decimal digits
-         * @param value the value to transform
-         * @return the rounded value
-         */
-        private double round(double value)
-        {
-            return Math.round(value) / 10.0;
-        }
-
         public String getCity()
         {
             return new String(city, 0, city.length);
@@ -137,8 +128,7 @@ public class BRC67_StoreArrayLength extends Benchmark
          */
         public String toString()
         {
-            final double mean = (double)this.total / (double)this.count;
-            return round(min) + "/" + round(mean) + "/" + round(max);
+            return MathUtil.toString(total, count, min, max);
         }
     }
 

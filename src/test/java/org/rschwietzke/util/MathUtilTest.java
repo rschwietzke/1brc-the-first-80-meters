@@ -41,4 +41,12 @@ public class MathUtilTest
         assertEquals("2.0", String.valueOf(MathUtil.meanAndRound(100, 5)));
         assertEquals("25.0", String.valueOf(MathUtil.meanAndRound(1000, 4)));
     }
+
+    @Test
+    void toIntToString()
+    {
+        assertEquals("2/10.0/5.0/21.0", String.valueOf(MathUtil.toString(100, 2, 100, 210)));
+        assertEquals("3/10.0/3.3/21.0", String.valueOf(MathUtil.toString(100, 3, 100, 210)));
+        assertEquals("4/10.0/2.5/21.0", String.valueOf(MathUtil.toString(100, 4, 100, 210)));
+    }
 }

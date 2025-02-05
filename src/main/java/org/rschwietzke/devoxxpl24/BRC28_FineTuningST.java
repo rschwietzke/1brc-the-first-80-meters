@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.ParseDouble;
 
 /**
@@ -85,16 +86,6 @@ public class BRC28_FineTuningST extends Benchmark
             return Arrays.mismatch(data, 0, data.length, other, 0, other.length) == -1;
         }
 
-        /**
-         * 1BRC wants to have one decimal digits
-         * @param value the value to transform
-         * @return the rounded value
-         */
-        private double round(double value)
-        {
-            return Math.round(value) / 10.0;
-        }
-
         public String getCity()
         {
             return new String(data, 0, data.length);
@@ -105,8 +96,7 @@ public class BRC28_FineTuningST extends Benchmark
          */
         public String toString()
         {
-            final double mean = (double)this.total / (double)this.count;
-            return round(min) + "/" + round(mean) + "/" + round(max);
+            return MathUtil.toString(total, count, min, max);
         }
     }
 

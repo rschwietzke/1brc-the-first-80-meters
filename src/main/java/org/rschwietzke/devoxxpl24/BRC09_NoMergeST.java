@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.ParseDouble;
 
 /**
@@ -40,7 +41,7 @@ public class BRC09_NoMergeST extends Benchmark
 	{
 		private final int min;
 		private final int max;
-		private final long total;
+		private final int total;
 		private final int count;
 
 		public Temperatures(final int value)
@@ -51,7 +52,7 @@ public class BRC09_NoMergeST extends Benchmark
 			this.count = 1;
 		}
 
-		private Temperatures(int min, int max, long total, int count)
+		private Temperatures(int min, int max, int total, int count)
 		{
 			this.min = min;
 			this.max = max;
@@ -71,22 +72,11 @@ public class BRC09_NoMergeST extends Benchmark
 		}
 
 		/**
-		 * 1BRC wants to have one decimal digits
-		 * @param value the value to transform
-		 * @return the rounded value
-		 */
-		private double round(double value)
-		{
-			return Math.round(value) / 10.0;
-		}
-
-		/**
 		 * Our final printing format
 		 */
 		public String toString()
         {
-            final double mean = (double)this.total / (double)this.count;
-            return round(min) + "/" + round(mean) + "/" + round(max);
+            return MathUtil.toString(total, count, min, max);
         }
 	}
 

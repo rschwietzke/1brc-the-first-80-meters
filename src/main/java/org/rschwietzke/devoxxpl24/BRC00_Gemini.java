@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 
 /**
  * This is an empty shell to check the framework overhead.
@@ -66,13 +67,7 @@ public class BRC00_Gemini extends Benchmark
 
         public String toString()
         {
-            final double mean = this.sum / (double)this.count;
-            return round(min) + "/" + round(mean) + "/" + round(max);
-        }
-
-        private double round(double value)
-        {
-            return Math.round(value * 10.0) / 10.0;
+            return MathUtil.toString(sum, count, min, max);
         }
     }
 

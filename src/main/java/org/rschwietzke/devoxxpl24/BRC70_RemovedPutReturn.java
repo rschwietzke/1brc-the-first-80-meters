@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 
 /**
  * Remove some data not needed
@@ -41,7 +42,7 @@ public class BRC70_RemovedPutReturn extends Benchmark
     {
         private int min;
         private int max;
-        private long total;
+        private int total;
         private int count;
         private final byte[] city;
         private final int length;
@@ -121,16 +122,6 @@ public class BRC70_RemovedPutReturn extends Benchmark
             throw new RuntimeException("Equals is not supported");
         }
 
-        /**
-         * 1BRC wants to have one decimal digits
-         * @param value the value to transform
-         * @return the rounded value
-         */
-        private double round(double value)
-        {
-            return Math.round(value) / 10.0;
-        }
-
         public String getCity()
         {
             return new String(city, 0, city.length);
@@ -141,12 +132,11 @@ public class BRC70_RemovedPutReturn extends Benchmark
          */
         public String toString()
         {
-            final double mean = (double)this.total / (double)this.count;
-            return round(min) + "/" + round(mean) + "/" + round(max);
+            return MathUtil.toString(total, count, min, max);
         }
     }
 
-    static class Line
+    static class LineReader
     {
         private static int MIN_BUFFERSIZE = 1_000_000;
         private static int REMAINING_MIN_BUFFERSIZE = 200;
@@ -168,7 +158,7 @@ public class BRC70_RemovedPutReturn extends Benchmark
 
         boolean EOF = false;
 
-        public Line(final RandomAccessFile file)
+        public LineReader(final RandomAccessFile file)
         {
             this.file = file;
         }
@@ -207,7 +197,7 @@ public class BRC70_RemovedPutReturn extends Benchmark
          * @param channel the channel to read from
          * @param buffer the buffer to fill
          */
-        private void read()
+        private void readLine()
         {
             // do we near the end of the buffer?
             // this branch is likely one of the expensive ones
@@ -344,18 +334,20 @@ public class BRC70_RemovedPutReturn extends Benchmark
 
         try (var raf = new RandomAccessFile(fileName, "r"))
         {
-            final Line line = new Line(raf);
+            final LineReader line = new LineReader(raf);
 
             while (!line.EOF)
             {
-                line.read();
+                line.readLine();
                 cities.putOrUpdate(line);
             }
 
-            // crawl to the end
+            // crawl to the end for the remaining data in the buffer
+            // the EOF told us that we are end of file data, so just
+            // read the rest
             for (; line.pos < line.end; )
             {
-                line.read();
+                line.readLine();
                 cities.putOrUpdate(line);
             }
         }
@@ -391,7 +383,7 @@ public class BRC70_RemovedPutReturn extends Benchmark
             m_threshold = (int) (capacity * 0.5f);
         }
 
-        public void putOrUpdate(final Line line)
+        public void putOrUpdate(final LineReader line)
         {
             // having the while loop here is slower due to
             // more branch misses, don't know yet exactly
@@ -436,7 +428,7 @@ public class BRC70_RemovedPutReturn extends Benchmark
             }
         }
 
-        private void put(final Line line)
+        private void put(final LineReader line)
         {
             put(new Temperatures(
                     Arrays.copyOfRange(
@@ -451,7 +443,7 @@ public class BRC70_RemovedPutReturn extends Benchmark
          * @param line
          * @param ptr the last position
          */
-        private void putOrUpdateSlow(final Line line, int ptr)
+        private void putOrUpdateSlow(final LineReader line, int ptr)
         {
             outer:
                 while (true)

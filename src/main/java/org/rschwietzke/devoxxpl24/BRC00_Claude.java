@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.util.MathUtil;
 
 /**
  * This is an empty shell to check the framework overhead.
@@ -34,7 +35,7 @@ public class BRC00_Claude extends Benchmark
         TreeMap<String, ArrayList<Double>> cityData = new TreeMap<>();
 
         // Read the file
-        try (BufferedReader br = new BufferedReader(new FileReader("temperatures.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(";");
@@ -55,26 +56,16 @@ public class BRC00_Claude extends Benchmark
         StringBuilder result = new StringBuilder();
         for (String city : cityData.keySet()) {
             ArrayList<Double> temperatures = cityData.get(city);
+            int count = temperatures.size();
             double min = temperatures.stream().mapToDouble(d -> d).min().getAsDouble();
             double max = temperatures.stream().mapToDouble(d -> d).max().getAsDouble();
             double avg = temperatures.stream().mapToDouble(d -> d).average().getAsDouble();
 
-            finalResult.put(city, outputString(min, max, avg));
+            finalResult.put(city, MathUtil.toString(count, min, max, avg));
         }
 
         return finalResult.toString();
     }
-
-    public static String outputString(double min, double max, double mean)
-    {
-        return round(min) + "/" + round(mean) + "/" + round(max);
-    }
-
-    private static double round(double value)
-    {
-        return Math.round(value * 10.0) / 10.0;
-    }
-
 
     public static void main(String[] args)
     {
