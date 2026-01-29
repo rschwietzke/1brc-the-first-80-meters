@@ -11,6 +11,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -68,89 +70,164 @@ public abstract class Benchmark
     private static void printError()
     {
         System.err.println("Where are the arguments?");
-        System.err.println("Usage: <file> [warmUpCount] [measurementCount] [--batchmode <comment>] [-o <filename>]");
+        System.err.println("Usage: run -f <file> -wc [warmUpCount] -mc [measurementCount] [--batchmode <comment>] [-o <filename>]");
+    }
+
+    /**
+     * Check if we have a parameter at the comment line, such as -o
+     * Return the pos or -1 if not found
+     * 
+     * @param args the args
+     * @param param the param to search for
+     * @return position or -1
+     */
+    private static <T> Optional<T> getValue(
+            final String[] args, 
+            final String param, 
+            final Function<String, T> f)
+    {
+        for (int i = 0; i < args.length; i++)
+        {
+            if (args[i].equals(param))
+            {
+                if (i + 1 >= args.length)
+                {
+                    System.err.println("Parameter " + param + " needs a value!");
+                    return Optional.empty();
+                }
+                else
+                {
+                    return Optional.ofNullable(f.apply(args[i + 1]));
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+
+    /**
+     * Check if we have a parameter at the comment line, such as -o
+     * Return the pos or -1 if not found
+     * 
+     * @param args the args
+     * @param param the param to search for
+     * @return position or -1
+     */
+    private static Optional<Boolean> hasParam(final String[] args, final String param) 
+    {
+        for (int i = 0; i < args.length; i++)
+        {
+            if (args[i].equals(param))
+            {
+                return Optional.of(true);
+            }
+        }
+
+        return Optional.empty();
     }
 
     /**
      * Just runs our test and measures things
+     * 
      * @throws IOException
      * @throws NoSuchAlgorithmException
      */
     public static void run(final Constructor<? extends Benchmark> ctr, final String[] args) throws IOException
     {
         // did we get anything?
-        if (args.length < 3)
+        if (args.length == 0)
         {
             printError();
             return;
         }
 
-        final String fileName = args[0];
-
-        // do we have an additional second and third?
-        final int warmUpRuns = Integer.valueOf(args[1]);
-        final int measurementRuns = Integer.valueOf(args[2]);
-
-        final boolean batchMode = args.length > 3 && args[3].equalsIgnoreCase("--batchmode");
-        final boolean printToFile = args.length > 3 && args[3].equalsIgnoreCase("-o");
-        final String outputFileName = args.length > 4 ? args[4] : null;
-
-        final String batchComment;
-        if (batchMode && args.length < 5)
+        try
         {
+            final String fileName = getValue(args, "-f", s -> s)
+                    .orElseThrow(() -> new IllegalArgumentException("File name is required"));
+
+            // do we have an additional second and third?
+            final int warmUpRuns = getValue(args, "-wc", s -> Integer.valueOf(s))
+                    .orElseThrow(() -> new IllegalArgumentException("Warmup count is required"));
+            final int measurementRuns = getValue(args, "-mc", s -> Integer.valueOf(s))
+                    .orElseThrow(() -> new IllegalArgumentException("Measurement count is required"));
+
+            final boolean batchMode = hasParam(args, "--batchmode").orElse(false);
+            final Optional<String> outputFileName = getValue(args, "-o", s -> s);
+            final boolean print = hasParam(args, "--print").orElse(false);
+
+            final String batchComment;
+            if (batchMode && args.length < 5)
+            {
+                printError();
+                return;
+            }
+            else if (batchMode && args.length == 5)
+            {
+                batchComment = args[4].isBlank() ? "none" : args[4];
+            }
+            else
+            {
+                batchComment = "none";
+            }
+
+            Benchmark.print(batchMode, () -> "==== WARMUP ==================\n");
+            var results = measure(ctr, Mode.WARMUP, warmUpRuns, fileName, batchMode);
+
+            Benchmark.print(batchMode, () -> "==== MEASUREMENT ==================\n");
+            results = measure(ctr, Mode.MEASUREMENT, measurementRuns, fileName, batchMode);
+
+            Benchmark.print(batchMode, () -> "==== RESULT ========================\n");
+            long total = 0;
+            String lastResult = null;
+
+            for (BenchmarkResult result : results)
+            {
+                total += result.runtime;
+                lastResult = result.data;
+            }
+            final int mean = Math.round(total / results.size());
+
+            //  verify the checksum
+            final var crcs = results.stream().map(r -> r.getCRC()).sorted().distinct().toList();
+            if (crcs.size() > 1)
+            {
+                throw new RuntimeException("CRCs vary!!!");
+            }
+
+            if (batchMode)
+            {
+                var clazzName = ctr.getDeclaringClass().getSimpleName();
+                System.out.print(String.format("%s,%s,%s,%d%n", clazzName, crcs.get(0), batchComment, mean));
+            }
+            else
+            {
+                System.out.println(String.format("Mean Measurement Runtime: %d ms", mean));
+            }
+
+            if (print)
+            {
+                System.out.println("==== OUTPUT ========================\n");
+                System.out.println(lastResult);
+            }
+            
+            // do we want to print?
+            if (outputFileName.isPresent())
+            {
+                var o = Files.newBufferedWriter(Paths.get(outputFileName.get()));
+                o.write(lastResult);
+                o.close();
+            }
+        }
+        catch (IllegalArgumentException e)
+        {
+            System.err.println(e.getMessage());
             printError();
+            
             return;
         }
-        else if (batchMode && args.length == 5)
-        {
-            batchComment = args[4].isBlank() ? "none" : args[4];
-        }
-        else
-        {
-            batchComment = "none";
-        }
 
-        Benchmark.print(batchMode, () -> "==== WARMUP ==================\n");
-        var results = measure(ctr, Mode.WARMUP, warmUpRuns, fileName, batchMode);
-
-        Benchmark.print(batchMode, () -> "==== MEASUREMENT ==================\n");
-        results = measure(ctr, Mode.MEASUREMENT, measurementRuns, fileName, batchMode);
-
-        Benchmark.print(batchMode, () -> "==== RESULT ========================\n");
-        long total = 0;
-        String lastResult = null;
-
-        for (BenchmarkResult result : results)
-        {
-            total += result.runtime;
-            lastResult = result.data;
-        }
-        final int mean = Math.round(total / results.size());
-
-        //  verify the checksum
-        final var crcs = results.stream().map(r -> r.getCRC()).sorted().distinct().toList();
-        if (crcs.size() > 1)
-        {
-            throw new RuntimeException("CRCs vary!!!");
-        }
-
-        if (batchMode)
-        {
-            var clazzName = ctr.getDeclaringClass().getSimpleName();
-            System.out.print(String.format("%s,%s,%s,%d%n", clazzName, crcs.get(0), batchComment, mean));
-        }
-        else
-        {
-            System.out.println(String.format("Mean Measurement Runtime: %d ms", mean));
-        }
-
-        // do we want to print?
-        if (printToFile)
-        {
-            var o = Files.newBufferedWriter(Paths.get(outputFileName));
-            o.write(lastResult);
-            o.close();
-        }
     }
 
     private static List<BenchmarkResult> measure(final Constructor<? extends Benchmark> ctr,

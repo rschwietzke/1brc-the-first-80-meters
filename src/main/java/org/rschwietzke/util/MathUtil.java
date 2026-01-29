@@ -8,18 +8,18 @@ public class MathUtil
      */
     public static double round(final double value)
     {
-        return Math.round(value * 10.0) / 10.0;
+        return Math.round(value * 1000.0d) / 1000.0d;
     }
 
     /**
-     * We assume we use an int to store double with with only one decimal digit
+     * We assume we use an int to store double with only one decimal digit
      *
      * @param value
      * @return a result as double with one decimal digit
      */
     public static double roundFromIntDouble(final double value)
     {
-        return Math.round(value) / 10.0d;
+        return Math.round(value) / 1000.0d;
     }
 
     /**
@@ -30,7 +30,7 @@ public class MathUtil
      */
     public static double round(final int value)
     {
-        return value / 10.0d;
+        return value / 1000.0d;
     }
 
     /**
@@ -41,7 +41,7 @@ public class MathUtil
      */
     public static double meanAndRound(final long total, final int count)
     {
-        return Math.round((double)total / (double)count) / 10.0;
+        return Math.round((double)total / (double)count) / 1000.0d;
     }
 
     /**
@@ -55,6 +55,26 @@ public class MathUtil
 
     /**
      * Standard formatter to ensure we get the same everywhere
+     */
+    public static String toString(double sum, long count, double min, double max)
+    {
+        final double mean = sum / (double)count;
+        return count + "/" + round(min) + "/" + round(mean) + "/" + round(max);
+    }
+    
+    /**
+     * Standard formatter to ensure we get the same everywhere. We assume that we
+     * store doubles as int with one decimal digit precision.
+     */
+    public static String toStringFromInteger(long sum, long count, int min, int max)
+    {
+        final double mean = (double)(sum / 10d) / (double)count;
+        return count + "/" + round(min / 10d) + "/" + round(mean) + "/" + round(max / 10d);
+    }
+    
+    /**
+     * Standard formatter to ensure we get the same everywhere. We assume that we
+     * store doubles as int with one decimal digit precision.
      */
     public static String toString(int sum, int count, int min, int max)
     {
