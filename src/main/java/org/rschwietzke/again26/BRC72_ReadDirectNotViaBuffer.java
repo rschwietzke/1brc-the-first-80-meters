@@ -28,8 +28,7 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Our parsing got too big, so it was not inlineable anymore.
- * Copy the code into the readline instead.
+ * Ok, 
  * 
  * @author Rene Schwietzke
  */
@@ -51,14 +50,19 @@ public class BRC72_ReadDirectNotViaBuffer extends Benchmark
 
         public City(final Line line)
         {
-            this.city = new byte[line.semicolon];
-            for (int i = 0; i < line.semicolon; i++)
+            int len = line.semicolon - line.startPos;
+            this.city = new byte[len];
+            int s = line.startPos;
+            for (int i = s; i < line.semicolon; i++)
             {
-                this.city[i] = line.data[i];
+                this.city[i - s] = line.backingArray[i];
             }
+//            System.out.println("Created city: " + new String(this.city));
             
             this.hashCode = line.hash;
-            this.cityLength = line.semicolon;
+            
+            this.cityLength = len;
+            
             this.min = line.temperature;
             this.max = line.temperature;
             this.total = line.temperature;
@@ -97,19 +101,26 @@ public class BRC72_ReadDirectNotViaBuffer extends Benchmark
          */
         public boolean equalsCity(Line line)
         {
-            int len = line.semicolon;
+            int start = line.startPos;
+            int len = line.semicolon - start;
             if (this.cityLength != len)
             {
                 return false;
             }
 
-            for (int i = 0; i < len; i++)
+//            System.out.format("Compare: '%s' -> '%s': ", getCity(), 
+//                    new String(line.backingArray, start, len));
+            
+            int end = start + len;
+            for (int i = start; i < end; i++)
             {
-                if (this.city[i] != line.data[i])
+                if (this.city[i - start] != line.backingArray[i])
                 {
+//                    System.out.format("false%n");
                     return false;
                 }
             }
+//            System.out.format("true%n");
             return true;
         }
 
@@ -391,12 +402,13 @@ public class BRC72_ReadDirectNotViaBuffer extends Benchmark
     {
         // by agreement, we never have more than 100 bytes of city, so stay
         // un the safe zone
-        public final byte[] data = new byte[250];
         public int semicolon;
         public int temperature;
         public int hash;
+        public int startPos;
         private FileChannel channel;
         private ByteBuffer buffer = ByteBuffer.allocate(8192);
+        private byte[] backingArray = buffer.array();
         
         public Line(FileChannel channel)
         {
@@ -433,25 +445,27 @@ public class BRC72_ReadDirectNotViaBuffer extends Benchmark
                     return false;
                 }
             }
+            
+            // let's operate on the backing array directly to speed things up
+            // keep track of the "reads" to be able to calculate the next position
+            this.startPos = buffer.position();
                 
             // read all data till the \n, calc the hash
             // an parse it
-            int length = 0;
+            int totalRead = 0;
             
             // find the semicolon and calculate hash in one go
             int h = 0;
             while (true)
             {
-                byte b = this.buffer.get(); 
-                this.data[length] = b;
-
+                byte b = this.backingArray[this.startPos + totalRead];  
                 if (b == ';')
                 {
-                    this.semicolon = length;
+                    this.semicolon = totalRead++ + this.startPos;
                     break;
                 }
                 h = 31 * h + b;
-                length++;
+                totalRead++;
             }
             this.hash = h;
 
@@ -470,24 +484,24 @@ public class BRC72_ReadDirectNotViaBuffer extends Benchmark
 //            8       56 00111000
 //            9       57 00111001
             
-            byte b = buffer.get();
+            byte b = this.backingArray[this.startPos + (totalRead++)];
             if (b == '-')
             {
                 // ok, -9.9 or -99.9
                 // first is always a number
-                byte b0 = buffer.get();
+                byte b0 = this.backingArray[this.startPos + (totalRead++)];
 
                 // next is either . or another number
-                byte b1 = buffer.get();
+                byte b1 = this.backingArray[this.startPos + (totalRead++)];
                 if (b1 != '.')
                 {
                     // must be 99.9
                     
-                    // skip the .
-                    buffer.position(buffer.position() + 1);
+                    // skip the ., we just read a number
+                    totalRead++;
 
                     // the part after the .
-                    byte b2 = buffer.get();
+                    byte b2 = this.backingArray[this.startPos + (totalRead++)];
                     value = -(100 * (b0 & 15) + 10 * (b1 & 15) + (b2 & 15));
                 }
                 else
@@ -496,7 +510,7 @@ public class BRC72_ReadDirectNotViaBuffer extends Benchmark
 
                     // it is -9.9
                     // the part after the .
-                    byte b2 = buffer.get();
+                    byte b2 = this.backingArray[this.startPos + (totalRead++)];
                     value = -(10 * (b0 & 15) + (b2 & 15));
                 }
             }
@@ -505,21 +519,22 @@ public class BRC72_ReadDirectNotViaBuffer extends Benchmark
                 // ok, 9.9 or 99.9
                 
                 // next is either . or another number
-                byte b1 = buffer.get();
+                byte b1 = this.backingArray[this.startPos + (totalRead++)];
                 if (b1 != '.')
                 {
                     // must be 99.9
 
                     // skip the .
-                    buffer.position(buffer.position() + 1);
-                    byte b2 = buffer.get();
+                    totalRead++;
+                    
+                    byte b2 = this.backingArray[this.startPos + (totalRead++)];
                     value = 100 * (b & 15) + 10 * (b1 & 15) + (b2 & 15);
                 }
                 else
                 {
                     // skip .
                     // it is 9.9
-                    byte b2 = buffer.get();
+                    byte b2 = this.backingArray[this.startPos + (totalRead++)];
                     value = 10 * (b & 15) + (b2 & 15);
                 }
             }
@@ -527,8 +542,16 @@ public class BRC72_ReadDirectNotViaBuffer extends Benchmark
             
             
             // skip newline
-            buffer.position(buffer.position() + 1);
+            buffer.position(this.startPos + totalRead + 1);
 
+//            System.out.format("Read: %s%n" ,
+//                    new String(this.backingArray, 
+//                            this.startPos, totalRead));
+//            System.out.format("Read line: %s;%d - hash: %d%n" ,
+//                    new String(this.backingArray, 
+//                            this.startPos, this.semicolon - this.startPos),
+//                    value, this.hash);
+            
             return true;
         }
         
