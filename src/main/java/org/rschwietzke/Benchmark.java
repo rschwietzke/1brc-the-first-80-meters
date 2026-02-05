@@ -142,22 +142,29 @@ public abstract class Benchmark
             return;
         }
 
+        final boolean batchMode;
+        final int warmUpRuns;
+        final int measurementRuns;
+        final Optional<String> outputFileName;
+        final boolean print;
+        final String fileName;
+        final String batchComment;
+        
         try
         {
-            final String fileName = getValue(args, "-f", s -> s)
+            fileName = getValue(args, "-f", s -> s)
                     .orElseThrow(() -> new IllegalArgumentException("File name is required"));
 
             // do we have an additional second and third?
-            final int warmUpRuns = getValue(args, "-wc", s -> Integer.valueOf(s))
+            warmUpRuns = getValue(args, "-wc", s -> Integer.valueOf(s))
                     .orElseThrow(() -> new IllegalArgumentException("Warmup count is required"));
-            final int measurementRuns = getValue(args, "-mc", s -> Integer.valueOf(s))
+            measurementRuns = getValue(args, "-mc", s -> Integer.valueOf(s))
                     .orElseThrow(() -> new IllegalArgumentException("Measurement count is required"));
 
-            final boolean batchMode = hasParam(args, "--batchmode").orElse(false);
-            final Optional<String> outputFileName = getValue(args, "-o", s -> s);
-            final boolean print = hasParam(args, "--print").orElse(false);
+            batchMode = hasParam(args, "--batchmode").orElse(false);
+            outputFileName = getValue(args, "-o", s -> s);
+            print = hasParam(args, "--print").orElse(false);
 
-            final String batchComment;
             if (batchMode && args.length < 5)
             {
                 printError();
@@ -171,6 +178,17 @@ public abstract class Benchmark
             {
                 batchComment = "none";
             }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+            printError();
+
+            return;
+        }
+
+        try
+        {
 
             Benchmark.print(batchMode, () -> "==== WARMUP ==================\n");
             var results = measure(ctr, Mode.WARMUP, warmUpRuns, fileName, batchMode);
@@ -211,7 +229,7 @@ public abstract class Benchmark
                 System.out.println("==== OUTPUT ========================\n");
                 System.out.println(lastResult);
             }
-            
+
             // do we want to print?
             if (outputFileName.isPresent())
             {
@@ -220,11 +238,9 @@ public abstract class Benchmark
                 o.close();
             }
         }
-        catch (IllegalArgumentException e)
+        catch (Exception e)
         {
-            System.err.println(e.getMessage());
-            printError();
-            
+            e.printStackTrace();
             return;
         }
 

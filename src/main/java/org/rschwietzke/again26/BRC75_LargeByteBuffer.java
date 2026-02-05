@@ -28,12 +28,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Don't read by from byte from the buffer, rather work on the backing array directly, 
- * to avoid the overhead of the ByteBuffer get() method.
+ * Load more via I/O in one og.
  * 
  * @author Rene Schwietzke
  */
-public class BRC72_ReadDirectNotViaBuffer extends Benchmark
+public class BRC75_LargeByteBuffer extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -408,7 +407,7 @@ public class BRC72_ReadDirectNotViaBuffer extends Benchmark
         public int hash;
         public int startPos;
         private FileChannel channel;
-        private ByteBuffer buffer = ByteBuffer.allocate(8192);
+        private ByteBuffer buffer = ByteBuffer.allocate(1_000_000);
         private byte[] backingArray = buffer.array();
         
         public Line(FileChannel channel)
@@ -560,6 +559,6 @@ public class BRC72_ReadDirectNotViaBuffer extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC72_ReadDirectNotViaBuffer.class, args);
+        Benchmark.run(BRC75_LargeByteBuffer.class, args);
     }
 }
