@@ -71,7 +71,17 @@ public class MathUtil
         final double mean = (double)(sum / 10d) / (double)count;
         return count + "/" + round(min / 10d) + "/" + round(mean) + "/" + round(max / 10d);
     }
-    
+
+    /**
+     * Standard formatter to ensure we get the same everywhere. We assume that we
+     * store doubles as int with one decimal digit precision.
+     */
+    public static String toStringFromInteger(int sum, int count, int min, int max)
+    {
+        final double mean = (double)(sum / 10d) / (double)count;
+        return count + "/" + round(min / 10d) + "/" + round(mean) + "/" + round(max / 10d);
+    }
+
     /**
      * Standard formatter to ensure we get the same everywhere. We assume that we
      * store doubles as int with one decimal digit precision.

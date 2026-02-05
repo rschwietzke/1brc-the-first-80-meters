@@ -21,47 +21,78 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.function.BiFunction;
 
 import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Go with a dedicated simple map implementation.
- *
+ * We don't need a map, we can keep things together with a Set.
+ * Our city will learn how to deal with the temperature. 
+ * We will leave the part of clean code and generics, also abuse
+ * equals in a sense that we don't use it... because we can compare a 
+ * String key to a City!!
+ * 
  * @author Rene Schwietzke
  */
-public class BRC30_OpenMap extends Benchmark
+public class BRC40_ASetIsGoodEnough extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
      * map already knows that
      */
-    private static class Temperatures
+    private static class City
     {
+        private String city;
         private int min;
         private int max;
         private long total;
         private long count;
 
-        public Temperatures(final int temperature)
+        public City(final String city, final int temperature)
         {
+            this.city = city;
             this.min = temperature;
             this.max = temperature;
             this.total = temperature;
             this.count = 1;
         }
 
-
-        public Temperatures merge(final int temperature)
+        public void merge(final int temperature)
         {
             this.min = Math.min(this.min, temperature);
             this.max = Math.max(this.max, temperature);
             this.total += temperature;
             this.count += 1;
-            return this;
         }
 
+        /**
+         * But our standard TreeMap will fail
+         */
+        @Override
+        public boolean equals(Object o)
+        {
+            return equalsKey(o != null ? ((City)o).city : null);
+        }
+        
+        /**
+         * We need that to ensure we compare against the defining key
+         * Because we don't want to trap us against standard equals,
+         * we name it differently
+         */
+        public boolean equalsKey(String key)
+        {
+            return city.equals(key);
+        }
+        
+        /**
+         * We need that to ensure we use the city as defining key
+         */
+        @Override
+        public int hashCode()
+        {
+            return this.city.hashCode();
+        }
+        
         public String toString()
         {
             // we delegate the formatting to our math util to
@@ -75,7 +106,7 @@ public class BRC30_OpenMap extends Benchmark
     public String run(final String fileName) throws IOException
     {
         // our storage, sized to avoid rehashing (413 stations in total)
-        final LightMap<String, Temperatures> cities = new LightMap<>(413 * 3);
+        final LightSet cities = new LightSet(413 * 3);
 
         // open the file
         try (var reader = Files.newBufferedReader(Paths.get(fileName)))
@@ -93,8 +124,15 @@ public class BRC30_OpenMap extends Benchmark
                 final int temperature = parseInteger(line, semicolon + 1, line.length());
 
                 // create new when needed, mutate when merging
-                cities.compute(city, 
-                        (k, v) -> v == null ? new Temperatures(temperature) : v.merge(temperature));
+                City c = cities.get(city);
+                if (c != null)
+                {
+                    c.merge(temperature);
+                }
+                else
+                {
+                    cities.add(new City(city, temperature));
+                }
             }
         }
 
@@ -150,15 +188,14 @@ public class BRC30_OpenMap extends Benchmark
         }
     }
 
-    public static class LightMap<K, V>
+    public static class LightSet
     {
-        private Object[] data;
+        private City[] data;
         private int size;
-        private int mask1;  
-        private int mask2;  
+        private int mask;  
         private int threshold;
 
-        public LightMap(int initialCapacity)
+        public LightSet(int initialCapacity)
         {
             if (initialCapacity < 7)
             {
@@ -168,12 +205,9 @@ public class BRC30_OpenMap extends Benchmark
             // we need a power of two for the capacity to be able to run modules as bitwise AND
             final int capacity = nextPowerOfTwo(initialCapacity);
 
-            this.mask1 = capacity - 1;
-            this.mask2 = (capacity << 1) - 1;
-            this.threshold = (capacity >> 1); // load factor 0.5
-
-            // we are twice the size
-            this.data = new Object[capacity << 1];
+            this.mask = capacity - 1;
+            this.threshold = capacity >> 1; // load factor 0.5
+            this.data = new City[capacity];
         }
 
         /**
@@ -186,22 +220,23 @@ public class BRC30_OpenMap extends Benchmark
          * @return      the value or null
          */
         @SuppressWarnings("unchecked")
-        public V get(K key)
+        public City get(String key)
         {
             final int hash = key.hashCode();
-            final int index = (hash & this.mask1) << 1;
+            final int index = hash & this.mask;
 
-            Object k = this.data[index];
-            if (k == null)
+            final City city = this.data[index];
+            if (city == null)
             {
                 return null;
             }
-            else if (k.equals(key))
+            else if (city.equalsKey(key))
             {
-                return (V)this.data[index + 1];
+                return city; 
             }
             else
             {
+                // expensive path
                 return getCollision(key, index);
             }
         }
@@ -214,107 +249,33 @@ public class BRC30_OpenMap extends Benchmark
          * @return     the value or null
          */
         @SuppressWarnings("unchecked")
-        private V getCollision(K key, int index)
+        private City getCollision(String key, int index)
         {
-            // collision
-            int nextIndex = (index + 2) & this.mask2;
+            int nextIndex = (index + 1) & this.mask;
             while (true)
             {
-                K k = (K) data[nextIndex];
-                if (k == null)
+                final City city = data[nextIndex];
+                if (city == null)
                 {
                     return null;
                 }
-                else if (k.equals(key))
+                else if (city.equalsKey(key))
                 {
-                    return (V)data[nextIndex + 1];
-                }
-                nextIndex = (nextIndex + 2) & this.mask2;
+                    return city;
+                }                
+                nextIndex = (nextIndex + 1) & this.mask;
             }
         }
 
-        /**
-         * Computes a value for the given key and stores it in the map.
-         * 
-         * @param key
-         * @param remappingFunction
-         * @return the computed value
-         */
-        public V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction)
+        public void add(final City city)
         {
-            final int hash = key.hashCode();
-            final int index = (hash & this.mask1) << 1;
+            final int hash = city.hashCode();
+            final int index = hash & this.mask;
 
-            final K k = (K) this.data[index];
-            if (k == null)
+            final City c = this.data[index];
+            if (c == null)
             {
-                this.data[index] = key;
-                final V t = (V) (this.data[index + 1] = remappingFunction.apply(k, null));
-                this.size++;
-
-                // check size
-                if (this.size > (this.threshold))
-                {
-                    resize();
-                }
-
-                return t;
-            }
-            else if (k.equals(key))
-            {
-                V v = (V) this.data[index + 1];
-                v = remappingFunction.apply(k, v);
-                this.data[index + 1] = v;
-                return v;
-            }
-            else
-            {
-                return computeCollision(key, index, remappingFunction);
-            }
-        }
-
-        public V computeCollision(K key, int index, BiFunction<? super K, ? super V, ? extends V> remappingFunction)
-        {
-            // collision
-            int nextIndex = (index + 2) & this.mask2;
-            while (true)
-            {
-                final K k = (K) this.data[nextIndex];
-                if (k == null)
-                {
-                    this.data[nextIndex] = key;
-                    final V t = (V) (this.data[nextIndex + 1] = remappingFunction.apply(k, null));
-                    this.size++;
-
-                    // check size
-                    if (this.size > this.threshold)
-                    {
-                        resize();
-                    }
-
-                    return t;
-                }
-                else if (k.equals(key))
-                {
-                    V v = (V) this.data[nextIndex + 1];
-                    v = remappingFunction.apply(k, v);
-                    this.data[nextIndex + 1] = v;
-                    return v;
-                }
-                nextIndex = (nextIndex + 2) & this.mask2;
-            }
-        }
-        
-        public V put(K key, V value)
-        {
-            final int hash = key.hashCode();
-            final int index = (hash & this.mask1) << 1;
-
-            Object k = this.data[index];
-            if (k == null)
-            {
-                this.data[index] = key;
-                this.data[index + 1] = value;
+                this.data[index] = city;
                 this.size++;
 
                 // check size
@@ -322,35 +283,29 @@ public class BRC30_OpenMap extends Benchmark
                 {
                     resize();
                 }
-                
-                return null;
             }
-            else if (k.equals(key))
+            else if (city.equalsKey(c.city))
             {
-                @SuppressWarnings("unchecked")
-                final V old = (V) this.data[index + 1];
-                this.data[index + 1] = value;
-                return old;
+                this.data[index] = city;
             }
             else
             {
-                return putCollision(key, value, index);
+                addCollision(city, index);
             }
         }
 
-        
+
         @SuppressWarnings("unchecked")
-        public V putCollision(K key, V value, int index)
+        public void addCollision(City city, int index)
         {
             // collision
-            int nextIndex = (index + 2) & this.mask2;
+            int nextIndex = (index + 1) & this.mask;
             while (true)
             {
-                final Object k = this.data[nextIndex];
-                if (k == null)
+                final City c = this.data[nextIndex];
+                if (c == null)
                 {
-                    this.data[nextIndex] = key;
-                    this.data[nextIndex + 1] = value;
+                    this.data[nextIndex] = city;
                     this.size++;
 
                     // check size
@@ -358,40 +313,37 @@ public class BRC30_OpenMap extends Benchmark
                     {
                         resize();
                     }
-                    
-                    return null;
+
+                    return;
                 }
-                else if (k.equals(key))
+                else if (city.equalsKey(c.city))
                 {
-                    final V old = (V) this.data[nextIndex + 1];
-                    this.data[nextIndex + 1] = value;
-                    return old;
+                    this.data[nextIndex] = city;
+                    return;
                 }
-                nextIndex = (nextIndex + 2) & this.mask2;
+                nextIndex = (nextIndex + 1) & this.mask;
             }
         }
+        
         private void resize()
         {
-            final Object[] oldData = this.data;
-            this.data = new Object[this.data.length << 1];
-            this.mask1 = (this.data.length >> 1) - 1;
-            this.mask2 = this.data.length - 1;
-            this.threshold = this.data.length >> 2;
-            
+            final City[] oldData = this.data;
+            int oldThreshold = this.threshold;
+            this.data = new City[this.data.length << 1];
+            this.mask = this.data.length - 1;
+            this.threshold = this.data.length >> 1;
+            System.out.format("Resize from %d to %d, thresholds: %d, %d%n", oldData.length, this.data.length, oldThreshold, this.threshold);
+
             // size is new
             this.size = 0;
 
             // ok, we use put to reinsert everything
-            for (int i = 0; i < oldData.length - 1; i += 2)
+            for (int i = 0; i < oldData.length; i++)
             {
-                final Object k = oldData[i];
-                if (k != null)
+                final City c = oldData[i];
+                if (c != null)
                 {
-                    @SuppressWarnings("unchecked")
-                    K key = (K) k;
-                    @SuppressWarnings("unchecked")
-                    V value = (V) oldData[i + 1];
-                    this.put(key,  value);
+                    this.add(c);
                 }
             }
         }
@@ -401,42 +353,36 @@ public class BRC30_OpenMap extends Benchmark
             return this.size;
         }
 
-        public TreeMap<K, V> toTreeMap()
+        public TreeMap<String, City> toTreeMap()
         {
-            final var map = new TreeMap<K, V>();
-            
+            final var map = new TreeMap<String, City>();
+
             // ok, we use put to reinsert everything
-            for (int i = 0; i < this.data.length - 1; i += 2)
+            for (int i = 0; i < this.data.length; i++)
             {
-                final Object k = this.data[i];
-                if (k != null)
+                final City c = this.data[i];
+                if (c != null)
                 {
-                    @SuppressWarnings("unchecked")
-                    K key = (K) k;
-                    @SuppressWarnings("unchecked")
-                    V value = (V) this.data[i + 1];
-                    map.put(key,  value);
+                    map.put(c.city,  c);
                 }
             }
-            
+
             return map;
         }
 
-        public List<K> keys()
+        public List<City> values()
         {
-            final var keys = new ArrayList<K>(this.size);
-            
-            for (int i = 0; i < this.data.length - 1; i += 2)
+            final var keys = new ArrayList<City>(this.size);
+
+            for (int i = 0; i < this.data.length; i++)
             {
-                final Object k = this.data[i];
-                if (k != null)
+                final City c = this.data[i];
+                if (c != null)
                 {
-                    @SuppressWarnings("unchecked")
-                    K key = (K) k;
-                    keys.add(key);
+                    keys.add(c);
                 }
             }
-            
+
             return keys;
         }
 
@@ -459,6 +405,6 @@ public class BRC30_OpenMap extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC30_OpenMap.class, args);
+        Benchmark.run(BRC40_ASetIsGoodEnough.class, args);
     }
 }

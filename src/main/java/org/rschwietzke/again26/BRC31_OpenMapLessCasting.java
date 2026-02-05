@@ -19,7 +19,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.BiFunction;
 
@@ -27,11 +29,12 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Go with a dedicated simple map implementation.
+ * Check the casting and clean it up. This avoid extra cycles for
+ * type checks everyone already knows. 
  *
  * @author Rene Schwietzke
  */
-public class BRC30_OpenMap extends Benchmark
+public class BRC31_OpenMapLessCasting extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -245,11 +248,12 @@ public class BRC30_OpenMap extends Benchmark
             final int hash = key.hashCode();
             final int index = (hash & this.mask1) << 1;
 
-            final K k = (K) this.data[index];
+            final Object k = this.data[index];
             if (k == null)
             {
                 this.data[index] = key;
-                final V t = (V) (this.data[index + 1] = remappingFunction.apply(k, null));
+                final V v = remappingFunction.apply(key, null);
+                this.data[index + 1] = v;
                 this.size++;
 
                 // check size
@@ -258,12 +262,12 @@ public class BRC30_OpenMap extends Benchmark
                     resize();
                 }
 
-                return t;
+                return v;
             }
             else if (k.equals(key))
             {
                 V v = (V) this.data[index + 1];
-                v = remappingFunction.apply(k, v);
+                v = remappingFunction.apply(key, v);
                 this.data[index + 1] = v;
                 return v;
             }
@@ -279,11 +283,12 @@ public class BRC30_OpenMap extends Benchmark
             int nextIndex = (index + 2) & this.mask2;
             while (true)
             {
-                final K k = (K) this.data[nextIndex];
+                final Object k = this.data[nextIndex];
                 if (k == null)
                 {
+                    final V v = remappingFunction.apply(key, null);
                     this.data[nextIndex] = key;
-                    final V t = (V) (this.data[nextIndex + 1] = remappingFunction.apply(k, null));
+                    this.data[nextIndex + 1] = v;
                     this.size++;
 
                     // check size
@@ -292,12 +297,12 @@ public class BRC30_OpenMap extends Benchmark
                         resize();
                     }
 
-                    return t;
+                    return v;
                 }
                 else if (k.equals(key))
                 {
                     V v = (V) this.data[nextIndex + 1];
-                    v = remappingFunction.apply(k, v);
+                    v = remappingFunction.apply(key, v);
                     this.data[nextIndex + 1] = v;
                     return v;
                 }
@@ -459,6 +464,6 @@ public class BRC30_OpenMap extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC30_OpenMap.class, args);
+        Benchmark.run(BRC31_OpenMapLessCasting.class, args);
     }
 }

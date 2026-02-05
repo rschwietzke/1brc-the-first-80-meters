@@ -21,17 +21,19 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Go with a dedicated simple map implementation.
+ * Our BiFunction always had to run an IF to check if we have that
+ * key or now. Split that up into Supplier and Function.
  *
  * @author Rene Schwietzke
  */
-public class BRC30_OpenMap extends Benchmark
+public class BRC33_SimplerLambda extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -93,8 +95,9 @@ public class BRC30_OpenMap extends Benchmark
                 final int temperature = parseInteger(line, semicolon + 1, line.length());
 
                 // create new when needed, mutate when merging
-                cities.compute(city, 
-                        (k, v) -> v == null ? new Temperatures(temperature) : v.merge(temperature));
+                cities.createOrMerge(city, 
+                        () -> new Temperatures(temperature), 
+                        v -> v.merge(temperature));
             }
         }
 
@@ -240,16 +243,16 @@ public class BRC30_OpenMap extends Benchmark
          * @param remappingFunction
          * @return the computed value
          */
-        public V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction)
+        public void createOrMerge(K key, Supplier<V> supplier, Consumer<V> mergeFunction)
         {
             final int hash = key.hashCode();
             final int index = (hash & this.mask1) << 1;
 
-            final K k = (K) this.data[index];
+            final Object k = this.data[index];
             if (k == null)
             {
                 this.data[index] = key;
-                final V t = (V) (this.data[index + 1] = remappingFunction.apply(k, null));
+                this.data[index + 1] = supplier.get();
                 this.size++;
 
                 // check size
@@ -257,33 +260,32 @@ public class BRC30_OpenMap extends Benchmark
                 {
                     resize();
                 }
-
-                return t;
+                
+                return;
             }
             else if (k.equals(key))
             {
                 V v = (V) this.data[index + 1];
-                v = remappingFunction.apply(k, v);
-                this.data[index + 1] = v;
-                return v;
+                mergeFunction.accept(v);
+                return;
             }
             else
             {
-                return computeCollision(key, index, remappingFunction);
+                createOrMergeCollision(key, index,supplier, mergeFunction);
             }
         }
 
-        public V computeCollision(K key, int index, BiFunction<? super K, ? super V, ? extends V> remappingFunction)
+        public void createOrMergeCollision(K key, int index, Supplier<V> supplier, Consumer<V> mergeFunction)
         {
             // collision
             int nextIndex = (index + 2) & this.mask2;
             while (true)
             {
-                final K k = (K) this.data[nextIndex];
+                final Object k = this.data[nextIndex];
                 if (k == null)
                 {
                     this.data[nextIndex] = key;
-                    final V t = (V) (this.data[nextIndex + 1] = remappingFunction.apply(k, null));
+                    this.data[nextIndex + 1] = supplier.get();
                     this.size++;
 
                     // check size
@@ -291,15 +293,13 @@ public class BRC30_OpenMap extends Benchmark
                     {
                         resize();
                     }
-
-                    return t;
+                    return;
                 }
                 else if (k.equals(key))
                 {
                     V v = (V) this.data[nextIndex + 1];
-                    v = remappingFunction.apply(k, v);
-                    this.data[nextIndex + 1] = v;
-                    return v;
+                    mergeFunction.accept(v);
+                    return;
                 }
                 nextIndex = (nextIndex + 2) & this.mask2;
             }
@@ -459,6 +459,6 @@ public class BRC30_OpenMap extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC30_OpenMap.class, args);
+        Benchmark.run(BRC33_SimplerLambda.class, args);
     }
 }
