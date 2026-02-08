@@ -16,9 +16,12 @@
 package org.rschwietzke.again26;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,12 +30,14 @@ import java.util.TreeMap;
 import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
+
+
 /**
  * Use some JDK array utils to speed up the city name comparison
  * 
  * @author Rene Schwietzke
  */
-public class BRC83_MainLoop extends Benchmark
+public class BRC90_MemorySegment_VOID extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -53,13 +58,17 @@ public class BRC83_MainLoop extends Benchmark
             int len = line.cityLength;
             this.city = new byte[len];
             
-            System.arraycopy(line.backingArray, line.bufferStart, this.city, 0, len);
+            MemorySegment.copy(line.memorySegment, ValueLayout.JAVA_BYTE, 
+                    line.bufferStart, this.city, 0, len);
+            
             this.hashCode = line.hash;
             
             this.min = line.temperature;
             this.max = line.temperature;
             this.total = line.temperature;
             this.count = 1;
+            
+//            System.out.format("Created city: %s, temp: %d%n", new String(this.city), line.temperature);
         }
 
         public void merge(final int temperature)
@@ -100,23 +109,14 @@ public class BRC83_MainLoop extends Benchmark
                 return false;
             }
 
-            int start = line.bufferStart;
-            int sem = line.semicolon;
-            if (len > 7)
+            long start = line.bufferStart;
+            long sem = line.semicolon;
+            int pos = 0;
+            for (long i = start; i < sem; i++)
             {
-                // equals is faster than compare for longer arrays, because it can stop earlier, 
-                // but for short ones the overhead is higher than the gain, so we just do it manually
-                // the JDK says > 7, so we do the same
-                return Arrays.equals(this.city, 0, this.city.length, line.backingArray, start, sem);
-            }
-            else
-            {
-                for (int i = start; i < sem; i++)
+                if (this.city[pos++] != line.memorySegment.get(ValueLayout.JAVA_BYTE, i))
                 {
-                    if (this.city[i - start] != line.backingArray[i])
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
             return true;
@@ -149,11 +149,21 @@ public class BRC83_MainLoop extends Benchmark
     public String run(final String fileName) throws IOException
     {
         // open the file
-        try (var file = new RandomAccessFile(fileName, "r"); 
-                var channel = file.getChannel())
+        try (Arena arena = Arena.ofConfined();
+                FileChannel channel = FileChannel.open(Path.of(fileName), StandardOpenOption.READ))
         {
+            // 1. Map the file into memory
+            // Note: 'size' can be larger than Integer.MAX_VALUE
+            long fileSize = channel.size();
+            MemorySegment segment = channel.map(
+                FileChannel.MapMode.READ_ONLY, 
+                0, 
+                fileSize, 
+                arena
+            );
+            
             // our transport container for a lot of intel at once
-            final Line line = new Line(channel);
+            final Line line = new Line(segment);
 
             var cities = line.process();
 
@@ -390,158 +400,96 @@ public class BRC83_MainLoop extends Benchmark
 
     public static class Line
     {
-        // by agreement, we never have more than 100 bytes of city, so stay
-        // un the safe zone
-        private int bufferStart = 0;
-        private int bufferEnd = 0;
-        private int bufferPos = 0;
-
-        public int semicolon;
+        private long bufferPos = 0;
+        private long bufferStart = 0;
+        
+        public long semicolon;
         public int temperature;
         public int hash;
         public int cityLength;
-        private byte[] backingArray = new byte[500_000];
+
+        public final MemorySegment memorySegment;
         
-        private FileChannel channel;
-        private ByteBuffer buffer = ByteBuffer.wrap(this.backingArray); 
-
-        public Line(FileChannel channel)
+        public Line(final MemorySegment memorySegment)
         {
-            this.channel = channel;
-            this.buffer.limit(0); // empty
+            this.memorySegment = memorySegment;
         }
-
+        
         public LightSet process() throws IOException
         {
             // our storage, sized to avoid rehashing (about 400 stations in total)
             final LightSet cities = new LightSet(4096);
 
-            // read all lines until end of file
-            while (readLine())
+            // read all lines until end of
+            long size = memorySegment.byteSize();
+            while (this.bufferPos < size)
             {
+                readLine();
+            
                 // let the set decide what to do
                 cities.update(this);
             }
             return cities;
         }
         
-        private boolean fillBuffer() throws IOException
+        public void readLine() throws IOException
         {
-            // fix the wrapper up first
-            buffer.position(this.bufferPos);
-            
-            buffer.compact();
-            int read = channel.read(buffer);
-            buffer.flip();
-            
-            if (read == -1 && !buffer.hasRemaining())
-            {
-                // we reached the end
-                this.bufferStart = 0;
-                this.bufferEnd = buffer.limit();
-                this.bufferPos = 0;
-                return true; // EOF
-            }
-            this.bufferStart = this.buffer.position();
-            this.bufferEnd = buffer.limit();
-            this.bufferPos = this.bufferStart;
-
-            return false;
-        }
-        
-        public boolean readLine() throws IOException
-        {
-            // ok, it is very inefficient to read directly from
-            // the input stream or channel, so we have to buffer
-            // it first, ensure we have more data than one line
-            // is long
-            if (bufferEnd - bufferPos < 128)
-            {
-                // this is very unlikely to happen often, so it is no here in the
-                // code to make it smaller and hence inlineable
-                if (fillBuffer())
-                {
-                    return false;
-                }
-            }
-            
-            // let's operate on the backing array directly to speed things up
-            // keep track of the "reads" to be able to calculate the next position
-                
-            // read all data till the \n, calc the hash
-            // an parse it
-            this.bufferStart = this.bufferPos;
-            int totalRead = this.bufferStart;
-            
             // find the semicolon and calculate hash in one go
             int h = 0;
+            this.bufferStart = this.bufferPos;
+            long pos = this.bufferPos;
+            
             while (true)
             {
-                byte b = this.backingArray[totalRead];  
+                byte b = memorySegment.get(ValueLayout.JAVA_BYTE, pos);
                 if (b == ';')
                 {
                     break;
                 }
                 h = (h << 5) - h + b;
-                totalRead++;
+                pos++;
 
-                b = this.backingArray[totalRead];  
+                b = memorySegment.get(ValueLayout.JAVA_BYTE, pos);  
                 if (b == ';')
                 {
                     break;
                 }
                 h = (h << 5) - h + b;
-                totalRead++;
+                pos++;
             }
-            this.cityLength = totalRead - this.bufferStart;
-            this.semicolon = totalRead++;
+            this.cityLength = (int) (pos - this.bufferStart);
+            this.semicolon = pos++;
             this.hash = h;
-
-            
             
             // skip newline
             // + 2 because we jump to \n and one more
-            this.bufferPos =  parseTemperature(totalRead) + 2;
+            this.bufferPos =  parseTemperature(pos) + 2;
 
-//            System.out.format("Read: %s%n" ,
-//                    new String(this.backingArray, 
-//                            this.startPos, totalRead));
+//            System.out.format("Read from %d to %d (%d bytes), temp: %d%n", 
+//                    this.bufferStart, t, t - this.bufferStart, this.temperature);
+//            this.bufferPos = t;
+            
 //            System.out.format("Read line: %s;%d - hash: %d%n" ,
 //                    new String(this.backingArray, 
 //                            this.startPos, this.semicolon - this.startPos),
 //                    value, this.hash);
-            
-            return true;
         }
         
     
-        private int parseTemperature(int totalRead)
+        private long parseTemperature(long pos)
         {
-            // we inlined the parse integer here as well to make it more inlineable
             int value;
-            // we can avoid the -48 by just ANDing with 15 (0b00001111)
-//            Character  Decimal   Binary
-//            0       48 00110000
-//            1       49 00110001
-//            2       50 00110010
-//            3       51 00110011
-//            4       52 00110100
-//            5       53 00110101
-//            6       54 00110110
-//            7       55 00110111
-//            8       56 00111000
-//            9       57 00111001
             
-            byte b = this.backingArray[totalRead++];
+            byte b = memorySegment.get(ValueLayout.JAVA_BYTE, pos++);
             if (b == '-')
             {
                 // ok, -9.9 or -99.9
                 // first is always a number
-                byte b0 = this.backingArray[totalRead++];
+                byte b0 = memorySegment.get(ValueLayout.JAVA_BYTE, pos++);
                 b0 &= 15;
 
                 // next is either . or another number
-                byte b1 = this.backingArray[totalRead++];
+                byte b1 = memorySegment.get(ValueLayout.JAVA_BYTE, pos++);
                 if (b1 != '.')
                 {
                     b1 &= 15;
@@ -549,10 +497,10 @@ public class BRC83_MainLoop extends Benchmark
                     // must be 99.9
                     
                     // skip the ., we just read a number
-                    totalRead++;
+                    pos++;
 
                     // the part after the .
-                    byte b2 = this.backingArray[totalRead];
+                    byte b2 = memorySegment.get(ValueLayout.JAVA_BYTE, pos);
                     value = -(100 * b0 + 10 * b1 + (b2 & 15));
                 }
                 else
@@ -561,7 +509,7 @@ public class BRC83_MainLoop extends Benchmark
 
                     // it is -9.9
                     // the part after the .
-                    byte b2 = this.backingArray[totalRead];
+                    byte b2 = memorySegment.get(ValueLayout.JAVA_BYTE, pos);
                     value = -(10 * b0 + (b2 & 15));
                 }
             }
@@ -571,35 +519,35 @@ public class BRC83_MainLoop extends Benchmark
                 b &= 15;
 
                 // next is either . or another number
-                byte b1 = this.backingArray[totalRead++];
+                byte b1 = memorySegment.get(ValueLayout.JAVA_BYTE, pos++);
                 if (b1 != '.')
                 {
                     // must be 99.9
                     b1 &= 15;
 
                     // skip the .
-                    totalRead++;
+                    pos++;
                     
-                    byte b2 = this.backingArray[totalRead];
+                    byte b2 = memorySegment.get(ValueLayout.JAVA_BYTE, pos);
                     value = 100 * b + 10 * b1 + (b2 & 15);
                 }
                 else
                 {
                     // skip .
                     // it is 9.9
-                    byte b2 = this.backingArray[totalRead];
+                    byte b2 = memorySegment.get(ValueLayout.JAVA_BYTE, pos);
                     value = 10 * b + (b2 & 15);
                 }
             }
             this.temperature = value;       
             
-            return totalRead;
+            return pos;
         }
     }
     
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC83_MainLoop.class, args);
+        Benchmark.run(BRC90_MemorySegment_VOID.class, args);
     }
 }

@@ -28,11 +28,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Use some JDK array utils to speed up the city name comparison
+ * Lookung at BRC83 again to improve it further.
  * 
  * @author Rene Schwietzke
  */
-public class BRC83_MainLoop extends Benchmark
+public class BRC91_Reviewed83 extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -62,6 +62,10 @@ public class BRC83_MainLoop extends Benchmark
             this.count = 1;
         }
 
+        /**
+         * This is hot code that runs again and again for every line, so we want to keep it as small as possible,
+         * @param temperature
+         */
         public void merge(final int temperature)
         {
             if (temperature > this.max)
@@ -72,13 +76,21 @@ public class BRC83_MainLoop extends Benchmark
             {
                 this.min = temperature;
             }
+            // this is here to let the expensive branch prediction with a likely
+            // miss run first and when we are in the branch, we can fill
+            // the rest of the pipeline with this
+            // if this is first, we have less instructions but more cycles 
+            // cycles are time, not instructions!!!
             this.total += temperature;
             this.count += 1;
         }
 
         /**
          * But our standard TreeMap will fail otherwise, not safe, but
-         * we know what we do       
+         * we know what we do. This is not hot, because we only need that for the 
+         * TreeMap final calculations.
+         * 
+         * @param o the other city to compare with
          */
         @Override
         public boolean equals(Object o)
@@ -202,7 +214,7 @@ public class BRC83_MainLoop extends Benchmark
             {
                 add(line, index);
             }
-            else if (city.equalsCity(line))
+            else if (city.hashCode == line.hash && city.equalsCity(line))
             {
                 city.merge(line.temperature); 
             }
@@ -600,6 +612,6 @@ public class BRC83_MainLoop extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC83_MainLoop.class, args);
+        Benchmark.run(BRC91_Reviewed83.class, args);
     }
 }
