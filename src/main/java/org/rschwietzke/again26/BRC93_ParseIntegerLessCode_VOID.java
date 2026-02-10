@@ -28,11 +28,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Looking at BRC83 again to improve it further.
+ * 
  * 
  * @author Rene Schwietzke
  */
-public class BRC91_Reviewed83 extends Benchmark
+public class BRC93_ParseIntegerLessCode_VOID extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -209,7 +209,8 @@ public class BRC91_Reviewed83 extends Benchmark
          */
         public void update(final Line line)
         {
-            final int index = line.hash & this.mask;
+            final int hash = line.hash ; // ensure non-negative
+            final int index = hash & this.mask;
 
             final City city = this.data[index];
             if (city == null)
@@ -550,63 +551,58 @@ public class BRC91_Reviewed83 extends Benchmark
             // we inlined the parse integer here as well to make it more inlineable
             int value;
 
-            byte b = this.backingArray[totalRead++];
-            if (b == '-')
+            byte b1 = this.backingArray[totalRead++];
+            if (b1 != '-')
             {
-                // ok, -9.9 or -99.9
-                // first is always a number
-                byte b0 = this.backingArray[totalRead++];
-                b0 &= 15;
-
-                // next is either . or another number
-                byte b1 = this.backingArray[totalRead++];
-                if (b1 != '.')
+                // 9.9 or 99.9, stored 9 in b1
+                
+                // .9 or 9.9 left
+                byte b2 = this.backingArray[totalRead++];
+                if (b2 == '.')
                 {
-                    b1 &= 15;
-
-                    // must be 99.9
-
-                    // skip the ., we just read a number
-
-                    // the part after the .
-                    byte b2 = this.backingArray[++totalRead];
-                    value = -(100 * b0 + 10 * b1 + (b2 & 15));
+                    // it is .9, we just need to read the 9
+                    byte b3 = this.backingArray[totalRead];
+                    value = (b1 & 15) * 10 + (b3 & 15);
                 }
                 else
                 {
-                    // skip .
-
-                    // it is -9.9
-                    // the part after the .
-                    byte b2 = this.backingArray[totalRead];
-                    value = -(10 * b0 + (b2 & 15));
+                    // it is 9.9 
+                    // add the b2
+                    value = (b1 & 15) * 10 + (b2 & 15);
+                    
+                    // jump the . that comes now
+                    byte b3 = this.backingArray[++totalRead];
+                    value = value * 10 + (b3 & 15);
                 }
             }
             else
             {
-                // ok, 9.9 or 99.9
-                b &= 15;
-
-                // next is either . or another number
-                byte b1 = this.backingArray[totalRead++];
-                if (b1 != '.')
+                // we are -9.9 or -99.9, store
+                byte b2 = this.backingArray[totalRead++];
+                value = (b2 & 15) * 10;
+                
+                // .9 or 9.9 left
+                byte b3 = this.backingArray[totalRead++];
+                if (b3 == '.')
                 {
-                    // must be 99.9
-                    b1 &= 15;
-
-                    // skip the .
-
-                    byte b2 = this.backingArray[++totalRead];
-                    value = 100 * b + 10 * b1 + (b2 & 15);
+                    // it is .9, we just need to read the 9
+                    byte b4 = this.backingArray[totalRead];
+                    value = -(value + (b4 & 15));
                 }
                 else
                 {
-                    // skip .
-                    // it is 9.9
-                    byte b2 = this.backingArray[totalRead];
-                    value = 10 * b + (b2 & 15);
+                    // it is 9.9 
+                    // add the b2
+                    value = value + (b3 & 15);
+                    
+                    // jump the . that comes now
+                    byte b4 = this.backingArray[++totalRead];
+                    value = -(value * 10 + (b4 & 15));
                 }
+
             }
+            
+            // fix up the sign
             this.temperature = value;       
 
             return totalRead;
@@ -616,6 +612,6 @@ public class BRC91_Reviewed83 extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC91_Reviewed83.class, args);
+        Benchmark.run(BRC93_ParseIntegerLessCode_VOID.class, args);
     }
 }

@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC91_Reviewed83 extends Benchmark
+public class BRC96_ReadInt_VOID extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -62,6 +62,8 @@ public class BRC91_Reviewed83 extends Benchmark
             this.max = line.temperature;
             this.total = line.temperature;
             this.count = 1;
+            
+            //System.out.format("%s,%d%n", new String(this.city), line.hash);
         }
 
         /**
@@ -251,23 +253,27 @@ public class BRC91_Reviewed83 extends Benchmark
          * @param index the original index where the collision happened
          * @return     the value or null
          */
+        //int c = 0;
         private void updateCollision(final Line line, int index)
         {
             while (true)
             {
+                //String c = line.toCity();
                 index = (index + 1) & this.mask;
 
                 final City city = this.data[index];
                 if (city == null)
                 {
                     add(line, index);
-                    return;
+                    // System.out.println("Collisions Add: " + ++c);
+                    break;
                 }
                 // we removed the size check in equalsCity, so we have to have that here
                 else if (city.length == line.cityLength && city.equalsCity(line))
                 {
                     city.merge(line.temperature); 
-                    return;
+                    //System.out.println("Collisions Merge: " + ++c);
+                    break;
                 }
             }
         }
@@ -471,7 +477,7 @@ public class BRC91_Reviewed83 extends Benchmark
             // the input stream or channel, so we have to buffer
             // it first, ensure we have more data than one line
             // is long
-            if (bufferEnd - bufferPos < 128)
+            if (this.bufferEnd - this.bufferPos < 128)
             {
                 // this is very unlikely to happen often, so it is no here in the
                 // code to make it smaller and hence inlineable
@@ -484,13 +490,12 @@ public class BRC91_Reviewed83 extends Benchmark
             // let's operate on the backing array directly to speed things up
             // keep track of the "reads" to be able to calculate the next position
 
-            // read all data till the \n, calc the hash on the go
-            // an parse it
-            this.bufferStart = this.bufferPos;
-            int totalRead = this.bufferStart;
+            // read all data till the ; and calc the hash on the go
+            int totalRead = this.bufferPos;
+            int start = totalRead;
 
             // find the semicolon and calculate hash in one go
-            int h = 0;
+            int h = 0x811c9dc5; // FNV offset basis, but rest is regular factor 31 hashing
             while (true)
             {
                 byte b = this.backingArray[totalRead];  
@@ -525,13 +530,14 @@ public class BRC91_Reviewed83 extends Benchmark
                 h = (h << 5) - h + b;
                 totalRead++;
             }
-            this.cityLength = totalRead - this.bufferStart;
+            this.cityLength = totalRead - start;
             this.semicolon = totalRead++;
             this.hash = h;
 
             // skip newline
             // + 2 because we jump to \n and one more
             this.bufferPos =  parseTemperature(totalRead) + 2;
+            this.bufferStart = start;
 
             //            System.out.format("Read: %s%n" ,
             //                    new String(this.backingArray, 
@@ -547,29 +553,30 @@ public class BRC91_Reviewed83 extends Benchmark
 
         private int parseTemperature(int totalRead)
         {
-            // we inlined the parse integer here as well to make it more inlineable
             int value;
-
-            byte b = this.backingArray[totalRead++];
+            int readInt = this.buffer.getInt(totalRead);
+            
+            int b = (readInt >>> 24) & 0xFF; // 1, the -
             if (b == '-')
             {
                 // ok, -9.9 or -99.9
                 // first is always a number
-                byte b0 = this.backingArray[totalRead++];
+                int b0 = (readInt >>> 16) & 0xFF; // 2 a 9
                 b0 &= 15;
 
                 // next is either . or another number
-                byte b1 = this.backingArray[totalRead++];
+                int b1 = (readInt >>> 8) & 0xFF; // 3 . or 9
                 if (b1 != '.')
                 {
-                    b1 &= 15;
+                    b1 &= 15; // was 9 
 
                     // must be 99.9
 
-                    // skip the ., we just read a number
+                    // skip the ., we just read a number // 4
 
-                    // the part after the .
-                    byte b2 = this.backingArray[++totalRead];
+                    // the part after the . we have to read from the array
+                    totalRead += 4;
+                    byte b2 = this.backingArray[totalRead]; 
                     value = -(100 * b0 + 10 * b1 + (b2 & 15));
                 }
                 else
@@ -578,8 +585,9 @@ public class BRC91_Reviewed83 extends Benchmark
 
                     // it is -9.9
                     // the part after the .
-                    byte b2 = this.backingArray[totalRead];
+                    int b2 = readInt & 0xFF; // 4
                     value = -(10 * b0 + (b2 & 15));
+                    totalRead += 3;
                 }
             }
             else
@@ -588,7 +596,7 @@ public class BRC91_Reviewed83 extends Benchmark
                 b &= 15;
 
                 // next is either . or another number
-                byte b1 = this.backingArray[totalRead++];
+                int b1 = (readInt >>> 16) & 0xFF;
                 if (b1 != '.')
                 {
                     // must be 99.9
@@ -596,26 +604,40 @@ public class BRC91_Reviewed83 extends Benchmark
 
                     // skip the .
 
-                    byte b2 = this.backingArray[++totalRead];
+                    int b2 = readInt & 0xFF;
                     value = 100 * b + 10 * b1 + (b2 & 15);
+                    totalRead += 3;
                 }
                 else
                 {
                     // skip .
                     // it is 9.9
-                    byte b2 = this.backingArray[totalRead];
+                    int b2 = (readInt >>> 8) & 0xFF;
                     value = 10 * b + (b2 & 15);
+                    totalRead += 2;
                 }
             }
             this.temperature = value;       
 
             return totalRead;
         }
+        
+        /**
+         * For debugging
+         * @return
+         */
+        private String toCity()
+        {
+            var ba = new byte[cityLength];
+            System.arraycopy(backingArray, bufferStart, ba, 0, cityLength);
+            return new String(ba);
+        }
+
     }
 
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC91_Reviewed83.class, args);
+        Benchmark.run(BRC96_ReadInt_VOID.class, args);
     }
 }

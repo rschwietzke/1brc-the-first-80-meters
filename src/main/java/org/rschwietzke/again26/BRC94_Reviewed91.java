@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC91_Reviewed83 extends Benchmark
+public class BRC94_Reviewed91 extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -251,23 +251,27 @@ public class BRC91_Reviewed83 extends Benchmark
          * @param index the original index where the collision happened
          * @return     the value or null
          */
+        //int c = 0;
         private void updateCollision(final Line line, int index)
         {
             while (true)
             {
+                //String c = line.toCity();
                 index = (index + 1) & this.mask;
 
                 final City city = this.data[index];
                 if (city == null)
                 {
                     add(line, index);
-                    return;
+                    // System.out.println("Collisions Add: " + ++c);
+                    break;
                 }
                 // we removed the size check in equalsCity, so we have to have that here
                 else if (city.length == line.cityLength && city.equalsCity(line))
                 {
                     city.merge(line.temperature); 
-                    return;
+                    //System.out.println("Collisions Merge: " + ++c);
+                    break;
                 }
             }
         }
@@ -611,11 +615,23 @@ public class BRC91_Reviewed83 extends Benchmark
 
             return totalRead;
         }
+        
+        /**
+         * For debugging
+         * @return
+         */
+        private String toCity()
+        {
+            var ba = new byte[cityLength];
+            System.arraycopy(backingArray, bufferStart, ba, 0, cityLength);
+            return new String(ba);
+        }
+
     }
 
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC91_Reviewed83.class, args);
+        Benchmark.run(BRC94_Reviewed91.class, args);
     }
 }

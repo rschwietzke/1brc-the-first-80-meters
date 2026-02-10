@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC91_Reviewed83 extends Benchmark
+public class BRC92_ParseIntegerLessBranches_VOID extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -209,7 +209,8 @@ public class BRC91_Reviewed83 extends Benchmark
          */
         public void update(final Line line)
         {
-            final int index = line.hash & this.mask;
+            final int hash = line.hash ; // ensure non-negative
+            final int index = hash & this.mask;
 
             final City city = this.data[index];
             if (city == null)
@@ -547,68 +548,52 @@ public class BRC91_Reviewed83 extends Benchmark
 
         private int parseTemperature(int totalRead)
         {
-            // we inlined the parse integer here as well to make it more inlineable
-            int value;
-
             byte b = this.backingArray[totalRead++];
-            if (b == '-')
+
+            // are we negative? we need some setup for a later bit flip
+            // compensate for the bit flip later
+            int negative = b == '-' ? -1 : 0;
+
+            // to save a branch, we just add 1 to the total read, so we are at the right position for the next read, no matter if we had a - or not
+            // compensate for the later add
+            int value = -negative - 1; // when negative we need 0 here, -1 otherwise
+            totalRead += value; // -1 when positive, 0 when negative
+
+            // ok, 9.9 or 99.9
+            // first is always a number, we might have to reread it if positive
+            byte b0 = this.backingArray[totalRead++];
+            b0 &= 15;
+
+            // next is either . or another number
+            byte b1 = this.backingArray[totalRead++];
+            if (b1 != '.')
             {
-                // ok, -9.9 or -99.9
-                // first is always a number
-                byte b0 = this.backingArray[totalRead++];
-                b0 &= 15;
+                b1 &= 15;
 
-                // next is either . or another number
-                byte b1 = this.backingArray[totalRead++];
-                if (b1 != '.')
-                {
-                    b1 &= 15;
+                // must be 99.9
 
-                    // must be 99.9
+                // skip the ., we just read a number
 
-                    // skip the ., we just read a number
-
-                    // the part after the .
-                    byte b2 = this.backingArray[++totalRead];
-                    value = -(100 * b0 + 10 * b1 + (b2 & 15));
-                }
-                else
-                {
-                    // skip .
-
-                    // it is -9.9
-                    // the part after the .
-                    byte b2 = this.backingArray[totalRead];
-                    value = -(10 * b0 + (b2 & 15));
-                }
+                // the part after the .
+                byte b2 = this.backingArray[++totalRead];
+                value = 100 * b0 + 10 * b1 + (b2 & 15) + value;
             }
             else
             {
-                // ok, 9.9 or 99.9
-                b &= 15;
+                // skip .
 
-                // next is either . or another number
-                byte b1 = this.backingArray[totalRead++];
-                if (b1 != '.')
-                {
-                    // must be 99.9
-                    b1 &= 15;
-
-                    // skip the .
-
-                    byte b2 = this.backingArray[++totalRead];
-                    value = 100 * b + 10 * b1 + (b2 & 15);
-                }
-                else
-                {
-                    // skip .
-                    // it is 9.9
-                    byte b2 = this.backingArray[totalRead];
-                    value = 10 * b + (b2 & 15);
-                }
+                // it is 9.9
+                // the part after the .
+                byte b2 = this.backingArray[totalRead];
+                value = 10 * b0 + (b2 & 15) + value;
             }
-            this.temperature = value;       
 
+            // flip the bits to get a negative value
+            // int negative = (x ^ -1) + 1
+            // negative is either 0 or -1, so we flip all bits when negative and add 1 to compensate for the earlier compensation
+            // if 0, we just add 1 and that was already accounted for before with value = -negative - 1 
+            this.temperature = (value ^ negative) + 1;
+            
             return totalRead;
         }
     }
@@ -616,6 +601,6 @@ public class BRC91_Reviewed83 extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC91_Reviewed83.class, args);
+        Benchmark.run(BRC92_ParseIntegerLessBranches_VOID.class, args);
     }
 }

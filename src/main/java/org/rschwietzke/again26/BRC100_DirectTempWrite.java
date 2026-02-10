@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC91_Reviewed83 extends Benchmark
+public class BRC100_DirectTempWrite extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -62,6 +62,8 @@ public class BRC91_Reviewed83 extends Benchmark
             this.max = line.temperature;
             this.total = line.temperature;
             this.count = 1;
+            
+            //System.out.format("%s,%d%n", new String(this.city), line.hash);
         }
 
         /**
@@ -116,24 +118,23 @@ public class BRC91_Reviewed83 extends Benchmark
 
             int start = line.bufferStart;
             int sem = line.semicolon;
-            if (len > 7)
+            if (len <= 7)
+            {
+                // because letting Arrays.equals run on short arrays is more expensive than just doing it manually, we do it manually for short ones
+                // otherwise it has to do a lot of checks first before it figures it out that the data is too short
+                boolean equals = true;
+                for (int i = 0; i < len; i++)
+                {
+                    equals &= this.city[i] == line.backingArray[start + i];
+                }
+                return equals;
+            }
+            else
             {
                 // equals is faster than compare for longer arrays, because it can stop earlier, 
                 // but for short ones the overhead is higher than the gain, so we just do it manually
                 // the JDK says > 7, so we do the same
                 return Arrays.equals(this.city, 0, this.city.length, line.backingArray, start, sem);
-            }
-            else
-            {
-                for (int i = 0; i < len; i++)
-                {
-                    // add is better than sub
-                    if (this.city[i] != line.backingArray[start + i])
-                    {
-                        return false;
-                    }
-                }
-                return true;
             }
         }
 
@@ -261,13 +262,13 @@ public class BRC91_Reviewed83 extends Benchmark
                 if (city == null)
                 {
                     add(line, index);
-                    return;
+                    break;
                 }
                 // we removed the size check in equalsCity, so we have to have that here
                 else if (city.length == line.cityLength && city.equalsCity(line))
                 {
                     city.merge(line.temperature); 
-                    return;
+                    break;
                 }
             }
         }
@@ -471,7 +472,7 @@ public class BRC91_Reviewed83 extends Benchmark
             // the input stream or channel, so we have to buffer
             // it first, ensure we have more data than one line
             // is long
-            if (bufferEnd - bufferPos < 128)
+            if (this.bufferEnd - this.bufferPos < 128)
             {
                 // this is very unlikely to happen often, so it is no here in the
                 // code to make it smaller and hence inlineable
@@ -484,16 +485,17 @@ public class BRC91_Reviewed83 extends Benchmark
             // let's operate on the backing array directly to speed things up
             // keep track of the "reads" to be able to calculate the next position
 
-            // read all data till the \n, calc the hash on the go
-            // an parse it
-            this.bufferStart = this.bufferPos;
-            int totalRead = this.bufferStart;
+            // read all data till the ; and calc the hash on the go
+            int totalRead = this.bufferPos;
+            final int start = totalRead;
 
             // find the semicolon and calculate hash in one go
-            int h = 0;
+            int h = 0x811c9dc5; // FNV offset basis, but rest is regular factor 31 hashing
+            byte[] backingArray = this.backingArray;
+            
             while (true)
             {
-                byte b = this.backingArray[totalRead];  
+                byte b = backingArray[totalRead];  
                 if (b == ';')
                 {
                     break;
@@ -501,7 +503,7 @@ public class BRC91_Reviewed83 extends Benchmark
                 h = (h << 5) - h + b;
                 totalRead++;
 
-                b = this.backingArray[totalRead];  
+                b = backingArray[totalRead];  
                 if (b == ';')
                 {
                     break;
@@ -509,7 +511,7 @@ public class BRC91_Reviewed83 extends Benchmark
                 h = (h << 5) - h + b;
                 totalRead++;
 
-                b = this.backingArray[totalRead];  
+                b = backingArray[totalRead];  
                 if (b == ';')
                 {
                     break;
@@ -517,7 +519,7 @@ public class BRC91_Reviewed83 extends Benchmark
                 h = (h << 5) - h + b;
                 totalRead++;
             
-                b = this.backingArray[totalRead];  
+                b = backingArray[totalRead];  
                 if (b == ';')
                 {
                     break;
@@ -525,13 +527,15 @@ public class BRC91_Reviewed83 extends Benchmark
                 h = (h << 5) - h + b;
                 totalRead++;
             }
-            this.cityLength = totalRead - this.bufferStart;
-            this.semicolon = totalRead++;
             this.hash = h;
+            this.cityLength = totalRead - start;
+            this.semicolon = totalRead;
+            this.bufferStart = start;
 
             // skip newline
+            // +1 is the pos after the semicolon
             // + 2 because we jump to \n and one more
-            this.bufferPos =  parseTemperature(totalRead) + 2;
+            this.bufferPos =  parseTemperature(totalRead + 1) + 2;
 
             //            System.out.format("Read: %s%n" ,
             //                    new String(this.backingArray, 
@@ -548,18 +552,18 @@ public class BRC91_Reviewed83 extends Benchmark
         private int parseTemperature(int totalRead)
         {
             // we inlined the parse integer here as well to make it more inlineable
-            int value;
+            var backingArray = this.backingArray;
 
-            byte b = this.backingArray[totalRead++];
+            byte b = backingArray[totalRead++];
             if (b == '-')
             {
                 // ok, -9.9 or -99.9
                 // first is always a number
-                byte b0 = this.backingArray[totalRead++];
+                byte b0 = backingArray[totalRead++];
                 b0 &= 15;
 
                 // next is either . or another number
-                byte b1 = this.backingArray[totalRead++];
+                byte b1 = backingArray[totalRead++];
                 if (b1 != '.')
                 {
                     b1 &= 15;
@@ -569,8 +573,8 @@ public class BRC91_Reviewed83 extends Benchmark
                     // skip the ., we just read a number
 
                     // the part after the .
-                    byte b2 = this.backingArray[++totalRead];
-                    value = -(100 * b0 + 10 * b1 + (b2 & 15));
+                    byte b2 = backingArray[++totalRead];
+                    this.temperature = -(100 * b0 + 10 * b1 + (b2 & 15));
                 }
                 else
                 {
@@ -578,8 +582,8 @@ public class BRC91_Reviewed83 extends Benchmark
 
                     // it is -9.9
                     // the part after the .
-                    byte b2 = this.backingArray[totalRead];
-                    value = -(10 * b0 + (b2 & 15));
+                    byte b2 = backingArray[totalRead];
+                    this.temperature = -(10 * b0 + (b2 & 15));
                 }
             }
             else
@@ -588,7 +592,7 @@ public class BRC91_Reviewed83 extends Benchmark
                 b &= 15;
 
                 // next is either . or another number
-                byte b1 = this.backingArray[totalRead++];
+                byte b1 = backingArray[totalRead++];
                 if (b1 != '.')
                 {
                     // must be 99.9
@@ -596,26 +600,37 @@ public class BRC91_Reviewed83 extends Benchmark
 
                     // skip the .
 
-                    byte b2 = this.backingArray[++totalRead];
-                    value = 100 * b + 10 * b1 + (b2 & 15);
+                    byte b2 = backingArray[++totalRead];
+                    this.temperature = 100 * b + 10 * b1 + (b2 & 15);
                 }
                 else
                 {
                     // skip .
                     // it is 9.9
-                    byte b2 = this.backingArray[totalRead];
-                    value = 10 * b + (b2 & 15);
+                    byte b2 = backingArray[totalRead];
+                    this.temperature = 10 * b + (b2 & 15);
                 }
             }
-            this.temperature = value;       
 
             return totalRead;
         }
+        
+        /**
+         * For debugging
+         * @return
+         */
+        private String toCity()
+        {
+            var ba = new byte[cityLength];
+            System.arraycopy(backingArray, bufferStart, ba, 0, cityLength);
+            return new String(ba);
+        }
+
     }
 
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC91_Reviewed83.class, args);
+        Benchmark.run(BRC100_DirectTempWrite.class, args);
     }
 }
