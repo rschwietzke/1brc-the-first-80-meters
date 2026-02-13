@@ -30,7 +30,6 @@ JVMARGS_HIGH="$JVMARGS_DEFAULT $JVMARGS_HIGHMEM"
 CLASSES_HIGHMEM="
 BRC00_Empty
 BRC01_Baseline
-BRC100_DirectTempWrite
 BRC10_NoStream
 BRC12_SplitRemoved
 BRC14_NewParseDouble
@@ -64,6 +63,7 @@ BRC63_OneAddLess
 BRC65_OneLoopLess
 BRC67_ParseDifferently
 BRC68_InlineParsing
+BRC69_InlineParsing_65
 BRC70_EqualsCity
 BRC72_ReadDirectNotViaBuffer
 BRC75_LargeByteBuffer
@@ -84,6 +84,11 @@ BRC96_ReadInt_VOID
 BRC97_EqualsCity
 BRC98_ParseTemperature_VOID
 BRC99_ArrayAccess
+BRC100_DirectTempWrite
+BRC101_ParseFrom65_VOID
+BRC105_ParseTemp_95
+BRC106_ParseTemp_105
+BRC107_ParseTemp
 "
 
 alias time='/usr/bin/time -f "Elapsed: %E, Faults: %F, Minor: %R, Max RSS: %M KB, FS Input: %I, FS Output: %O, System: %S s, User: %U s, Context I/V: %c/%w"'
@@ -99,12 +104,10 @@ time cat $1 > /dev/null
 echo "=== Measurements"
 for c in $CLASSES_HIGHMEM
 do
-    #perf stat -o $c.perf.txt
-    java $JVMARGS_HIGH org.rschwietzke.again26.$c -f $1 -wc $2 -mc $3 --batchMode ""
+    perf stat -o $c.perf.txt java $JVMARGS_HIGH org.rschwietzke.again26.$c -f $1 -wc $2 -mc $3 --batchmode ""
 done
 
 for c in $CLASSES_LOWMEM
 do
-    #perf stat -o $c.perf.txt
-    java $JVMARGS_LOW org.rschwietzke.again26.$c -f $1 -wc $2 -mc $3 --batchMode ""
+    perf stat -o $c.perf.txt java $JVMARGS_LOW org.rschwietzke.again26.$c -f $1 -wc $2 -mc $3 --batchmode ""
 done
