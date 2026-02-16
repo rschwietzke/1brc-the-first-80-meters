@@ -19,7 +19,7 @@ echo "File: $1"
 echo "Warmups: $2"
 echo "Measurements: $3"
 
-JVMARGS_DEFAULT="-cp $CLASSPATH -XX:+AlwaysPreTouch"
+JVMARGS_DEFAULT="-cp $CLASSPATH -XX:+AlwaysPreTouch --add-exports java.base/jdk.internal.util=ALL-UNNAMED"
 
 JVMARGS_LOWMEM="-Xmx10m -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC"
 JVMARGS_HIGHMEM="-Xms2g -Xmx2g "
@@ -89,6 +89,9 @@ BRC101_ParseFrom65_VOID
 BRC105_ParseTemp_95
 BRC106_ParseTemp_105
 BRC107_ParseTemp
+BRC110_EqualsCitySplit
+BRC111_EqualsCitySplit_Reverse
+BRC112_EqualsCityMismatch
 "
 
 alias time='/usr/bin/time -f "Elapsed: %E, Faults: %F, Minor: %R, Max RSS: %M KB, FS Input: %I, FS Output: %O, System: %S s, User: %U s, Context I/V: %c/%w"'
