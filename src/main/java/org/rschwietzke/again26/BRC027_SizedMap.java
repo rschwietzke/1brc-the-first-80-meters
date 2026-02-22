@@ -30,7 +30,7 @@ import org.rschwietzke.util.MathUtil;
  *
  * @author Rene Schwietzke
  */
-public class BRC27_SizedMap extends Benchmark
+public class BRC027_SizedMap extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -151,6 +151,6 @@ public class BRC27_SizedMap extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-		Benchmark.run(BRC27_SizedMap.class, args);
+		Benchmark.run(BRC027_SizedMap.class, args);
     }
 }

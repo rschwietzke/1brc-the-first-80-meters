@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC75_LargeByteBuffer extends Benchmark
+public class BRC075_LargeByteBuffer extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -559,6 +559,6 @@ public class BRC75_LargeByteBuffer extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC75_LargeByteBuffer.class, args);
+        Benchmark.run(BRC075_LargeByteBuffer.class, args);
     }
 }

@@ -33,7 +33,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC65_OneLoopLess extends Benchmark
+public class BRC065_OneLoopLess extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -536,6 +536,6 @@ public class BRC65_OneLoopLess extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC65_OneLoopLess.class, args);
+        Benchmark.run(BRC065_OneLoopLess.class, args);
     }
 }

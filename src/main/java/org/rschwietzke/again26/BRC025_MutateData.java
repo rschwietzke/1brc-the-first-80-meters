@@ -31,7 +31,7 @@ import org.rschwietzke.util.MathUtil;
  *
  * @author Rene Schwietzke
  */
-public class BRC25_MutateData extends Benchmark
+public class BRC025_MutateData extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -152,6 +152,6 @@ public class BRC25_MutateData extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-		Benchmark.run(BRC25_MutateData.class, args);
+		Benchmark.run(BRC025_MutateData.class, args);
     }
 }

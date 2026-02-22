@@ -31,7 +31,7 @@ import org.rschwietzke.util.MathUtil;
  *
  * @author Rene Schwietzke
  */
-public class BRC20_IntegerValue extends Benchmark
+public class BRC020_IntegerValue extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -136,6 +136,6 @@ public class BRC20_IntegerValue extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-		Benchmark.run(BRC20_IntegerValue.class, args);
+		Benchmark.run(BRC020_IntegerValue.class, args);
     }
 }

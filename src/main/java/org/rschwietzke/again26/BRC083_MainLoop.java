@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC83_MainLoop extends Benchmark
+public class BRC083_MainLoop extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -600,6 +600,6 @@ public class BRC83_MainLoop extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC83_MainLoop.class, args);
+        Benchmark.run(BRC083_MainLoop.class, args);
     }
 }

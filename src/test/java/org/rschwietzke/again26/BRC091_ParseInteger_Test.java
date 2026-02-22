@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class BRC91_ParseInteger_Test 
+public class BRC091_ParseInteger_Test 
 {
     private byte[] backingArray;
 

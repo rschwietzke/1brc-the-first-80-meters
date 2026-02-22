@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class BRC21_LooplessParsing_Test 
+public class BRC022_LooplessParsing2_Test 
 {
     private static final int parseInteger(String s)
     {
-        return BRC21_LooplessParsing.parseInteger(s, 0, s.length());
+        return BRC022_LooplessParsing2.parseInteger(s, 0, s.length());
     }
     
     @Test

@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC95_Hash extends Benchmark
+public class BRC095_Hash extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -634,6 +634,6 @@ public class BRC95_Hash extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC95_Hash.class, args);
+        Benchmark.run(BRC095_Hash.class, args);
     }
 }

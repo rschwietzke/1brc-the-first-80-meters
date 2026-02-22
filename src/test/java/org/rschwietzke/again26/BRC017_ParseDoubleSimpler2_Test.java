@@ -5,14 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-public class BRC16_NoExtraString_Test 
+public class BRC017_ParseDoubleSimpler2_Test 
 {
     /**
      * In case we want to parse the full string
      */
     public static double parseDouble(final String s)
     {
-        return BRC16_NoExtraString.parseDouble(s, 0, s.length() - 1);
+        return BRC017_ParseDoubleSimpler2.parseDouble(s, 0, s.length());
     }
     
     @Test
@@ -20,9 +20,9 @@ public class BRC16_NoExtraString_Test
     {
         String s = "";
 
+        s = "1.0"; assertEquals(Double.parseDouble(s), parseDouble(s));
         s = "0"; assertEquals(Double.parseDouble(s), parseDouble(s));
         s = "0.0"; assertEquals(Double.parseDouble(s), parseDouble(s));
-        s = "1.0"; assertEquals(Double.parseDouble(s), parseDouble(s));
         s = "-1.0"; assertEquals(Double.parseDouble(s), parseDouble(s));
         s = "-1.5"; assertEquals(Double.parseDouble(s), parseDouble(s));
         s = "0.1"; assertEquals(Double.parseDouble(s), parseDouble(s));

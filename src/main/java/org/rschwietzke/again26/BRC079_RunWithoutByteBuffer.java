@@ -34,7 +34,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC79_RunWithoutByteBuffer extends Benchmark
+public class BRC079_RunWithoutByteBuffer extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -577,6 +577,6 @@ public class BRC79_RunWithoutByteBuffer extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC79_RunWithoutByteBuffer.class, args);
+        Benchmark.run(BRC079_RunWithoutByteBuffer.class, args);
     }
 }

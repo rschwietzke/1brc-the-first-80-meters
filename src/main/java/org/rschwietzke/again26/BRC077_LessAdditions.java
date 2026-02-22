@@ -33,7 +33,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC77_LessAdditions extends Benchmark
+public class BRC077_LessAdditions extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -558,6 +558,6 @@ public class BRC77_LessAdditions extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC77_LessAdditions.class, args);
+        Benchmark.run(BRC077_LessAdditions.class, args);
     }
 }

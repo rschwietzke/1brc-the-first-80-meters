@@ -31,7 +31,7 @@ import org.rschwietzke.util.MathUtil;
  *
  * @author Rene Schwietzke
  */
-public class BRC14_NewParseDouble extends Benchmark
+public class BRC014_NewParseDouble extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -153,6 +153,6 @@ public class BRC14_NewParseDouble extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-		Benchmark.run(BRC14_NewParseDouble.class, args);
+		Benchmark.run(BRC014_NewParseDouble.class, args);
     }
 }

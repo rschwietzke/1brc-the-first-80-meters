@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC80_JDKArrayUtils extends Benchmark
+public class BRC080_JDKArrayUtils extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -570,6 +570,6 @@ public class BRC80_JDKArrayUtils extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC80_JDKArrayUtils.class, args);
+        Benchmark.run(BRC080_JDKArrayUtils.class, args);
     }
 }

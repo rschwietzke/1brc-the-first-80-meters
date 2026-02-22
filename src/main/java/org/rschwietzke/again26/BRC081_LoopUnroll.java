@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC81_LoopUnroll extends Benchmark
+public class BRC081_LoopUnroll extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -572,6 +572,6 @@ public class BRC81_LoopUnroll extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC81_LoopUnroll.class, args);
+        Benchmark.run(BRC081_LoopUnroll.class, args);
     }
 }

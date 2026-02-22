@@ -34,7 +34,7 @@ import org.rschwietzke.util.MathUtil;
  *
  * @author Rene Schwietzke
  */
-public class BRC31_OpenMapLessCasting extends Benchmark
+public class BRC031_OpenMapLessCasting extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -464,6 +464,6 @@ public class BRC31_OpenMapLessCasting extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC31_OpenMapLessCasting.class, args);
+        Benchmark.run(BRC031_OpenMapLessCasting.class, args);
     }
 }

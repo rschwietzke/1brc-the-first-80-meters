@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 
 import org.junit.jupiter.api.Test;
 
-public class BRC67_ParseDifferently_Test 
+public class BRC067_ParseDifferently_Test 
 {
     private static final int parseInteger(String s)
     {
@@ -14,7 +14,7 @@ public class BRC67_ParseDifferently_Test
         b.put(s.getBytes());
         b.position(0);
         
-        return BRC67_ParseDifferently.parseInteger(b);
+        return BRC067_ParseDifferently.parseInteger(b);
     }
     
     @Test

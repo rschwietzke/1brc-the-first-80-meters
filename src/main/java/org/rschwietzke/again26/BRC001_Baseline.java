@@ -33,7 +33,7 @@ import org.rschwietzke.Benchmark;
  * 
  * It has been slightly modified to use our Benchmark framework and fit my personal formatting style.
  */
-public class BRC01_Baseline extends Benchmark 
+public class BRC001_Baseline extends Benchmark 
 {
     private static record Measurement(String station, double value) 
     {
@@ -112,6 +112,6 @@ public class BRC01_Baseline extends Benchmark
 
     public static void main(String[] args)
     {
-        Benchmark.run(BRC01_Baseline.class, args);
+        Benchmark.run(BRC001_Baseline.class, args);
     }
 }

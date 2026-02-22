@@ -33,7 +33,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC72_ReadDirectNotViaBuffer extends Benchmark
+public class BRC072_ReadDirectNotViaBuffer extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -560,6 +560,6 @@ public class BRC72_ReadDirectNotViaBuffer extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC72_ReadDirectNotViaBuffer.class, args);
+        Benchmark.run(BRC072_ReadDirectNotViaBuffer.class, args);
     }
 }

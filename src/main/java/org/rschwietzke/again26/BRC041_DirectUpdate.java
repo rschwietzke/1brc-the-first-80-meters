@@ -31,7 +31,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC41_DirectUpdate extends Benchmark
+public class BRC041_DirectUpdate extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -406,6 +406,6 @@ public class BRC41_DirectUpdate extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC41_DirectUpdate.class, args);
+        Benchmark.run(BRC041_DirectUpdate.class, args);
     }
 }

@@ -4,29 +4,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class BRC30_OpenMap_Test 
+public class BRC030_OpenMap_Test 
 {
     @Test
     public void nextPowerOfTwo()
     {
-        assertEquals(1, BRC30_OpenMap.LightMap.nextPowerOfTwo(1));
-        assertEquals(2, BRC30_OpenMap.LightMap.nextPowerOfTwo(2));
-        assertEquals(4, BRC30_OpenMap.LightMap.nextPowerOfTwo(3));
-        assertEquals(4, BRC30_OpenMap.LightMap.nextPowerOfTwo(4));
-        assertEquals(8, BRC30_OpenMap.LightMap.nextPowerOfTwo(5));
-        assertEquals(8, BRC30_OpenMap.LightMap.nextPowerOfTwo(6));
-        assertEquals(8, BRC30_OpenMap.LightMap.nextPowerOfTwo(7));
-        assertEquals(8, BRC30_OpenMap.LightMap.nextPowerOfTwo(8));
-        assertEquals(16, BRC30_OpenMap.LightMap.nextPowerOfTwo(9));
-        assertEquals(1, BRC30_OpenMap.LightMap.nextPowerOfTwo(0));
-        assertEquals(512, BRC30_OpenMap.LightMap.nextPowerOfTwo(413));
-        assertEquals(512, BRC30_OpenMap.LightMap.nextPowerOfTwo(512));
+        assertEquals(1, BRC030_OpenMap.LightMap.nextPowerOfTwo(1));
+        assertEquals(2, BRC030_OpenMap.LightMap.nextPowerOfTwo(2));
+        assertEquals(4, BRC030_OpenMap.LightMap.nextPowerOfTwo(3));
+        assertEquals(4, BRC030_OpenMap.LightMap.nextPowerOfTwo(4));
+        assertEquals(8, BRC030_OpenMap.LightMap.nextPowerOfTwo(5));
+        assertEquals(8, BRC030_OpenMap.LightMap.nextPowerOfTwo(6));
+        assertEquals(8, BRC030_OpenMap.LightMap.nextPowerOfTwo(7));
+        assertEquals(8, BRC030_OpenMap.LightMap.nextPowerOfTwo(8));
+        assertEquals(16, BRC030_OpenMap.LightMap.nextPowerOfTwo(9));
+        assertEquals(1, BRC030_OpenMap.LightMap.nextPowerOfTwo(0));
+        assertEquals(512, BRC030_OpenMap.LightMap.nextPowerOfTwo(413));
+        assertEquals(512, BRC030_OpenMap.LightMap.nextPowerOfTwo(512));
     }
     
     @Test 
     public void basicCtr()
     {
-        BRC30_OpenMap.LightMap<String, Integer> map = new BRC30_OpenMap.LightMap<>(8);
+        BRC030_OpenMap.LightMap<String, Integer> map = new BRC030_OpenMap.LightMap<>(8);
         assertEquals(0, map.size());
         assertEquals(0, map.keys().size());
     }
@@ -34,7 +34,7 @@ public class BRC30_OpenMap_Test
     @Test 
     public void basicPutGet()
     {
-        BRC30_OpenMap.LightMap<String, Integer> map = new BRC30_OpenMap.LightMap<>(8);
+        BRC030_OpenMap.LightMap<String, Integer> map = new BRC030_OpenMap.LightMap<>(8);
         map.put("one", 1);
         map.put("two", 2);
         map.put("three", 3);
@@ -49,7 +49,7 @@ public class BRC30_OpenMap_Test
     @Test
     public void customKeyPutGet()
     {
-        BRC30_OpenMap.LightMap<CString, Integer> map = new BRC30_OpenMap.LightMap<>(8);
+        BRC030_OpenMap.LightMap<CString, Integer> map = new BRC030_OpenMap.LightMap<>(8);
         map.put(new CString("one", "one".hashCode()), 1);
         map.put(new CString("two", "two".hashCode()), 2);
         map.put(new CString("three", "three".hashCode()), 3);
@@ -64,7 +64,7 @@ public class BRC30_OpenMap_Test
     @Test
     public void collisions()
     {
-        BRC30_OpenMap.LightMap<CString, Integer> map = new BRC30_OpenMap.LightMap<>(8);
+        BRC030_OpenMap.LightMap<CString, Integer> map = new BRC030_OpenMap.LightMap<>(8);
         map.put(new CString("one", 21), 1);
         map.put(new CString("two", 21), 2);
         map.put(new CString("three", 21), 3);
@@ -79,7 +79,7 @@ public class BRC30_OpenMap_Test
     @Test
     public void grow()
     {
-        BRC30_OpenMap.LightMap<String, Integer> map = new BRC30_OpenMap.LightMap<>(8);
+        BRC030_OpenMap.LightMap<String, Integer> map = new BRC030_OpenMap.LightMap<>(8);
         for (int i = 1; i <= 2000; i++)
         {
             map.put(i + "any" + i, i);
@@ -110,7 +110,7 @@ public class BRC30_OpenMap_Test
     @Test
     public void compute()
     {
-        BRC30_OpenMap.LightMap<String, Integer> map = new BRC30_OpenMap.LightMap<>(8);
+        BRC030_OpenMap.LightMap<String, Integer> map = new BRC030_OpenMap.LightMap<>(8);
         for (int i = 1; i <= 1000; i++)
         {
             final int val = i;

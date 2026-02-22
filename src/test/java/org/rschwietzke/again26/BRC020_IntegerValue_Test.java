@@ -4,12 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class BRC60_ReadingBytes_Test 
+public class BRC020_IntegerValue_Test 
 {
     private static final int parseInteger(String s)
     {
-        byte[] b = s.getBytes();
-        return BRC60_ReadingBytes.parseInteger(b, 0, b.length);
+        return BRC020_IntegerValue.parseInteger(s, 0, s.length());
     }
     
     @Test

@@ -31,7 +31,7 @@ import org.rschwietzke.util.MathUtil;
  *
  * @author Rene Schwietzke
  */
-public class BRC21_LooplessParsing extends Benchmark
+public class BRC021_LooplessParsing extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -155,6 +155,6 @@ public class BRC21_LooplessParsing extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-		Benchmark.run(BRC21_LooplessParsing.class, args);
+		Benchmark.run(BRC021_LooplessParsing.class, args);
     }
 }

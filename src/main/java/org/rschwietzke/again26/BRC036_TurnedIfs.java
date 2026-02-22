@@ -33,7 +33,7 @@ import org.rschwietzke.util.MathUtil;
  *
  * @author Rene Schwietzke
  */
-public class BRC36_TurnedIfs extends Benchmark
+public class BRC036_TurnedIfs extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -480,6 +480,6 @@ public class BRC36_TurnedIfs extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC36_TurnedIfs.class, args);
+        Benchmark.run(BRC036_TurnedIfs.class, args);
     }
 }

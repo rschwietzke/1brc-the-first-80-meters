@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC98_ParseTemperature_VOID extends Benchmark
+public class BRC098_ParseTemperature_VOID extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -624,6 +624,6 @@ public class BRC98_ParseTemperature_VOID extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC98_ParseTemperature_VOID.class, args);
+        Benchmark.run(BRC098_ParseTemperature_VOID.class, args);
     }
 }

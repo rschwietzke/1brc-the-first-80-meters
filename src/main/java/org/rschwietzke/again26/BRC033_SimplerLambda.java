@@ -33,7 +33,7 @@ import org.rschwietzke.util.MathUtil;
  *
  * @author Rene Schwietzke
  */
-public class BRC33_SimplerLambda extends Benchmark
+public class BRC033_SimplerLambda extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -459,6 +459,6 @@ public class BRC33_SimplerLambda extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC33_SimplerLambda.class, args);
+        Benchmark.run(BRC033_SimplerLambda.class, args);
     }
 }

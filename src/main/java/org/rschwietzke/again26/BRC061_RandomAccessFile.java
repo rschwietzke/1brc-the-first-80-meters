@@ -34,7 +34,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC61_RandomAccessFile extends Benchmark
+public class BRC061_RandomAccessFile extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -531,6 +531,6 @@ public class BRC61_RandomAccessFile extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC61_RandomAccessFile.class, args);
+        Benchmark.run(BRC061_RandomAccessFile.class, args);
     }
 }

@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  *
  * @author Rene Schwietzke
  */
-public class BRC10_NoStream extends Benchmark
+public class BRC010_NoStream extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -111,6 +111,6 @@ public class BRC10_NoStream extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-		Benchmark.run(BRC10_NoStream.class, args);
+		Benchmark.run(BRC010_NoStream.class, args);
     }
 }

@@ -23,7 +23,7 @@ import org.rschwietzke.Benchmark;
  * This is an empty shell to check the framework overhead. We expect almost zero runtime here.
  * The only thing we might see is the Java framework overhead when coming up.
  */
-public class BRC00_Empty extends Benchmark
+public class BRC000_Empty extends Benchmark
 {
     @Override
     public String run(final String fileName) throws IOException
@@ -33,6 +33,6 @@ public class BRC00_Empty extends Benchmark
 
     public static void main(String[] args)
     {
-		Benchmark.run(BRC00_Empty.class, args);
+		Benchmark.run(BRC000_Empty.class, args);
     }
 }

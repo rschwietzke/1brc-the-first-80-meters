@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC99_ArrayAccess extends Benchmark
+public class BRC099_ArrayAccess extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -632,6 +632,6 @@ public class BRC99_ArrayAccess extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC99_ArrayAccess.class, args);
+        Benchmark.run(BRC099_ArrayAccess.class, args);
     }
 }

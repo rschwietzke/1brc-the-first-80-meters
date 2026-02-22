@@ -34,7 +34,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC40_ASetIsGoodEnough extends Benchmark
+public class BRC040_ASetIsGoodEnough extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -405,6 +405,6 @@ public class BRC40_ASetIsGoodEnough extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC40_ASetIsGoodEnough.class, args);
+        Benchmark.run(BRC040_ASetIsGoodEnough.class, args);
     }
 }

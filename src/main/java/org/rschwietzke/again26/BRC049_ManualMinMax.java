@@ -30,7 +30,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC49_ManualMinMax extends Benchmark
+public class BRC049_ManualMinMax extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -468,6 +468,6 @@ public class BRC49_ManualMinMax extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC49_ManualMinMax.class, args);
+        Benchmark.run(BRC049_ManualMinMax.class, args);
     }
 }

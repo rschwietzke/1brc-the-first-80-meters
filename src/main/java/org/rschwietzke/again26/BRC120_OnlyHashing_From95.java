@@ -28,11 +28,12 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Looking at BRC83 again to improve it further.
+ * We are going really nuts now and try to use an almost collion free hashing to 
+ * avoid any comparison of the data. That is risky, but possible. 
  * 
  * @author Rene Schwietzke
  */
-public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
+public class BRC120_OnlyHashing_From95 extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -41,7 +42,7 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
     private static class City
     {
         public byte[] city;
-        public int hashCode;
+        public long hashCode;
         // keep the length here to avoid accessing it from the array
         public int length;
 
@@ -56,12 +57,14 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
             this.city = new byte[this.length];
 
             System.arraycopy(line.backingArray, line.bufferStart, this.city, 0, this.length);
-            this.hashCode = line.hash;
+            this.hashCode = line.hashCode;
 
             this.min = line.temperature;
             this.max = line.temperature;
             this.total = line.temperature;
             this.count = 1;
+            
+            //System.out.format("%s,%d%n", new String(this.city), line.hash);
         }
 
         /**
@@ -101,41 +104,41 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
             return Arrays.compare(this.city, other.city) == 0;
         }
 
-        /**
-         * We need that to ensure we compare against the defining key
-         * Because we don't want to trap us against standard equals,
-         * we name it differently
-         */
-        public boolean equalsCity(Line line)
-        {
-            int len = this.length;
-            //            if (len != line.cityLength)
-            //            {
-            //                return false;
-            //            }
-
-            int start = line.bufferStart;
-            int sem = line.semicolon;
-            if (len > 7)
-            {
-                // equals is faster than compare for longer arrays, because it can stop earlier, 
-                // but for short ones the overhead is higher than the gain, so we just do it manually
-                // the JDK says > 7, so we do the same
-                return Arrays.equals(this.city, 0, this.city.length, line.backingArray, start, sem);
-            }
-            else
-            {
-                for (int i = 0; i < len; i++)
-                {
-                    // add is better than sub
-                    if (this.city[i] != line.backingArray[start + i])
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
+//        /**
+//         * We need that to ensure we compare against the defining key
+//         * Because we don't want to trap us against standard equals,
+//         * we name it differently
+//         */
+//        public boolean equalsCity(Line line)
+//        {
+//            int len = this.length;
+//            //            if (len != line.cityLength)
+//            //            {
+//            //                return false;
+//            //            }
+//
+//            int start = line.bufferStart;
+//            int sem = line.semicolon;
+//            if (len > 7)
+//            {
+//                // equals is faster than compare for longer arrays, because it can stop earlier, 
+//                // but for short ones the overhead is higher than the gain, so we just do it manually
+//                // the JDK says > 7, so we do the same
+//                return Arrays.equals(this.city, 0, this.city.length, line.backingArray, start, sem);
+//            }
+//            else
+//            {
+//                for (int i = 0; i < len; i++)
+//                {
+//                    // add is better than sub
+//                    if (this.city[i] != line.backingArray[start + i])
+//                    {
+//                        return false;
+//                    }
+//                }
+//                return true;
+//            }
+//        }
 
         public String getCity()
         {
@@ -143,14 +146,16 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
         }
 
         /**
-         * We need that to ensure we use the city as defining key
+         * We need that to ensure we use the city as defining key. We remove 
+         * a lot of information by downcasting to int
          */
         @Override
         public int hashCode()
         {
-            return hashCode;
+            // for our treemap
+            return (int)this.hashCode;
         }
-
+        
         public String toString()
         {
             // we delegate the formatting to our math util to
@@ -209,16 +214,16 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
          */
         public void update(final Line line)
         {
-            final int hash = line.hash ; // ensure non-negative
-            final int index = hash & this.mask;
+            final int index = (int)(line.hashCode & this.mask);
 
             final City city = this.data[index];
             if (city == null)
             {
                 add(line, index);
             }
-            // we removed the size check in equalsCity, so we have to have that here
-            else if (city.length == line.cityLength && city.equalsCity(line))
+            // here is the risky part, the hash is good enough because
+            // we get almost no collisions. DANGER!!!
+            else if (city.hashCode == line.hashCode)
             {
                 city.merge(line.temperature); 
             }
@@ -252,31 +257,36 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
          * @param index the original index where the collision happened
          * @return     the value or null
          */
+        //int c = 0;
         private void updateCollision(final Line line, int index)
         {
             while (true)
             {
+                //String c = line.toCity();
                 index = (index + 1) & this.mask;
 
                 final City city = this.data[index];
                 if (city == null)
                 {
                     add(line, index);
-                    return;
+                    // System.out.println("Collisions Add: " + ++c);
+                    break;
                 }
-                // we removed the size check in equalsCity, so we have to have that here
-                else if (city.length == line.cityLength && city.equalsCity(line))
+                // once again, we take the risky path and rely on our very
+                // good hash to avoid any comparison, that is risky
+                else if (city.hashCode == line.hashCode)
                 {
                     city.merge(line.temperature); 
-                    return;
+                    //System.out.println("Collisions Merge: " + ++c);
+                    break;
                 }
             }
         }
 
         public void add(final City city)
         {
-            final int hash = city.hashCode();
-            final int index = hash & this.mask;
+            final long hash = city.hashCode();
+            final int index = (int)(hash & this.mask);
 
             final City c = this.data[index];
             if (c == null)
@@ -415,7 +425,7 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
 
         public int semicolon;
         public int temperature;
-        public int hash;
+        public long hashCode;
         public int cityLength;
         private byte[] backingArray = new byte[500_000];
 
@@ -466,13 +476,16 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
             return false;
         }
 
+        private static final long FNV_64_INIT = 0xcbf29ce484222325L;
+        private static final long FNV_64_PRIME = 0x100000001b3L;
+        
         public boolean readLine() throws IOException
         {
             // ok, it is very inefficient to read directly from
             // the input stream or channel, so we have to buffer
             // it first, ensure we have more data than one line
             // is long
-            if (bufferEnd - bufferPos < 128)
+            if (this.bufferEnd - this.bufferPos < 128)
             {
                 // this is very unlikely to happen often, so it is no here in the
                 // code to make it smaller and hence inlineable
@@ -485,13 +498,16 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
             // let's operate on the backing array directly to speed things up
             // keep track of the "reads" to be able to calculate the next position
 
-            // read all data till the \n, calc the hash on the go
-            // an parse it
-            this.bufferStart = this.bufferPos;
-            int totalRead = this.bufferStart;
+            // read all data till the ; and calc the hash on the go
+            int totalRead = this.bufferPos;
+            int start = totalRead;
 
             // find the semicolon and calculate hash in one go
-            int h = 0;
+            long hash = FNV_64_INIT; 
+            // FNV-1a 64 bit hash, we can use that because we have no more than 400 stations, 
+            // so no risk of collision, but it is very fast and has a good distribution, 
+            // so we WILL skip any comparison of the city name, we just rely on the hash, that is risky, 
+            // but we want to see how far we can get with that
             while (true)
             {
                 byte b = this.backingArray[totalRead];  
@@ -499,7 +515,8 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
                 {
                     break;
                 }
-                h = (h << 5) - h + b;
+                hash ^= (b & 0xff);
+                hash *= FNV_64_PRIME;
                 totalRead++;
 
                 b = this.backingArray[totalRead];  
@@ -507,7 +524,8 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
                 {
                     break;
                 }
-                h = (h << 5) - h + b;
+                hash ^= (b & 0xff);
+                hash *= FNV_64_PRIME;
                 totalRead++;
 
                 b = this.backingArray[totalRead];  
@@ -515,7 +533,8 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
                 {
                     break;
                 }
-                h = (h << 5) - h + b;
+                hash ^= (b & 0xff);
+                hash *= FNV_64_PRIME;
                 totalRead++;
             
                 b = this.backingArray[totalRead];  
@@ -523,16 +542,29 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
                 {
                     break;
                 }
-                h = (h << 5) - h + b;
+                hash ^= (b & 0xff);
+                hash *= FNV_64_PRIME;
+                totalRead++;
+
+                // we do that unrolled to avoid the overhead of the loop and the if, but we have to check for the ; at each step, because we don't want to read beyond it
+                // unroll to 5 items seem to be the sweet spot, more is slower and less is slower
+                b = this.backingArray[totalRead];  
+                if (b == ';')
+                {
+                    break;
+                }
+                hash ^= (b & 0xff);
+                hash *= FNV_64_PRIME;
                 totalRead++;
             }
-            this.cityLength = totalRead - this.bufferStart;
+            this.cityLength = totalRead - start;
             this.semicolon = totalRead++;
-            this.hash = h;
+            this.hashCode = hash;
 
             // skip newline
             // + 2 because we jump to \n and one more
             this.bufferPos =  parseTemperature(totalRead) + 2;
+            this.bufferStart = start;
 
             //            System.out.format("Read: %s%n" ,
             //                    new String(this.backingArray, 
@@ -548,59 +580,87 @@ public class BRC092_ParseIntegerLessBranches_VOID extends Benchmark
 
         private int parseTemperature(int totalRead)
         {
+            // we inlined the parse integer here as well to make it more inlineable
+            int value;
+
             byte b = this.backingArray[totalRead++];
-
-            // are we negative? we need some setup for a later bit flip
-            // compensate for the bit flip later
-            int negative = b == '-' ? -1 : 0;
-
-            // to save a branch, we just add 1 to the total read, so we are at the right position for the next read, no matter if we had a - or not
-            // compensate for the later add
-            int value = -negative - 1; // when negative we need 0 here, -1 otherwise
-            totalRead += value; // -1 when positive, 0 when negative
-
-            // ok, 9.9 or 99.9
-            // first is always a number, we might have to reread it if positive
-            byte b0 = this.backingArray[totalRead++];
-            b0 &= 15;
-
-            // next is either . or another number
-            byte b1 = this.backingArray[totalRead++];
-            if (b1 != '.')
+            if (b == '-')
             {
-                b1 &= 15;
+                // ok, -9.9 or -99.9
+                // first is always a number
+                byte b0 = this.backingArray[totalRead++];
+                b0 &= 15;
 
-                // must be 99.9
+                // next is either . or another number
+                byte b1 = this.backingArray[totalRead++];
+                if (b1 != '.')
+                {
+                    b1 &= 15;
 
-                // skip the ., we just read a number
+                    // must be 99.9
 
-                // the part after the .
-                byte b2 = this.backingArray[++totalRead];
-                value = 100 * b0 + 10 * b1 + (b2 & 15) + value;
+                    // skip the ., we just read a number
+
+                    // the part after the .
+                    byte b2 = this.backingArray[++totalRead];
+                    value = -(100 * b0 + 10 * b1 + (b2 & 15));
+                }
+                else
+                {
+                    // skip .
+
+                    // it is -9.9
+                    // the part after the .
+                    byte b2 = this.backingArray[totalRead];
+                    value = -(10 * b0 + (b2 & 15));
+                }
             }
             else
             {
-                // skip .
+                // ok, 9.9 or 99.9
+                b &= 15;
 
-                // it is 9.9
-                // the part after the .
-                byte b2 = this.backingArray[totalRead];
-                value = 10 * b0 + (b2 & 15) + value;
+                // next is either . or another number
+                byte b1 = this.backingArray[totalRead++];
+                if (b1 != '.')
+                {
+                    // must be 99.9
+                    b1 &= 15;
+
+                    // skip the .
+
+                    byte b2 = this.backingArray[++totalRead];
+                    value = 100 * b + 10 * b1 + (b2 & 15);
+                }
+                else
+                {
+                    // skip .
+                    // it is 9.9
+                    byte b2 = this.backingArray[totalRead];
+                    value = 10 * b + (b2 & 15);
+                }
             }
+            this.temperature = value;       
 
-            // flip the bits to get a negative value
-            // int negative = (x ^ -1) + 1
-            // negative is either 0 or -1, so we flip all bits when negative and add 1 to compensate for the earlier compensation
-            // if 0, we just add 1 and that was already accounted for before with value = -negative - 1 
-            this.temperature = (value ^ negative) + 1;
-            
             return totalRead;
         }
+        
+        /**
+         * For debugging
+         * @return
+         */
+        private String toCity()
+        {
+            var ba = new byte[cityLength];
+            System.arraycopy(backingArray, bufferStart, ba, 0, cityLength);
+            return new String(ba);
+        }
+
     }
 
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC092_ParseIntegerLessBranches_VOID.class, args);
+        Benchmark.run(BRC120_OnlyHashing_From95.class, args);
     }
 }

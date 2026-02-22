@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 
 import org.junit.jupiter.api.Test;
 
-public class BRC96_ParseInt_Test 
+public class BRC096_ParseInt_Test 
 {
     private byte[] backingArray;
 

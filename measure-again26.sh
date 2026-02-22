@@ -93,6 +93,8 @@ BRC110_EqualsCitySplit
 BRC111_EqualsCitySplit_Reverse
 BRC112_EqualsCityMismatch
 BRC113_EqualsCityMismatchSimple
+BRC120_OnlyHashing_From95
+BRC121_UpdatedLoops
 "
 
 alias time='/usr/bin/time -f "Elapsed: %E, Faults: %F, Minor: %R, Max RSS: %M KB, FS Input: %I, FS Output: %O, System: %S s, User: %U s, Context I/V: %c/%w"'

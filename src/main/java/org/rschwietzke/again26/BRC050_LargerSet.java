@@ -30,7 +30,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC50_LargerSet extends Benchmark
+public class BRC050_LargerSet extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -468,6 +468,6 @@ public class BRC50_LargerSet extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC50_LargerSet.class, args);
+        Benchmark.run(BRC050_LargerSet.class, args);
     }
 }

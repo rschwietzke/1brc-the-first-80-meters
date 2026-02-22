@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC82_VectorSearchOnlyForLargeArray extends Benchmark
+public class BRC082_VectorSearchOnlyForLargeArray extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -594,6 +594,6 @@ public class BRC82_VectorSearchOnlyForLargeArray extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC82_VectorSearchOnlyForLargeArray.class, args);
+        Benchmark.run(BRC082_VectorSearchOnlyForLargeArray.class, args);
     }
 }
