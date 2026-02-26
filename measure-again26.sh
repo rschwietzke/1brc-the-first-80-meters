@@ -95,7 +95,8 @@ BRC112_EqualsCityMismatch
 BRC113_EqualsCityMismatchSimple
 BRC120_OnlyHashing_From95
 BRC121_UpdatedLoops
-BRC123_121plus105
+BRC123_121plus105_VOID
+BRC125_Refined_121
 "
 
 alias time='/usr/bin/time -f "Elapsed: %E, Faults: %F, Minor: %R, Max RSS: %M KB, FS Input: %I, FS Output: %O, System: %S s, User: %U s, Context I/V: %c/%w"'
@@ -109,10 +110,10 @@ echo "File Warmup 2: "
 time cat $1 > /dev/null
 
 echo "=== Measurements"
-#for c in $CLASSES_HIGHMEM
-#do
-#    perf stat -o $c.perf.txt java $JVMARGS_HIGH org.rschwietzke.again26.$c -f $1 -wc $2 -mc $3 --batchmode ""
-#done
+for c in $CLASSES_HIGHMEM
+do
+    perf stat -o $c.perf.txt java $JVMARGS_HIGH org.rschwietzke.again26.$c -f $1 -wc $2 -mc $3 --batchmode ""
+done
 
 for c in $CLASSES_LOWMEM
 do

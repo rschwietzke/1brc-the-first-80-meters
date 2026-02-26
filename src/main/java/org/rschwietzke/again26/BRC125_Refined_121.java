@@ -32,7 +32,7 @@ import org.rschwietzke.util.MathUtil;
  * 
  * @author Rene Schwietzke
  */
-public class BRC123_121plus105 extends Benchmark
+public class BRC125_Refined_121 extends Benchmark
 {
     /**
      * Holds our temperature data without the station, because the
@@ -428,8 +428,8 @@ public class BRC123_121plus105 extends Benchmark
         public int cityLength;
         private byte[] backingArray = new byte[500_000];
 
-        private FileChannel channel;
         private ByteBuffer buffer = ByteBuffer.wrap(this.backingArray); 
+        private FileChannel channel;
 
         public Line(FileChannel channel)
         {
@@ -440,7 +440,7 @@ public class BRC123_121plus105 extends Benchmark
         public LightSet process() throws IOException
         {
             // our storage, sized to avoid rehashing (about 400 stations in total)
-            final LightSet cities = new LightSet(4096);
+            final LightSet cities = new LightSet(6096);
 
             // read all lines until end of file
             while (true)
@@ -449,7 +449,7 @@ public class BRC123_121plus105 extends Benchmark
                 // the input stream or channel, so we have to buffer
                 // it first, ensure we have more data than one line
                 // is long
-                if (this.bufferEnd - this.bufferPos < 128)
+                if (this.bufferEnd - this.bufferPos < 256)
                 {
                     // this is very unlikely to happen often, so it is no here in the
                     // code to make it smaller and hence inlineable
@@ -461,30 +461,9 @@ public class BRC123_121plus105 extends Benchmark
                 
                 // will always be ok
                 readLine();
-                
-                // let the set decide what to do
                 cities.update(this);
             }
             return cities;
-        }
-
-        private void finishBuffer(LightSet cities) throws IOException
-        {
-            while (true)
-            {
-                if (this.bufferEnd - this.bufferPos < 128)
-                {
-                    // this is very unlikely to happen often, so it is no here in the
-                    // code to make it smaller and hence inlineable
-                    if (fillBuffer() == -1)
-                    {
-                        break;
-                    }
-                }
-                
-                readLine();
-                cities.update(this);
-            }
         }
         
         private int fillBuffer() throws IOException
@@ -522,7 +501,6 @@ public class BRC123_121plus105 extends Benchmark
 
             // read all data till the ; and calc the hash on the go
             int totalRead = this.bufferPos;
-            int start = totalRead;
 
             // find the semicolon and calculate hash in one go
             long hash = FNV_64_INIT; 
@@ -579,73 +557,78 @@ public class BRC123_121plus105 extends Benchmark
                 hash *= FNV_64_PRIME;
                 totalRead++;
             }
-            this.cityLength = totalRead - start;
-            this.semicolon = totalRead++;
             this.hashCode = hash;
+            this.cityLength = totalRead - this.bufferPos;
+            this.bufferStart = this.bufferPos;
+            this.semicolon = totalRead++;
 
             // skip newline
             // + 2 because we jump to \n and one more
             this.bufferPos =  parseTemperature(totalRead) + 2;
-            this.bufferStart = start;
-
-            //            System.out.format("Read: %s%n" ,
-            //                    new String(this.backingArray, 
-            //                            this.startPos, totalRead));
-            //            System.out.format("Read line: %s;%d - hash: %d%n" ,
-            //                    new String(this.backingArray, 
-            //                            this.startPos, this.semicolon - this.startPos),
-            //                    value, this.hash);
         }
-
 
         private int parseTemperature(int totalRead)
         {
-            // read last if needed
-            // 01234 Position, n means newline
-            // 9.9n
-            // 99.9n
-            // -9.9n
-            // -99.9n to be covered later
-            byte sign; 
-            
-            // [-]9.9 or [-]99.9, [9].9 or [9]9.9
-            byte b = sign = this.backingArray[totalRead++];
+            int value;
 
-            int value = b;
-
-            // -[9].9 or -[9]9.9 or 9[.]9 or 9[9].9
-            b = this.backingArray[totalRead++];
-            
-            if (b == '.')
+            byte b = this.backingArray[totalRead++];
+            if (b == '-')
             {
-                // 9.9
-                value = value * 10 + this.backingArray[totalRead];
-                value -= '0' * 10 + '0';
-                
-                this.temperature = value;
-                return totalRead;
-            }
-            value = value * 10 + b;
-            
-            // -9[.]9 or -9[9].9 or 99[.]9
-            b = this.backingArray[totalRead++];
-            if (b == '.')
-            {
-                // 99.9 or -9.9 
-                value = value * 10 + this.backingArray[totalRead];
-                
-                this.temperature = sign == '-' ?
-                        -value + ('-' * 100 + '0' * 10  + '0') 
-                        :
-                        value - ('0' * 100 + '0' * 10  + '0');
-                return totalRead;
-            }
-            value = value * 10 + b;
+                // ok, -9.9 or -99.9
+                // first is always a number
+                byte b0 = this.backingArray[totalRead++];
+                b0 &= 15;
 
-            // -99.9 left
-            b = this.backingArray[++totalRead]; // skip .
-            value = value * 10 + b;
-            this.temperature = -value + ('-' * 1000 + '0' * 100 + '0' * 10  + '0');
+                // next is either . or another number
+                byte b1 = this.backingArray[totalRead++];
+                if (b1 != '.')
+                {
+                    b1 &= 15;
+
+                    // must be 99.9
+
+                    // skip the ., we just read a number
+
+                    // the part after the .
+                    byte b2 = this.backingArray[++totalRead];
+                    value = -(100 * b0 + 10 * b1 + (b2 & 15));
+                }
+                else
+                {
+                    // skip .
+
+                    // it is -9.9
+                    // the part after the .
+                    byte b2 = this.backingArray[totalRead];
+                    value = -(10 * b0 + (b2 & 15));
+                }
+            }
+            else
+            {
+                // ok, 9.9 or 99.9
+                b &= 15;
+
+                // next is either . or another number
+                byte b1 = this.backingArray[totalRead++];
+                if (b1 != '.')
+                {
+                    // must be 99.9
+                    b1 &= 15;
+
+                    // skip the .
+
+                    byte b2 = this.backingArray[++totalRead];
+                    value = 100 * b + 10 * b1 + (b2 & 15);
+                }
+                else
+                {
+                    // skip .
+                    // it is 9.9
+                    byte b2 = this.backingArray[totalRead];
+                    value = 10 * b + (b2 & 15);
+                }
+            }
+            this.temperature = value;       
 
             return totalRead;
         }
@@ -666,6 +649,6 @@ public class BRC123_121plus105 extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC123_121plus105.class, args);
+        Benchmark.run(BRC125_Refined_121.class, args);
     }
 }

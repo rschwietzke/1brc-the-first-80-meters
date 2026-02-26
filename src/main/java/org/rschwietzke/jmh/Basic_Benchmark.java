@@ -15,6 +15,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.rschwietzke.again26.BRC125_Refined_121;
 import org.rschwietzke.devoxxpl24.BRC67_StoreArrayLength;
 import org.rschwietzke.devoxxpl24.BRC68_RemoveNewLinePos;
 
@@ -26,18 +27,24 @@ import org.rschwietzke.devoxxpl24.BRC68_RemoveNewLinePos;
 @Fork(1)
 public class Basic_Benchmark
 {
-    @Benchmark
-    public void measure67()
-    {
-        BRC67_StoreArrayLength.main(new String[]{"data-1000m.txt", "0", "1"});
-    }
+//    @Benchmark
+//    public void measure67()
+//    {
+//        BRC67_StoreArrayLength.main(new String[]{"data-1000m.txt", "0", "1"});
+//    }
+//
+//    @Benchmark
+//    public void measure68()
+//    {
+//        BRC68_RemoveNewLinePos.main(new String[]{"data-1000m.txt", "0", "1"});
+//    }
 
     @Benchmark
-    public void measure68()
+    public void measure125() throws NoSuchMethodException, SecurityException
     {
-        BRC68_RemoveNewLinePos.main(new String[]{"data-1000m.txt", "0", "1"});
+        BRC125_Refined_121.main(new String[]{"data-1000m.txt", "0", "1"});
     }
-
+    
     public static void main(String[] args) throws RunnerException
     {
         Options opt = new OptionsBuilder()
