@@ -24,6 +24,11 @@ import java.util.function.Supplier;
 public abstract class Benchmark
 {
     /**
+     * The thread count for our concurrent tests 
+     */
+    private int threadCount;
+    
+    /**
      * The interface to implement to make all implementation easily pluggable
      *
      * @param fileName
@@ -36,6 +41,25 @@ public abstract class Benchmark
      */
     public abstract String run(final String fileName) throws IOException;
 
+    /**
+     * Set the thread count for later retrivial
+     * 
+     * @param count the thread count
+     */
+    public void setThreadCount(final int count)
+    {
+        this.threadCount = count;
+    }
+    
+    /**
+     * Fetch the thread count, does not mean it is used 
+     * @return the count defined, might be too big or small, no guarantees
+     */
+    public int getThreadCount()
+    {
+        return threadCount;
+    }
+    
     public static void run(final Class<? extends Benchmark> clazz, final String[] args)
     {
         try
@@ -70,16 +94,16 @@ public abstract class Benchmark
     private static void printError()
     {
         System.err.println("Where are the arguments?");
-        System.err.println("Usage: run -f <file> -wc [warmUpCount] -mc [measurementCount] [--batchmode <comment>] [-o <filename>]");
+        System.err.println("Usage: run -f <file> -wc [warmUpCount] -mc [measurementCount] [-t <count>] [--batchmode <comment>] [-o <filename>]");
     }
 
     /**
-     * Check if we have a parameter at the comment line, such as -o
-     * Return the pos or -1 if not found
+     * Return the value of the parameter on the command line
      * 
      * @param args the args
      * @param param the param to search for
-     * @return position or -1
+     * @param f the transformation function
+     * @return the value
      */
     private static <T> Optional<T> getValue(
             final String[] args, 
@@ -107,7 +131,7 @@ public abstract class Benchmark
 
 
     /**
-     * Check if we have a parameter at the comment line, such as -o
+     * Check if we have a parameter at the command line, such as -o
      * Return the pos or -1 if not found
      * 
      * @param args the args
@@ -149,6 +173,7 @@ public abstract class Benchmark
         final boolean print;
         final String fileName;
         final String batchComment;
+        final int threadCount;
         
         try
         {
@@ -160,6 +185,7 @@ public abstract class Benchmark
                     .orElseThrow(() -> new IllegalArgumentException("Warmup count is required"));
             measurementRuns = getValue(args, "-mc", s -> Integer.valueOf(s))
                     .orElseThrow(() -> new IllegalArgumentException("Measurement count is required"));
+            threadCount = getValue(args, "-t", s -> Integer.valueOf(s)).orElse(1);
 
             batchMode = hasParam(args, "--batchmode").orElse(false);
             outputFileName = getValue(args, "-o", s -> s);
@@ -191,10 +217,10 @@ public abstract class Benchmark
         {
 
             Benchmark.print(batchMode, () -> "==== WARMUP ==================\n");
-            var results = measure(ctr, Mode.WARMUP, warmUpRuns, fileName, batchMode);
+            var results = measure(ctr, Mode.WARMUP, warmUpRuns, fileName, batchMode, threadCount);
 
             Benchmark.print(batchMode, () -> "==== MEASUREMENT ==================\n");
-            results = measure(ctr, Mode.MEASUREMENT, measurementRuns, fileName, batchMode);
+            results = measure(ctr, Mode.MEASUREMENT, measurementRuns, fileName, batchMode, threadCount);
 
             Benchmark.print(batchMode, () -> "==== RESULT ========================\n");
             long total = 0;
@@ -248,7 +274,7 @@ public abstract class Benchmark
 
     private static List<BenchmarkResult> measure(final Constructor<? extends Benchmark> ctr,
             Mode mode, int iterationCount, String fileName,
-            final boolean batchMode)
+            final boolean batchMode, int threadCount)
     {
         final List<BenchmarkResult> results = new ArrayList<>();
 
@@ -266,6 +292,8 @@ public abstract class Benchmark
                 e.printStackTrace();
             }
 
+            benchmark.setThreadCount(threadCount);
+            
             var result = measure(benchmark, fileName);
             results.add(result);
 

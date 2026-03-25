@@ -42,7 +42,7 @@ public class Basic_Benchmark
     @Benchmark
     public void measure125() throws NoSuchMethodException, SecurityException
     {
-        BRC125_Refined_121.main(new String[]{"data-1000m.txt", "0", "1"});
+        BRC125_Refined_121.main(new String[]{"-f", "data-1000m.txt", "-wc", "0", "-mc", "1"});
     }
     
     public static void main(String[] args) throws RunnerException

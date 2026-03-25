@@ -31,6 +31,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <jmh.version>1.37</jmh.version>
+    <uberjar.name>benchmarks</uberjar.name>
   </properties>
 
   <name>1BRC for Learners</name>
@@ -86,7 +87,13 @@
                 <configuration>
                     <source>25</source>
                     <target>25</target>
-                    
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.openjdk.jmh</groupId>
+                            <artifactId>jmh-generator-annprocess</artifactId>
+                            <version>${jmh.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                      <compilerArgs>
                         <arg>--add-exports</arg>
                         <arg>java.base/jdk.internal.util=ALL-UNNAMED</arg>
