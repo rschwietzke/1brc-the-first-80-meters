@@ -22,10 +22,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.Callable;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
@@ -36,7 +37,7 @@ import org.rschwietzke.util.PositionableReader;
  *
  * @author Rene Schwietzke
  */
-public class BRC046_VirtualThreads extends Benchmark
+public class BRC046_MapperReduceEarly extends Benchmark
 {
     /**
      * Holds our temperature data
@@ -91,18 +92,17 @@ public class BRC046_VirtualThreads extends Benchmark
     /**
      * Split up the file into a number of chunks and let subtasks run on each
      */
-    @SuppressWarnings("serial")
     class FileChunker
     {
         private final String filePath;
-        private final int chunkCount;
-        
-        public FileChunker(String filePath, int chunkCount)
+        private final int threadCount;
+
+        public FileChunker(String filePath, int threadCount)
         {
             this.filePath = filePath;
-            this.chunkCount = chunkCount;
+            this.threadCount = threadCount;
         }
-        
+
         public Map<String, Temperatures> run()
         {
             // first, we must know the file size
@@ -117,71 +117,66 @@ public class BRC046_VirtualThreads extends Benchmark
             }
 
             // define chunks
-            final long chunkSize = size / chunkCount;
+            final long chunkSize = size / threadCount;
 
             final List<Mapper> tasks = new ArrayList<>();
+            final BlockingQueue<Map<String, Temperatures>> resultStorage = new LinkedBlockingQueue<>(threadCount);
             
-            for (int i = 1; i <= chunkCount; i++)
+            for (int i = 1; i <= threadCount; i++)
             {
                 long from = i == 1 ? 0 : (i - 1 ) * chunkSize - 1;
-                long to = i == chunkCount ? size : i * chunkSize;
-                tasks.add(new Mapper(filePath, from, to));
+                long to = i == threadCount ? size : i * chunkSize;
+                tasks.add(new Mapper(filePath, from, to, resultStorage));
             }
-            
-            List<Future<Map<String, Temperatures>>> results = new ArrayList<>();
-            
-            try (var executor = Executors.newVirtualThreadPerTaskExecutor())
-            {
-                results = tasks.stream().map(t -> executor.submit(t)).toList();
-            }
-            
-            // reduce result
+
+            // result
             final Map<String, Temperatures> cities = new HashMap<>();
-            
-            results.stream().map(mapper -> 
+
+            try (var executor = Executors.newFixedThreadPool(threadCount))
             {
-                try 
+                tasks.stream().map(t -> executor.submit(t)).toList();
+
+                // reduce when available
+                for (int i = 0; i < threadCount; i++)
                 {
-                    return mapper.get();
-                } 
-                catch (InterruptedException e) 
-                {
-                    throw new RuntimeException(e);
-                } 
-                catch (ExecutionException e) 
-                {
-                    throw new RuntimeException(e);
+                    var map = resultStorage.take();
+                    map.forEach(
+                                (k, v) -> cities.merge(k, v, (t1, t2) -> t1.merge(t2)));
                 }
-            }).forEach(
-                    map -> map.forEach(
-                            (k, v) -> cities.merge(k, v, (t1, t2) -> t1.merge(t2))));
+            } 
+            catch (InterruptedException e) 
+            {
+                throw new RuntimeException(e);
+            }
             
             return cities;
         }
-        
-    }
-    
-    class Mapper implements Callable<Map<String, Temperatures>>
-    {
-        private long from;
-        private long to;
-        private String filePath;
 
-        public Mapper(String filePath, long from, long to)
+    }
+
+    class Mapper implements Runnable
+    {
+        private final long from;
+        private final long to;
+        private final String filePath;
+        private final BlockingQueue<Map<String, Temperatures>> resultStorage;
+
+        public Mapper(String filePath, long from, long to, BlockingQueue<Map<String, Temperatures>> resultStorage)
         {
             this.from = from;
             this.to = to;
             this.filePath = filePath;
+            this.resultStorage = resultStorage;
         }
 
         @Override
-        public Map<String, Temperatures> call() throws Exception
+        public void run()
         {
             try (var r = new PositionableReader(filePath, from, to))
             {
                 String line;
                 final Map<String, Temperatures> cities = new HashMap<>();
-                
+
                 while ((line = r.readln()) != null)
                 {
                     var splitData = line.split(";");
@@ -198,7 +193,14 @@ public class BRC046_VirtualThreads extends Benchmark
                     cities.merge(city, measurement, (t1, t2) -> t1.merge(t2));
                 }
 
-                return cities;
+                try 
+                {
+                    this.resultStorage.put(cities);
+                } 
+                catch (InterruptedException e) 
+                {
+                    throw new RuntimeException(e);
+                }
             } 
             catch (IOException e) 
             {
@@ -207,9 +209,9 @@ public class BRC046_VirtualThreads extends Benchmark
         }
 
     }
-    
+
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC046_VirtualThreads.class, args);
+        Benchmark.run(BRC046_MapperReduceEarly.class, args);
     }
 }
