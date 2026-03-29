@@ -22,11 +22,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RecursiveTask;
 
 import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
@@ -37,7 +37,7 @@ import org.rschwietzke.util.PositionableReader;
  *
  * @author Rene Schwietzke
  */
-public class BRC046_MapperReduceEarly extends Benchmark
+public class BRC043_ForkJoinPool_NoReducer extends Benchmark
 {
     /**
      * Holds our temperature data
@@ -85,25 +85,42 @@ public class BRC046_MapperReduceEarly extends Benchmark
     @Override
     public String run(final String filePath) throws IOException
     {
-        var result = new FileChunker(filePath, this.getThreadCount()).run();
-        return new TreeMap<String, Temperatures>(result).toString();
+        Future<Map<String, Temperatures>> result = null;
+        
+        // Ok, call our initial file splitter to start more tasks later
+        try (var executor = new ForkJoinPool(this.getThreadCount()))
+        {
+            result = executor.submit(new FileChunker(filePath, this.getThreadCount()));
+
+            return new TreeMap<String, Temperatures>(result.get()).toString();
+        }
+        catch (InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        } 
+        catch (ExecutionException e) 
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * Split up the file into a number of chunks and let subtasks run on each
      */
-    class FileChunker
+    @SuppressWarnings("serial")
+    class FileChunker extends RecursiveTask<Map<String, Temperatures>>
     {
         private final String filePath;
-        private final int threadCount;
-
-        public FileChunker(String filePath, int threadCount)
+        private final int chunkCount;
+        
+        public FileChunker(String filePath, int chunkCount)
         {
             this.filePath = filePath;
-            this.threadCount = threadCount;
+            this.chunkCount = chunkCount;
         }
-
-        public Map<String, Temperatures> run()
+        
+        @Override
+        protected Map<String, Temperatures> compute()
         {
             // first, we must know the file size
             long size = -1;
@@ -117,66 +134,66 @@ public class BRC046_MapperReduceEarly extends Benchmark
             }
 
             // define chunks
-            final long chunkSize = size / threadCount;
+            final long chunkSize = size / chunkCount;
 
             final List<Mapper> tasks = new ArrayList<>();
-            final BlockingQueue<Map<String, Temperatures>> resultStorage = new LinkedBlockingQueue<>(threadCount);
             
-            for (int i = 1; i <= threadCount; i++)
+            for (int i = 1; i <= chunkCount; i++)
             {
                 long from = i == 1 ? 0 : (i - 1 ) * chunkSize - 1;
-                long to = i == threadCount ? size : i * chunkSize;
-                tasks.add(new Mapper(filePath, from, to, resultStorage));
+                long to = i == chunkCount ? size : i * chunkSize;
+                tasks.add(new Mapper(filePath, from, to));
             }
-
-            // result
+            ForkJoinTask.invokeAll(tasks);
+            
+            // reduce result
             final Map<String, Temperatures> cities = new HashMap<>();
-
-            try (var executor = Executors.newFixedThreadPool(threadCount))
+            
+            tasks.stream().map(mapper -> 
             {
-                tasks.stream().map(t -> executor.submit(t)).toList();
-
-                // reduce when available and only as many as we expect
-                for (int i = 0; i < threadCount; i++)
+                try 
                 {
-                    var map = resultStorage.take();
-                    map.forEach(
-                                (k, v) -> cities.merge(k, v, (t1, t2) -> t1.merge(t2)));
+                    return mapper.get();
+                } 
+                catch (InterruptedException e) 
+                {
+                    throw new RuntimeException(e);
+                } 
+                catch (ExecutionException e) 
+                {
+                    throw new RuntimeException(e);
                 }
-            } 
-            catch (InterruptedException e) 
-            {
-                throw new RuntimeException(e);
-            }
+            }).forEach(
+                    map -> map.forEach(
+                            (k, v) -> cities.merge(k, v, (t1, t2) -> t1.merge(t2))));
             
             return cities;
         }
-
+        
     }
-
-    class Mapper implements Runnable
+    
+    @SuppressWarnings("serial")
+    class Mapper extends RecursiveTask<Map<String, Temperatures>>
     {
-        private final long from;
-        private final long to;
-        private final String filePath;
-        private final BlockingQueue<Map<String, Temperatures>> resultStorage;
+        private long from;
+        private long to;
+        private String filePath;
 
-        public Mapper(String filePath, long from, long to, BlockingQueue<Map<String, Temperatures>> resultStorage)
+        public Mapper(String filePath, long from, long to)
         {
             this.from = from;
             this.to = to;
             this.filePath = filePath;
-            this.resultStorage = resultStorage;
         }
 
         @Override
-        public void run()
+        protected Map<String, Temperatures> compute() 
         {
             try (var r = new PositionableReader(filePath, from, to))
             {
                 String line;
                 final Map<String, Temperatures> cities = new HashMap<>();
-
+                
                 while ((line = r.readln()) != null)
                 {
                     var splitData = line.split(";");
@@ -193,25 +210,17 @@ public class BRC046_MapperReduceEarly extends Benchmark
                     cities.merge(city, measurement, (t1, t2) -> t1.merge(t2));
                 }
 
-                try 
-                {
-                    this.resultStorage.put(cities);
-                } 
-                catch (InterruptedException e) 
-                {
-                    throw new RuntimeException(e);
-                }
+                return cities;
             } 
             catch (IOException e) 
             {
                 throw new RuntimeException(e);
             }
         }
-
     }
-
+    
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC046_MapperReduceEarly.class, args);
+        Benchmark.run(BRC043_ForkJoinPool_NoReducer.class, args);
     }
 }

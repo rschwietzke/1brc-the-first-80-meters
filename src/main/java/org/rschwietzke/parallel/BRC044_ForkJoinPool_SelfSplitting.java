@@ -25,8 +25,8 @@ import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
@@ -37,7 +37,7 @@ import org.rschwietzke.util.PositionableReader;
  *
  * @author Rene Schwietzke
  */
-public class BRC044_ForkJoinPool_NoReducer extends Benchmark
+public class BRC044_ForkJoinPool_SelfSplitting extends Benchmark
 {
     /**
      * Holds our temperature data
@@ -82,16 +82,26 @@ public class BRC044_ForkJoinPool_NoReducer extends Benchmark
         }
     }
 
+    private AtomicInteger counter = new AtomicInteger(0);
+    
     @Override
     public String run(final String filePath) throws IOException
     {
-        Future<Map<String, Temperatures>> result = null;
-        
-        // Ok, call our initial file splitter to start more tasks later
+        // first, we must know the file size
+        long size = -1;
+        try (var r = new RandomAccessFile(filePath, "r"))
+        {
+            size = r.length();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        // Ok, let's recursively map and reduce
         try (var executor = new ForkJoinPool(this.getThreadCount()))
         {
-            result = executor.submit(new FileChunker(filePath, this.getThreadCount()));
-
+            var result = executor.submit(new Mapper(filePath, 0, size));
             return new TreeMap<String, Temperatures>(result.get()).toString();
         }
         catch (InterruptedException e)
@@ -104,96 +114,84 @@ public class BRC044_ForkJoinPool_NoReducer extends Benchmark
         }
     }
 
-    /**
-     * Split up the file into a number of chunks and let subtasks run on each
-     */
-    @SuppressWarnings("serial")
-    class FileChunker extends RecursiveTask<Map<String, Temperatures>>
-    {
-        private final String filePath;
-        private final int chunkCount;
-        
-        public FileChunker(String filePath, int chunkCount)
-        {
-            this.filePath = filePath;
-            this.chunkCount = chunkCount;
-        }
-        
-        @Override
-        protected Map<String, Temperatures> compute()
-        {
-            // first, we must know the file size
-            long size = -1;
-            try (var r = new RandomAccessFile(filePath, "r"))
-            {
-                size = r.length();
-            }
-            catch (IOException e)
-            {
-                throw new RuntimeException(e);
-            }
-
-            // define chunks
-            final long chunkSize = size / chunkCount;
-
-            final List<Mapper> tasks = new ArrayList<>();
-            
-            for (int i = 1; i <= chunkCount; i++)
-            {
-                long from = i == 1 ? 0 : (i - 1 ) * chunkSize - 1;
-                long to = i == chunkCount ? size : i * chunkSize;
-                tasks.add(new Mapper(filePath, from, to));
-            }
-            ForkJoinTask.invokeAll(tasks);
-            
-            // reduce result
-            final Map<String, Temperatures> cities = new HashMap<>();
-            
-            tasks.stream().map(mapper -> 
-            {
-                try 
-                {
-                    return mapper.get();
-                } 
-                catch (InterruptedException e) 
-                {
-                    throw new RuntimeException(e);
-                } 
-                catch (ExecutionException e) 
-                {
-                    throw new RuntimeException(e);
-                }
-            }).forEach(
-                    map -> map.forEach(
-                            (k, v) -> cities.merge(k, v, (t1, t2) -> t1.merge(t2))));
-            
-            return cities;
-        }
-        
-    }
-    
     @SuppressWarnings("serial")
     class Mapper extends RecursiveTask<Map<String, Temperatures>>
     {
         private long from;
         private long to;
         private String filePath;
+        private final int count;
 
         public Mapper(String filePath, long from, long to)
         {
             this.from = from;
             this.to = to;
             this.filePath = filePath;
+            this.count = counter.incrementAndGet();
         }
 
         @Override
         protected Map<String, Temperatures> compute() 
         {
-            try (var r = new PositionableReader(filePath, from, to))
+            // split work if not yet small enough
+            if (to - from >= 20_000_000L)
+            {
+//                System.out.printf("Split[%d]: %,d/%,d -> %,d%n", count, from, to, to - from);
+
+                final List<Mapper> tasks = new ArrayList<>();
+                
+                long size = to - from;
+                
+                long from1 = from == 0 ? 0 : from;
+                long to1 = from + size / 2;
+                long from2 = to1;
+                long to2 = to;
+                
+                tasks.add(
+                        new Mapper(filePath, from1, to1));
+                tasks.add(
+                        new Mapper(filePath, from2, to2));
+
+                ForkJoinTask.invokeAll(tasks);
+
+                // reduce result
+                final Map<String, Temperatures> cities = new HashMap<>();
+
+                tasks.stream().map(mapper -> 
+                {
+                    try 
+                    {
+                        return mapper.get();
+                    } 
+                    catch (InterruptedException e) 
+                    {
+                        throw new RuntimeException(e);
+                    } 
+                    catch (ExecutionException e) 
+                    {
+                        throw new RuntimeException(e);
+                    }
+                }).forEach(
+                        map -> map.forEach(
+                                (k, v) -> cities.merge(k, v, (t1, t2) -> t1.merge(t2))));
+
+                return cities;
+            }
+            else
+            {
+//                System.out.printf("Map[%d]: %,d/%,d -> %,d%n", count, from, to, to - from);
+                return map();
+            }
+
+        }
+
+        private Map<String, Temperatures> map()
+        {
+            try (var r = new PositionableReader(filePath, from > 0 ? from - 1 : 0, to))
             {
                 String line;
                 final Map<String, Temperatures> cities = new HashMap<>();
-                
+
                 while ((line = r.readln()) != null)
                 {
                     var splitData = line.split(";");
@@ -218,9 +216,9 @@ public class BRC044_ForkJoinPool_NoReducer extends Benchmark
             }
         }
     }
-    
+
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC044_ForkJoinPool_NoReducer.class, args);
+        Benchmark.run(BRC044_ForkJoinPool_SelfSplitting.class, args);
     }
 }
