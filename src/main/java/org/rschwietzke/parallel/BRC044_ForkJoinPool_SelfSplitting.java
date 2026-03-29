@@ -82,8 +82,6 @@ public class BRC044_ForkJoinPool_SelfSplitting extends Benchmark
         }
     }
 
-    private AtomicInteger counter = new AtomicInteger(0);
-    
     @Override
     public String run(final String filePath) throws IOException
     {
@@ -120,14 +118,12 @@ public class BRC044_ForkJoinPool_SelfSplitting extends Benchmark
         private long from;
         private long to;
         private String filePath;
-        private final int count;
 
         public Mapper(String filePath, long from, long to)
         {
             this.from = from;
             this.to = to;
             this.filePath = filePath;
-            this.count = counter.incrementAndGet();
         }
 
         @Override
