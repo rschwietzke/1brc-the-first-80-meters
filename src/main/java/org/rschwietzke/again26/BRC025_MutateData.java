@@ -52,7 +52,6 @@ public class BRC025_MutateData extends Benchmark
 			this.count = 1;
 		}
 
-
 		public Temperatures merge(final int temperature)
         {
             this.min = Math.min(this.min, temperature);
@@ -94,7 +93,7 @@ public class BRC025_MutateData extends Benchmark
 
     			// create new when needed, mutate when merging
 				cities.compute(city, 
-				        (k, v) -> v == null ? new Temperatures(temperature) : v.merge(temperature));
+				        (_, v) -> v == null ? new Temperatures(temperature) : v.merge(temperature));
     		}
     	}
 
