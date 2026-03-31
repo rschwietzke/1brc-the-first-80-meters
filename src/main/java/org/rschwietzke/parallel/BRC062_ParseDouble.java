@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -33,7 +34,9 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Builds on BRC060 by replacing Double.parseDouble() with a custom parser that accumulates
+ * digits as a long and applies a pre-computed decimal multiplier. Exploits the known format
+ * (-99.9 to 99.9) to avoid the full IEEE 754 parsing overhead of the JDK method.
  *
  * @author Rene Schwietzke
  */

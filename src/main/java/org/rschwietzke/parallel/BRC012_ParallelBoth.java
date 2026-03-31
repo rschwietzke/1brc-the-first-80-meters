@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -102,7 +103,8 @@ public class BRC012_ParallelBoth extends Benchmark
 
         Map<String, ResultRow> measurements = 
                 Files.lines(Paths.get(fileName)).parallel()
-                .map(l -> new Measurement(l.split(";"))).parallel()
+                .map(l -> l.split(";")).parallel()
+                .map(a -> new Measurement(a))
                 .collect(
                         Collectors.groupingBy(m -> m.station(), collector));
 

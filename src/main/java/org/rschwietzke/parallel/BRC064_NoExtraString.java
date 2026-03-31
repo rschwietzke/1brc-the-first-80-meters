@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -32,7 +33,9 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Builds on BRC062 by eliminating the substring() call for the temperature portion.
+ * The custom parseDouble() now accepts the full line string with offset/end parameters,
+ * avoiding one String allocation per measurement line.
  *
  * @author Rene Schwietzke
  */

@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -32,7 +33,10 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Builds on BRC066's integer arithmetic with a branchless, loop-free parseInteger().
+ * Reads characters at known positions (end-1, end-3, end-4) by exploiting the fixed
+ * temperature format, reducing parsing to at most two conditional branches covering all
+ * four possible input patterns: 9.9, 99.9, -9.9, -99.9.
  *
  * @author Rene Schwietzke
  */

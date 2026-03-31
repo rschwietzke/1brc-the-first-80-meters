@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -33,7 +34,9 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * A single self-splitting RecursiveTask: if the assigned byte range exceeds 20 MB, the Mapper
+ * forks itself recursively into two halves. Leaf tasks below 20 MB do the actual parsing.
+ * This is the canonical ForkJoin divide-and-conquer pattern applied directly to file processing.
  *
  * @author Rene Schwietzke
  */

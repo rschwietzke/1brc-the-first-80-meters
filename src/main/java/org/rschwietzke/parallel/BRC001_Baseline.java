@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -101,13 +102,13 @@ public class BRC001_Baseline extends Benchmark
                 });
 
         Map<String, ResultRow> measurements = 
-                Files.lines(Paths.get(fileName))
-                .map(l -> new Measurement(l.split(";")))
+                Files.lines(Paths.get(fileName))            
+                .map(l -> l.split(";"))
+                .map(a -> new Measurement(a))
                 .collect(
                         Collectors.groupingBy(m -> m.station(), collector));
 
         return new TreeMap<>(measurements).toString();
-
     }
 
     public static void main(String[] args)

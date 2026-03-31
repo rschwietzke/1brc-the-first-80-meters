@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -33,7 +34,9 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Same structure as BRC045 but workers publish their partial result maps to a BlockingQueue
+ * as soon as they finish. The main thread reduces results eagerly in arrival order, overlapping
+ * reduction with still-running mappers rather than waiting for all to complete.
  *
  * @author Rene Schwietzke
  */

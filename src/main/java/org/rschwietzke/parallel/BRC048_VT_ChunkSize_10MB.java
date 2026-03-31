@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -32,7 +33,9 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Virtual Thread variant (like BRC047) but file chunks are a fixed 10 MB each, independent of
+ * thread count. This produces more tasks than threads, relying on the Loom scheduler to
+ * multiplex many virtual thread tasks efficiently without explicit pool configuration.
  *
  * @author Rene Schwietzke
  */

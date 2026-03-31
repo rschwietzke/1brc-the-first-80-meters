@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -33,7 +34,9 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Same batch-task approach as BRC036, but uses Executors.newVirtualThreadPerTaskExecutor()
+ * so each 100,000-line task runs on its own virtual thread. Allows unbounded concurrency
+ * (up to 1,000 in-flight futures) to test if Loom can replace explicit pool sizing.
  *
  * @author Rene Schwietzke
  */

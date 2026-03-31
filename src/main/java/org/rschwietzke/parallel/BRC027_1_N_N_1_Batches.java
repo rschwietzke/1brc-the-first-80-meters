@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
@@ -30,14 +32,13 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Classic 4-stage pipeline: 1 Reader, N Splitters, N Measurers, 1 Reducer.
- * Each stage is connected via a BlockingQueue with capacity 100. The splitting
- * (line -> String[]) and measurement (String[] -> Temperatures object) are separate
- * thread stages, demonstrating where pipeline overhead occurs.
+ * Same 4-stage pipeline as BRC025, but stages pass batches of 100,000 lines instead of
+ * individual items. Reduces queue contention by amortizing lock overhead across many items
+ * per enqueue/dequeue operation.
  *
  * @author Rene Schwietzke
  */
-public class BRC025_1_N_N_1 extends Benchmark
+public class BRC027_1_N_N_1_Batches extends Benchmark
 {
     /**
      * Holds our temperature data
@@ -87,9 +88,9 @@ public class BRC025_1_N_N_1 extends Benchmark
     {
         // let't do a raw and basic old-school implementation without
         // most modern Java help
-        BlockingQueue<String> splittingQueueInput = new LinkedBlockingDeque<>(100);
-        BlockingQueue<String[]> measureQueueInput = new LinkedBlockingDeque<>(100);
-        BlockingQueue<Temperatures> mappingQueueInput = new LinkedBlockingDeque<>(100);
+        BlockingQueue<List<String>> splittingQueueInput = new LinkedBlockingDeque<>(100_000);
+        BlockingQueue<List<String[]>> measureQueueInput = new LinkedBlockingDeque<>(100_000);
+        BlockingQueue<List<Temperatures>> mappingQueueInput = new LinkedBlockingDeque<>(100_000);
 
         var maxThreadCount = this.getThreadCount();
 
@@ -99,7 +100,7 @@ public class BRC025_1_N_N_1 extends Benchmark
         readerThread.start();
 
         for (int i = 0; i < consumerCount; i++)
-        {
+        {                     
             var sThread = new SplittingThread(splittingQueueInput, measureQueueInput);
             sThread.start();
             
@@ -133,11 +134,11 @@ public class BRC025_1_N_N_1 extends Benchmark
     class ReaderThread extends Thread 
     {
         private final Path src;
-        private final BlockingQueue<String> target;
+        private final BlockingQueue<List<String>> target;
         private final int consumerCount;
-        public final static String ENDMARKER = new String("ENDMARKER");
+        public final static List<String> ENDMARKER = new ArrayList<>();
 
-        public ReaderThread(Path src, BlockingQueue<String> target, int consumerCount)
+        public ReaderThread(Path src, BlockingQueue<List<String>> target, int consumerCount)
         {
             this.target = target;
             this.src = src;
@@ -150,12 +151,24 @@ public class BRC025_1_N_N_1 extends Benchmark
         {
             try (var reader = Files.newBufferedReader(src))
             {
+                List<String> lines = new ArrayList<>();
                 String line;
 
                 // read all lines until end of file
                 while ((line = reader.readLine()) != null)
                 {
-                    target.put(line);
+                    lines.add(line);
+                    
+                    if (lines.size() >= 100_000)
+                    {
+                        target.put(lines);
+                        lines = new ArrayList<>();
+                    }
+                }
+                // the rest
+                if (!lines.isEmpty())
+                {
+                    target.put(lines);
                 }
 
                 // tell the next thread that we are done
@@ -181,11 +194,11 @@ public class BRC025_1_N_N_1 extends Benchmark
      */
     class SplittingThread extends Thread 
     {
-        private final BlockingQueue<String> src;
-        private final BlockingQueue<String[]> target;
-        public final static String[] ENDMARKER = new String[] {"", ""};
+        private final BlockingQueue<List<String>> src;
+        private final BlockingQueue<List<String[]>> target;
+        public final static List<String[]> ENDMARKER = new ArrayList<>();
 
-        public SplittingThread(BlockingQueue<String> src, BlockingQueue<String[]> target)
+        public SplittingThread(BlockingQueue<List<String>> src, BlockingQueue<List<String[]>> target)
         {
             this.target = target;
             this.src = src;
@@ -194,13 +207,21 @@ public class BRC025_1_N_N_1 extends Benchmark
 
         public void run() 
         {
-            String line;
+            List<String> lines;
             try 
             {
-                while ((line = src.take()) != ReaderThread.ENDMARKER)
+                while ((lines = src.take()) != ReaderThread.ENDMARKER)
                 {
-                    target.put(line.split(";")); 
+                    final List<String[]> splitLines = new ArrayList<>();
+                    
+                    for (String line : lines)
+                    {
+                        splitLines.add(line.split(";"));
+                    }
+                    
+                    target.put(splitLines); 
                 }
+                
                 target.put(ENDMARKER);
             } 
             catch (InterruptedException e) 
@@ -215,11 +236,11 @@ public class BRC025_1_N_N_1 extends Benchmark
      */
     class MeasurementThread extends Thread 
     {
-        private final BlockingQueue<String[]> src;
-        private final BlockingQueue<Temperatures> target;
-        public final static Temperatures ENDMARKER = new Temperatures("", 0.0);
+        private final BlockingQueue<List<String[]>> src;
+        private final BlockingQueue<List<Temperatures>> target;
+        public final static List<Temperatures> ENDMARKER = new ArrayList<>();
 
-        public MeasurementThread(BlockingQueue<String[]> src, BlockingQueue<Temperatures> target)
+        public MeasurementThread(BlockingQueue<List<String[]>> src, BlockingQueue<List<Temperatures>> target)
         {
             this.target = target;
             this.src = src;
@@ -229,20 +250,26 @@ public class BRC025_1_N_N_1 extends Benchmark
         public void run() 
         {
             // read all lines until end of file
-            String [] data;
+            List<String[]> data;
             try 
             {
                 int x = 0;
                 while ((data = src.take()) != SplittingThread.ENDMARKER)
                 {
-                    // first is the city
-                    final String city = data[0];
-
-                    // second our double temperature
-                    final double temperature = Double.parseDouble(data[1]);
-
-                    // get us our measurement record
-                    target.put(new Temperatures(city, temperature));                
+                    final List<Temperatures> temperatures = new ArrayList<>();
+                    
+                    for (String[] splitLine : data)
+                    {
+                        // first is the city
+                        final String city = splitLine[0];
+    
+                        // second our double temperature
+                        final double temperature = Double.parseDouble(splitLine[1]);
+    
+                        // get us our measurement record
+                        temperatures.add(new Temperatures(city, temperature));
+                    }
+                    target.put(temperatures);
                 }
 
                 // tell the next threads that we are done
@@ -261,11 +288,11 @@ public class BRC025_1_N_N_1 extends Benchmark
      */
     class MapperThread extends Thread 
     {
-        private final BlockingQueue<Temperatures> src;
+        private final BlockingQueue<List<Temperatures>> src;
         private final Map<String, Temperatures> cities = new HashMap<>();
         private final int measurerCount;
 
-        public MapperThread(BlockingQueue<Temperatures> src, int measurerCount)
+        public MapperThread(BlockingQueue<List<Temperatures>> src, int measurerCount)
         {
             this.src = src;
             this.setName("MapperThread");
@@ -277,13 +304,12 @@ public class BRC025_1_N_N_1 extends Benchmark
             try 
             {
                 int endMarkerCount = 0;
-                long lines = 0;
 
                 while (true)
                 {
-                    Temperatures temp = src.take();
+                    final List<Temperatures> temperatures = src.take();
                     
-                    if (temp == MeasurementThread.ENDMARKER)
+                    if (temperatures == MeasurementThread.ENDMARKER)
                     {
                         endMarkerCount++;
                         if (endMarkerCount == this.measurerCount)
@@ -296,8 +322,11 @@ public class BRC025_1_N_N_1 extends Benchmark
                         }
                     }
 
-                    // store it, when it exists, merge both measurements
-                    cities.merge(temp.city, temp, (t1, t2) -> t1.merge(t2));
+                    for (final Temperatures temp : temperatures)
+                    {
+                        // store it, when it exists, merge both measurements
+                        cities.merge(temp.city, temp, (t1, t2) -> t1.merge(t2));
+                    }
                 }
 
             } 
@@ -315,6 +344,6 @@ public class BRC025_1_N_N_1 extends Benchmark
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC025_1_N_N_1.class, args);
+        Benchmark.run(BRC027_1_N_N_1_Batches.class, args);
     }
 }

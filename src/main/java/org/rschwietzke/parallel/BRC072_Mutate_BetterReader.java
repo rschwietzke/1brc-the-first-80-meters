@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -32,7 +33,9 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader2;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Same mutable aggregation approach as BRC070 but substitutes PositionableReader2 for
+ * PositionableReader in the file reading layer. Intended to measure whether an improved
+ * I/O reader implementation provides additional throughput gains on top of the parser changes.
  *
  * @author Rene Schwietzke
  */

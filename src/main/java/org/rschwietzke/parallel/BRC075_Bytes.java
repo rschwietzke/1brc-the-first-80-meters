@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -35,7 +36,9 @@ import org.rschwietzke.util.PositionableByteReader;
 import org.rschwietzke.util.PositionableByteReader.Line;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Eliminates all String and char processing from the hot path. PositionableByteReader reads
+ * raw bytes and pre-computes a city hash per line. Aggregation uses a byte[]-keyed City object
+ * with custom equals/hashCode. String conversion happens only at the final TreeMap output step.
  *
  * @author Rene Schwietzke
  */

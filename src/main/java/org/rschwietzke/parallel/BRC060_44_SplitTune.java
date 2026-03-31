@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -33,7 +34,9 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Same self-splitting ForkJoin as BRC044 but replaces String.split(";") with indexOf(';')
+ * and substring() for line splitting. Eliminates regex compilation and array allocation
+ * overhead, establishing this as the performance baseline for subsequent parsing improvements.
  *
  * @author Rene Schwietzke
  */

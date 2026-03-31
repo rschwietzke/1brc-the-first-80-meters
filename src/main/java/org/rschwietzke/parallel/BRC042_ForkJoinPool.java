@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -34,7 +35,9 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Uses ForkJoinPool with explicit Mapper and Reducer RecursiveTasks. A coordinating FileChunker
+ * splits the file into N equal byte-range chunks, invokes all Mappers in parallel, then delegates
+ * merging to a dedicated Reducer task, keeping map and reduce as distinct fork/join operations.
  *
  * @author Rene Schwietzke
  */

@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -29,7 +30,9 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Simplified 3-stage pipeline: 1 Reader, N Workers (parse + aggregate), 1 Reducer.
+ * Merges the splitting and measurement stages from BRC025 into a single worker thread
+ * to reduce inter-stage queue traffic and object allocation overhead.
  *
  * @author Rene Schwietzke
  */

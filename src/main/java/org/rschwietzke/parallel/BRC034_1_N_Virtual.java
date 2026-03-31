@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -31,7 +32,9 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Same batched 1-N architecture as BRC032, but all threads (reader and workers) are
+ * Java Virtual Threads (Project Loom). Tests whether Loom's lightweight scheduling
+ * offers any advantage for CPU-bound, queue-based workloads.
  *
  * @author Rene Schwietzke
  */

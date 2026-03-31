@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -35,7 +36,10 @@ import org.rschwietzke.util.PositionableByteReader;
 import org.rschwietzke.util.PositionableByteReader.Line;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Same byte-level processing as BRC075 but replaces binary recursive splitting with a flat
+ * pre-computed chunk split: the root Mapper task divides the file into N equal chunks upfront
+ * and submits all N leaf tasks at once via invokeAll(), avoiding deep recursion and redundant
+ * splitting overhead. Includes per-thread memory tracking via ThreadMXBean.
  *
  * @author Rene Schwietzke
  */

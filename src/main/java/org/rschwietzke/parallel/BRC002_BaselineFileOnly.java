@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -98,7 +99,6 @@ public class BRC002_BaselineFileOnly extends Benchmark
                 });
 
         Files.lines(Paths.get(fileName)).forEach(_ -> {});
-
 
         return "";
 

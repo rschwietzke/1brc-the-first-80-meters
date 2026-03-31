@@ -92,9 +92,12 @@ public class CreateExtendedMeasurements
                 .map(c -> new WeatherStation(c))
                 .toList();
 
-        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(args[2]))) {
-            for (int i = 0; i < size; i++) {
-                if (i > 0 && i % 50_000_000 == 0) {
+        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(args[2]))) 
+        {
+            for (int i = 0; i < size; i++) 
+            {
+                if (i > 0 && i % 50_000_000 == 0) 
+                {
                     System.out.printf("Wrote %,d measurements in %s ms%n", i, System.currentTimeMillis() - start);
                 }
                 WeatherStation station = stations.get(r.nextInt(stations.size()));

@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -33,7 +34,7 @@ import org.rschwietzke.Benchmark;
  * 
  * It has been slightly modified to use our Benchmark framework and fit my personal formatting style.
  */
-public class BRC013_ParallelGrouping extends Benchmark 
+public class BRC014_ParallelGrouping extends Benchmark 
 {
     private static record Measurement(String station, double value) 
     {
@@ -102,7 +103,8 @@ public class BRC013_ParallelGrouping extends Benchmark
 
         Map<String, ResultRow> measurements = 
                 Files.lines(Paths.get(fileName)).parallel()
-                .map(l -> new Measurement(l.split(";"))).parallel()
+                .map(l -> l.split(";")).parallel()
+                .map(a -> new Measurement(a))
                 .collect(
                         Collectors.groupingByConcurrent(m -> m.station(), collector));
 
@@ -112,6 +114,6 @@ public class BRC013_ParallelGrouping extends Benchmark
 
     public static void main(String[] args)
     {
-        Benchmark.run(BRC013_ParallelGrouping.class, args);
+        Benchmark.run(BRC014_ParallelGrouping.class, args);
     }
 }

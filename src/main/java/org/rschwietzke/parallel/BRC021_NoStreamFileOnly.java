@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -24,55 +25,12 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * We are tuning the single threaded performance first, because
- * it is easier to profile. Just make this code nice first and tune
- * from there.
+ * Just see how fast we can read the data without processing.
  *
  * @author Rene Schwietzke
  */
 public class BRC021_NoStreamFileOnly extends Benchmark
 {
-    /**
-     * Holds our temperature data without the station, because the
-     * map already knows that
-     */
-    private static class Temperatures
-    {
-        private final double min;
-        private final double max;
-        private final double total;
-        private final long count;
-
-        public Temperatures(final double value)
-        {
-            this.min = value;
-            this.max = value;
-            this.total = value;
-            this.count = 1;
-        }
-
-        private Temperatures(double min, double max, double total, long count)
-        {
-            this.min = min;
-            this.max = max;
-            this.total = total;
-            this.count = count;
-        }
-
-        public Temperatures merge(final Temperatures other)
-        {
-            return new Temperatures(Math.min(min, other.min), Math.max(max, other.max), total + other.total, count + other.count);
-        }
-
-        public String toString()
-        {
-            // we delegate the formatting to our math util to
-            // ensure we do the same everywhere, helps us later to 
-            // change the accuracy if needed
-            return MathUtil.toString(total, count, min, max);
-        }
-    }
-    
     @Override
     public String run(final String fileName) throws IOException
     {
@@ -88,7 +46,7 @@ public class BRC021_NoStreamFileOnly extends Benchmark
     	}
 
     	// ok, we got everything, now we need to order it
-        return new TreeMap<String, Temperatures>().toString();
+        return new TreeMap<String, String>().toString();
     }
 
     public static void main(String[] args) throws NoSuchMethodException, SecurityException

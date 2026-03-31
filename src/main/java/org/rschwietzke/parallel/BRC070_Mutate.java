@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -32,7 +33,10 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Introduces mutable aggregation: Temperatures.merge(int) updates fields in-place
+ * rather than allocating a new immutable object per merge. Uses Map.compute() to
+ * distinguish first-encounter (new object) from subsequent merges (mutate existing),
+ * dramatically reducing GC pressure in the hot aggregation loop.
  *
  * @author Rene Schwietzke
  */

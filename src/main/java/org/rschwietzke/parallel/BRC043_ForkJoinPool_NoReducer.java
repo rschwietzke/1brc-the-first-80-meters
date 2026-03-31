@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -33,7 +34,9 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Same ForkJoinPool structure as BRC042 but eliminates the dedicated Reducer RecursiveTask.
+ * The FileChunker merges all mapper results inline using stream().forEach() after invokeAll(),
+ * reducing the number of task allocations and fork/join overhead.
  *
  * @author Rene Schwietzke
  */

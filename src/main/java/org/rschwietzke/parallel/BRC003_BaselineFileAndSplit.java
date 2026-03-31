@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -98,8 +99,8 @@ public class BRC003_BaselineFileAndSplit extends Benchmark
                 });
 
         Files.lines(Paths.get(fileName))
-                .map(l -> l.split(";"))
-                .forEach(_ -> {});
+            .map(l -> l.split(";"))
+            .forEach(_ -> {});
 
         return "";
 

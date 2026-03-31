@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -30,7 +31,9 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * N threads concurrently read distinct byte-range chunks of the file using RandomAccessFile
+ * and a custom PositionableReader. This is a read-throughput probe only: lines are counted
+ * but not parsed, to measure whether concurrent reads can saturate available I/O bandwidth.
  *
  * @author Rene Schwietzke
  */

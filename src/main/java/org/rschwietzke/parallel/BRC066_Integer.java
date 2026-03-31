@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -32,7 +33,9 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Replaces all double arithmetic with fixed-point integer arithmetic. Temperatures are
+ * stored as integers (e.g. 12.3 -> 123) and a custom parseInteger() reads digits directly
+ * past the decimal point without any floating-point conversion, eliminating FPU overhead.
  *
  * @author Rene Schwietzke
  */

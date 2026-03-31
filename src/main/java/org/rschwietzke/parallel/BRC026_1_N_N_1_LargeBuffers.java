@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -30,7 +31,9 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Same 4-stage pipeline as BRC025, but with queue capacities increased from 100 to 100,000.
+ * Tests whether larger in-flight buffers between stages reduce blocking overhead or expose
+ * that the pipeline is CPU-bound rather than queue-bound.
  *
  * @author Rene Schwietzke
  */
@@ -84,9 +87,9 @@ public class BRC026_1_N_N_1_LargeBuffers extends Benchmark
     {
         // let't do a raw and basic old-school implementation without
         // most modern Java help
-        BlockingQueue<String> splittingQueueInput = new LinkedBlockingDeque<>(100000);
-        BlockingQueue<String[]> measureQueueInput = new LinkedBlockingDeque<>(100000);
-        BlockingQueue<Temperatures> mappingQueueInput = new LinkedBlockingDeque<>(100000);
+        BlockingQueue<String> splittingQueueInput = new LinkedBlockingDeque<>(100_000);
+        BlockingQueue<String[]> measureQueueInput = new LinkedBlockingDeque<>(100_000);
+        BlockingQueue<Temperatures> mappingQueueInput = new LinkedBlockingDeque<>(100_000);
 
         var maxThreadCount = this.getThreadCount();
 
@@ -278,6 +281,7 @@ public class BRC026_1_N_N_1_LargeBuffers extends Benchmark
                 while (true)
                 {
                     Temperatures temp = src.take();
+                    
                     if (temp == MeasurementThread.ENDMARKER)
                     {
                         endMarkerCount++;

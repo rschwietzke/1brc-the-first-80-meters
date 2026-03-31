@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -32,7 +33,9 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Main thread reads the file and submits 100,000-line batches as Callable tasks to a
+ * fixed-size ExecutorService. Includes manual backpressure: drains completed futures when
+ * the in-flight queue exceeds 100. Shows the standard Java task submission pattern.
  *
  * @author Rene Schwietzke
  */

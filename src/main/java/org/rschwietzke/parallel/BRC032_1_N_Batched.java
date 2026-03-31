@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -31,7 +32,9 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * Same 1-N architecture as BRC030, but the reader enqueues batches of 1,000 lines rather
+ * than individual strings. Reduces queue lock contention and improves cache locality
+ * by processing related data together.
  *
  * @author Rene Schwietzke
  */

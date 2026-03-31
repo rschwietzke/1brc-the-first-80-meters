@@ -1,3 +1,4 @@
+// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *
@@ -31,7 +32,9 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Single Thread Reader, Multi-Thread Tranforming, Single-Thread 
+ * 1 Reader, N independent Workers: each worker reads from a shared queue, parses,
+ * and aggregates into its own private HashMap. Results are merged by the main thread
+ * after all workers finish. Eliminates the dedicated reducer thread.
  *
  * @author Rene Schwietzke
  */
