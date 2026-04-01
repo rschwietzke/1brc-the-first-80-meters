@@ -116,7 +116,7 @@ run_benchmark() {
         
         # Extract checksum and runtime from the output
         local line
-        line=$(echo "$output" | grep "Measurement Runtime")
+        line=$(echo "$output" | grep "^Measurement Runtime" | tail -n 1)
         if [ -z "$line" ]; then
             echo "  [Error] Measurement Runtime not found in output."
             echo "          Check the output below:"
