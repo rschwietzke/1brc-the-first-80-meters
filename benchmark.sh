@@ -41,7 +41,7 @@ CLASSPATH="target/classes"
 OUTPUT_CSV="results.csv"
 
 # JVM parameters defined as requested (easy to adjust, same for all)
-JVM_OPTS="-XX:+AlwaysPreTouch"
+JVM_OPTS=""
 LOW_MEM="-Xmx10m -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC $JVM_OPTS"
 HIGH_MEM="-Xms2g -Xmx2g $JVM_OPTS"
 
@@ -131,23 +131,35 @@ run_benchmark() {
     if [ -n "$task_opts" ]; then
         cmd_base=(taskset $task_opts "${cmd_base[@]}")
     fi
-    local perf_cmd=(env LC_ALL=C perf stat -B -e instructions,cycles,branches,branch-misses,task-clock,context-switches "${cmd_base[@]}")
+    local perf_file=$(mktemp)
+    local time_file=$(mktemp)
+    local perf_cmd=(env LC_ALL=C perf stat -x, -o "$perf_file" -e instructions,cycles,branches,branch-misses,task-clock,context-switches "${cmd_base[@]}")
     
-    local perf_out
-    perf_out=$("${perf_cmd[@]}" 2>&1)
+    # Capture metrics natively without JVM stdout disruption
+    /usr/bin/time -o "$time_file" -f "%e,%U,%S" "${perf_cmd[@]}" >/dev/null 2>&1
 
-    # Parse perf output robustly
-    local instructions=$(echo "$perf_out" | awk '$2 == "instructions" || $3 == "instructions" {print $1}' | head -n 1)
-    local cycles=$(echo "$perf_out" | awk '$2 == "cycles" || $3 == "cycles" {print $1}' | head -n 1)
-    local branches=$(echo "$perf_out" | awk '$2 == "branches" || $3 == "branches" {print $1}' | head -n 1)
-    local branch_misses=$(echo "$perf_out" | awk '$2 == "branch-misses" || $3 == "branch-misses" {print $1}' | head -n 1)
-    local task_clock=$(echo "$perf_out" | awk '$2 == "task-clock" || $3 == "task-clock" {print $1}' | head -n 1)
-    local context_switches=$(echo "$perf_out" | awk '$2 == "context-switches" || $3 == "context-switches" {print $1}' | head -n 1)
+    # Parse perf output robustly via CSV mode
+    local instructions=$(awk -F, '$3 == "instructions" {print $1}' "$perf_file")
+    local cycles=$(awk -F, '$3 == "cycles" {print $1}' "$perf_file")
+    local branches=$(awk -F, '$3 == "branches" {print $1}' "$perf_file")
+    local branch_misses=$(awk -F, '$3 == "branch-misses" {print $1}' "$perf_file")
+    local task_clock=$(awk -F, '$3 == "task-clock" {print $1}' "$perf_file")
+    local context_switches=$(awk -F, '$3 == "context-switches" {print $1}' "$perf_file")
     
-    local ipc=$(echo "$perf_out" | awk '/insn per cycle/ {for(i=1;i<=NF;i++) if($i=="insn") print $(i-1)}')
-    local seconds_elapsed=$(echo "$perf_out" | awk '/seconds time elapsed/ {print $1}')
-    local seconds_user=$(echo "$perf_out" | awk '/seconds user/ {print $1}')
-    local seconds_sys=$(echo "$perf_out" | awk '/seconds sys/ {print $1}')
+    local ipc=$(awk -F, '/insn per cycle/ {print $6}' "$perf_file")
+    
+    local seconds_elapsed=""
+    local seconds_user=""
+    local seconds_sys=""
+    if [ -f "$time_file" ]; then
+        local time_out=$(cat "$time_file")
+        seconds_elapsed=$(echo "$time_out" | cut -d, -f1)
+        seconds_user=$(echo "$time_out" | cut -d, -f2)
+        seconds_sys=$(echo "$time_out" | cut -d, -f3)
+    fi
+
+    # Cleanup temp files
+    rm -f "$perf_file" "$time_file"
 
     # Save to CSV
     echo "\"$classname\",\"$run_name\",\"$jvm_opts\",\"$params\",\"$task_opts\",$median,$last_checksum,$instructions,$cycles,$branches,$branch_misses,$task_clock,$context_switches,$ipc,$seconds_elapsed,$seconds_user,$seconds_sys" >> "$OUTPUT_CSV"
