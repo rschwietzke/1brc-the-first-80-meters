@@ -36,14 +36,12 @@ import org.rschwietzke.util.PositionableByteReader;
 import org.rschwietzke.util.PositionableByteReader.Line;
 
 /**
- * Same byte-level processing as BRC075 but replaces binary recursive splitting with a flat
- * pre-computed chunk split: the root Mapper task divides the file into N equal chunks upfront
- * and submits all N leaf tasks at once via invokeAll(), avoiding deep recursion and redundant
- * splitting overhead. Includes per-thread memory tracking via ThreadMXBean.
+ * Eliminates all String and char processing from the hot path. PositionableByteReader reads
+ * raw bytes. We are just checking our speed for the moment.
  *
  * @author Rene Schwietzke
  */
-public class BRC077_Bytes_NoRecursion extends Benchmark
+public class BRC075_Bytes_ConcurrentRead extends Benchmark
 {
     private static class City
     {
@@ -142,7 +140,7 @@ public class BRC077_Bytes_NoRecursion extends Benchmark
         // Ok, let's recursively map and reduce
         try (var executor = new ForkJoinPool(this.getThreadCount()))
         {
-            var result = executor.submit(new Mapper(filePath, 0, size, this.getThreadCount()));
+            var result = executor.submit(new Mapper(filePath, 0, size));
             
             var cities = new TreeMap<String, City>();
             result.get().keySet().forEach(c -> cities.put(c.getCity(), c));
@@ -162,45 +160,37 @@ public class BRC077_Bytes_NoRecursion extends Benchmark
     @SuppressWarnings("serial")
     class Mapper extends RecursiveTask<Map<City, City>>
     {
-        private final long from;
-        private final long to;
-        private final String filePath;
-        private final int taskCount;
+        private long from;
+        private long to;
+        private String filePath;
 
-        public Mapper(String filePath, long from, long to, int taskCount)
+        public Mapper(String filePath, long from, long to)
         {
             this.from = from;
             this.to = to;
             this.filePath = filePath;
-            this.taskCount = taskCount;
         }
 
         @Override
         protected Map<City, City> compute() 
         {
-            // split only when we should
-            if (taskCount > 1)
+            // split work if not yet small enough
+            if (to - from >= 20_000_000L)
             {
-                final List<Mapper> tasks = new ArrayList<>(taskCount);
+                final List<Mapper> tasks = new ArrayList<>();
                 
-                final long size = this.to - this.from;
-                final long chunkSize = size / taskCount;
-
-                long from = -chunkSize;
-                long to = 0;
-                while (to < size)
-                {
-                    from += chunkSize;
-                    to = from + chunkSize;
-                    
-                    // when close to the end, make one chunk larger than really small... otherwise 
-                    // we lose data
-                    to = (size - to) < chunkSize ? size : to;
-
-//                    System.out.format("from= %,d, to=%,d, size=%,d%n", from, to, size);
-                    tasks.add(new Mapper(filePath, from, to, 1));
-                }
+                long size = to - from;
                 
+                long from1 = from == 0 ? 0 : from;
+                long to1 = from + size / 2;
+                long from2 = to1;
+                long to2 = to;
+                
+                tasks.add(
+                        new Mapper(filePath, from1, to1));
+                tasks.add(
+                        new Mapper(filePath, from2, to2));
+
                 ForkJoinTask.invokeAll(tasks);
 
                 // reduce result
@@ -243,15 +233,6 @@ public class BRC077_Bytes_NoRecursion extends Benchmark
 
                 while ((line = r.readln()) != null)
                 {
-                    // second our double temperature
-                    final int temperature = parseInteger(line.bytes, line.semicolon + 1, line.length);
-
-                    // temp solution because of Set
-                    final City city = new City(line.bytes, line.semicolon, temperature, line.cityHash);
-                    
-                    // create new when needed, mutate when merging
-                    cities.compute(city, 
-                            (_, v) -> v == null ? city : v.update(temperature));
                 }
 
                 return cities;
@@ -263,56 +244,8 @@ public class BRC077_Bytes_NoRecursion extends Benchmark
         }
     }
     
-    private static final int DIGITOFFSET = 48;
-
-    /**
-     * Parses a double but ends up with an int, only because we know
-     * the format of the results -99.9 to 99.9
-     * 
-     * Best case, two branches
-     * Worst case, two branches
-     */
-    public static int parseInteger(final byte[] s, int offset, final int end)
-    {
-        int l = end - offset;
-        var p0 = s[end - 1];
-        var p2 = s[end - 3] * 10;
-        var value = p2 + p0 - (DIGITOFFSET * 10 + DIGITOFFSET);
-        
-        final byte firstChar = s[offset];
-        if (firstChar == '-')
-        {
-            if (l == 5)
-            {
-                // -99.9
-                var p3 = s[end - 4] * 100;
-                value = p3 + value - (DIGITOFFSET * 100);
-            }
-            else
-            {
-                // -9.9
-            }
-            return -value;
-        }
-        else
-        {
-            if (l == 4)
-            {
-                // 99.9
-                // we can use firstChar directly as we know its not '-'
-                var p3 = firstChar * 100;
-                value = p3 + value - (DIGITOFFSET * 100);
-            }
-            else
-            {
-                // 9.9
-            }
-            return value;
-        }
-    }
-    
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC077_Bytes_NoRecursion.class, args);
+        Benchmark.run(BRC075_Bytes_ConcurrentRead.class, args);
     }
 }

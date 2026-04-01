@@ -36,13 +36,14 @@ import org.rschwietzke.util.PositionableByteReader;
 import org.rschwietzke.util.PositionableByteReader.Line;
 
 /**
- * Eliminates all String and char processing from the hot path. PositionableByteReader reads
- * raw bytes and pre-computes a city hash per line. Aggregation uses a byte[]-keyed City object
- * with custom equals/hashCode. String conversion happens only at the final TreeMap output step.
+ * Same byte-level processing as BRC075 but replaces binary recursive splitting with a flat
+ * pre-computed chunk split: the root Mapper task divides the file into N equal chunks upfront
+ * and submits all N leaf tasks at once via invokeAll(), avoiding deep recursion and redundant
+ * splitting overhead. Includes per-thread memory tracking via ThreadMXBean.
  *
  * @author Rene Schwietzke
  */
-public class BRC075_Bytes extends Benchmark
+public class BRC077_Bytes_ForkJoin_1Level extends Benchmark
 {
     private static class City
     {
@@ -141,7 +142,7 @@ public class BRC075_Bytes extends Benchmark
         // Ok, let's recursively map and reduce
         try (var executor = new ForkJoinPool(this.getThreadCount()))
         {
-            var result = executor.submit(new Mapper(filePath, 0, size));
+            var result = executor.submit(new Mapper(filePath, 0, size, this.getThreadCount()));
             
             var cities = new TreeMap<String, City>();
             result.get().keySet().forEach(c -> cities.put(c.getCity(), c));
@@ -161,37 +162,45 @@ public class BRC075_Bytes extends Benchmark
     @SuppressWarnings("serial")
     class Mapper extends RecursiveTask<Map<City, City>>
     {
-        private long from;
-        private long to;
-        private String filePath;
+        private final long from;
+        private final long to;
+        private final String filePath;
+        private final int taskCount;
 
-        public Mapper(String filePath, long from, long to)
+        public Mapper(String filePath, long from, long to, int taskCount)
         {
             this.from = from;
             this.to = to;
             this.filePath = filePath;
+            this.taskCount = taskCount;
         }
 
         @Override
         protected Map<City, City> compute() 
         {
-            // split work if not yet small enough
-            if (to - from >= 20_000_000L)
+            // split only when we should
+            if (taskCount > 1)
             {
-                final List<Mapper> tasks = new ArrayList<>();
+                final List<Mapper> tasks = new ArrayList<>(taskCount);
                 
-                long size = to - from;
-                
-                long from1 = from == 0 ? 0 : from;
-                long to1 = from + size / 2;
-                long from2 = to1;
-                long to2 = to;
-                
-                tasks.add(
-                        new Mapper(filePath, from1, to1));
-                tasks.add(
-                        new Mapper(filePath, from2, to2));
+                final long size = this.to - this.from;
+                final long chunkSize = size / taskCount;
 
+                long from = -chunkSize;
+                long to = 0;
+                while (to < size)
+                {
+                    from += chunkSize;
+                    to = from + chunkSize;
+                    
+                    // when close to the end, make one chunk larger than really small... otherwise 
+                    // we lose data
+                    to = (size - to) < chunkSize ? size : to;
+
+//                    System.out.format("from= %,d, to=%,d, size=%,d%n", from, to, size);
+                    tasks.add(new Mapper(filePath, from, to, 1));
+                }
+                
                 ForkJoinTask.invokeAll(tasks);
 
                 // reduce result
@@ -304,6 +313,6 @@ public class BRC075_Bytes extends Benchmark
     
     public static void main(String[] args) throws NoSuchMethodException, SecurityException
     {
-        Benchmark.run(BRC075_Bytes.class, args);
+        Benchmark.run(BRC077_Bytes_ForkJoin_1Level.class, args);
     }
 }
