@@ -21,24 +21,21 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.rschwietzke.Benchmark;
+import org.rschwietzke.parallel.BRC042_ForkJoinPool.Temperatures;
 
 /**
- * Improved multi-threaded implementation focusing only on execution strategy.
+ * This is a baseline implementation using only Java standard library to perform the task.
+ * This matches the original version by Gunnar but it is the single threaded version only.
  * 
- * Optimizations:
- * - Runs the parallel stream in a dedicated custom ForkJoinPool to ensure maximum
- *   resource allocation, avoiding the JVM's common pool.
- * - Uses standard groupingBy instead of groupingByConcurrent. For small key spaces 
- *   (~400 stations), avoiding lock contention on a shared concurrent map by merging 
- *   thread-local maps is much faster.
+ * https://github.com/gunnarmorling/1brc/blob/main/src/main/java/dev/morling/onebrc/CalculateAverage_baseline.java
+ * 
+ * It has been slightly modified to use our Benchmark framework and fit my personal formatting style.
  */
-public class BRC015_ParallelGemini extends Benchmark 
+public class BRC015_Parallel_NoCollector extends Benchmark 
 {
     private static record Measurement(String station, double value) 
     {
@@ -52,6 +49,9 @@ public class BRC015_ParallelGemini extends Benchmark
     {
         public String toString() 
         {
+            // This output format is different from the original Gunnar version
+            // We also print the count to ensure that we are not missing any data
+            // because with a billion rows, a few missing items stay unnoticed.
             return 
                     count + "/"
                     + round(min) + "/" 
@@ -61,6 +61,8 @@ public class BRC015_ParallelGemini extends Benchmark
 
         private double round(double value) 
         {
+            // that is also different from Gunnar's version, to ensure proper parsing
+            // we make things more precise here and output with three decimal digit !!!
             return Math.round(value * 1000.0d) / 1000.0d;
         }
     };
@@ -100,39 +102,17 @@ public class BRC015_ParallelGemini extends Benchmark
                     return new ResultRow(agg.count, agg.sum, agg.min, agg.max);
                 });
 
-        // Dedicated thread pool for this processing task
-        try (ForkJoinPool customThreadPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors())) 
-        {
-            Map<String, ResultRow> measurements = customThreadPool.submit(() ->
-            {
-                try
-                {
-                    return new TreeMap<String, ResultRow>(Files.lines(Paths.get(fileName))
-                            .parallel()
-                            .map(l -> new Measurement(l.split(";")))
-                            .collect(
-                                    // Non-concurrent groupingBy creates thread-local maps and merges them.
-                                    // This is faster than groupingByConcurrent for small numbers of unique keys.
-                                    Collectors.groupingBy(m -> m.station, collector))
-                            );
-                }
-                catch (IOException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }).get();
+        Files.lines(Paths.get(fileName)).parallel()
+                .map(l -> l.split(";")).parallel()
+                .map(a -> new Measurement(a))
+                .forEach(_ -> {});
 
-            return measurements.toString();
-        }
-        catch (InterruptedException | ExecutionException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return new TreeMap<String, Temperatures>().toString();
+
     }
-
 
     public static void main(String[] args)
     {
-        Benchmark.run(BRC015_ParallelGemini.class, args);
+        Benchmark.run(BRC015_Parallel_NoCollector.class, args);
     }
 }

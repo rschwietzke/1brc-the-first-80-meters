@@ -20,19 +20,41 @@
 #                   Use $DEFAULT to refer to the script's arguments.
 #         TASKSET : Taskset parameters for CPU pinning (e.g., "-c 0-7" or "0-7").
 #                   If defined, the Java process is launched with `taskset`.
+#         ROUNDS  : Number of evaluation runs to take the median from. Defaults to 3.
 #
 #       Examples of `// exec`:
 #         // exec JVM_OPTS="-Xms2g"; PARAMS="-f 10M.txt -mc 0"
 #         // exec NAME="high-mem"; JVM_OPTS=$HIGH_MEM; PARAMS=$DEFAULT; TASKSET="-c 0,2,3"
 #
 
+# Set the configured number of operational rounds (defaults to 3 if not present in env variables)
+GLOBAL_ROUNDS="${ROUNDS:-3}"
+
+# Parse script arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --rounds)
+            GLOBAL_ROUNDS="$2"
+            shift 2
+            ;;
+        -*)
+            echo "Unknown option: $1"
+            echo "Usage: $0 [--rounds N] <src_dir|file.java> [additional_args...]"
+            exit 1
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
 if [ -z "$1" ]; then
-    echo "Error: The first parameter must be the source directory."
-    echo "Usage: $0 <src_dir> [additional_args...]"
+    echo "Error: The first parameter must be the source directory or a specific Java file."
+    echo "Usage: $0 [--rounds N] <src_dir|file.java> [additional_args...]"
     exit 1
 fi
 
-SRC_DIR="$1"
+TARGET="$1"
 shift
 DEFAULT="$@"
 
@@ -52,9 +74,13 @@ echo "Command line arguments passed: $DEFAULT"
 echo "Default JVM parameters: $JVM_OPTS"
 echo "Results will be saved to $OUTPUT_CSV"
 
-# Make sure to run inside the root of the project
-if [ ! -d "$SRC_DIR" ]; then
-    echo "Directory $SRC_DIR does not exist. Please run this script from the project root."
+# Determine file array based on whether target is a file or directory
+if [ -f "$TARGET" ]; then
+    FILES=("$TARGET")
+elif [ -d "$TARGET" ]; then
+    FILES=("$TARGET"/*.java)
+else
+    echo "Target $TARGET is neither a file nor a directory. Please run this script from the project root."
     exit 1
 fi
 
@@ -65,6 +91,7 @@ run_benchmark() {
     local jvm_opts="$4"
     local task_opts="$5"
     local params="$6"
+    local rounds="$7"
 
     echo "============================================================"
     echo "Executing $fqcn [$run_name]"
@@ -77,8 +104,8 @@ run_benchmark() {
     local last_checksum=""
     local runtime_error=""
 
-    for i in {1..3}; do
-        echo "  Run $i/3 (Measuring Runtime)..."
+    for i in $(seq 1 "$rounds"); do
+        echo "  Run $i/$rounds (Measuring Runtime)..."
         local cmd=(java $jvm_opts -cp "$CLASSPATH" "$fqcn" $params)
         if [ -n "$task_opts" ]; then
             cmd=(taskset $task_opts "${cmd[@]}")
@@ -113,15 +140,21 @@ run_benchmark() {
         runtimes+=("$runtime")
     done
 
-    # Check if we got exactly 3 runtimes and no checksum errors
+    # Check if we got exactly the requested runtimes and no checksum errors
     local median
-    if [ ${#runtimes[@]} -eq 3 ] && [ "$runtime_error" != "CHECKSUM_MISMATCH" ] && [ "$runtime_error" != "RUNTIME_NOT_FOUND" ]; then
+    if [ ${#runtimes[@]} -eq "$rounds" ] && [ "$runtime_error" != "CHECKSUM_MISMATCH" ] && [ "$runtime_error" != "RUNTIME_NOT_FOUND" ]; then
         # Sort best (lowest) to worst (highest) and take the middle.
         local sorted=( $(printf "%s\n" "${runtimes[@]}" | sort -n) )
-        median="${sorted[1]}"
+        if [ $((rounds % 2)) -ne 0 ]; then
+            median="${sorted[$((rounds / 2))]}"
+        else
+            local mid1="${sorted[$((rounds / 2 - 1))]}"
+            local mid2="${sorted[$((rounds / 2))]}"
+            median=$(( (mid1 + mid2) / 2 ))
+        fi
         echo "  Median Runtime: $median ms"
     else
-        echo "  [Warning] Failed to collect 3 valid runs or checksum mismatch."
+        echo "  [Warning] Failed to collect $rounds valid runs or checksum mismatch."
         median="ERROR"
     fi
 
@@ -165,7 +198,7 @@ run_benchmark() {
     echo "\"$classname\",\"$run_name\",\"$jvm_opts\",\"$params\",\"$task_opts\",$median,$last_checksum,$instructions,$cycles,$branches,$branch_misses,$task_clock,$context_switches,$ipc,$seconds_elapsed,$seconds_user,$seconds_sys" >> "$OUTPUT_CSV"
 }
 
-for file in "$SRC_DIR"/*.java; do
+for file in "${FILES[@]}"; do
     # Extract the class name from file path
     basename=$(basename "$file")
     classname="${basename%.java}"
@@ -208,15 +241,16 @@ for file in "$SRC_DIR"/*.java; do
                 TASKSET=""
                 PARAMS="$DEFAULT"
                 JVM_OPTS="$CURRENT_JVM_OPTS"
+                ROUNDS="$GLOBAL_ROUNDS"
                 
                 eval "$exec_line"
                 
-                run_benchmark "$fqcn" "$classname" "$NAME" "$JVM_OPTS" "$TASKSET" "$PARAMS"
+                run_benchmark "$fqcn" "$classname" "$NAME" "$JVM_OPTS" "$TASKSET" "$PARAMS" "$ROUNDS"
             )
         done
     else
         # No exec hints, do standard fallback
-        run_benchmark "$fqcn" "$classname" "default" "$CURRENT_JVM_OPTS" "" "$DEFAULT"
+        run_benchmark "$fqcn" "$classname" "default" "$CURRENT_JVM_OPTS" "" "$DEFAULT" "$GLOBAL_ROUNDS"
     fi
 
     # Reset vars
