@@ -13,5 +13,8 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
-java -cp target/classes dev.morling.onebrc.CreateOriginalMeasurements $1 $2
+# 
+java \
+    -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints \
+    -XX:StartFlightRecording=filename=profile.jfr,name=infinite,dumponexit=true,settings=profile \
+    -cp target/classes dev.morling.onebrc.CreateOriginalMeasurements $1 $2

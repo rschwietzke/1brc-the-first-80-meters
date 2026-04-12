@@ -49,10 +49,12 @@ public class CreateOriginalMeasurements {
         }
 
         int size = 0;
+        var s = args[0].replaceAll("[^0-9]", "");
+        
         try {
-            size = Integer.parseInt(args[0]);
+            size = Integer.parseInt(s);
         } catch (NumberFormatException e) {
-            System.out.println("Invalid value for <number of records to create>");
+            System.out.println("Invalid value " + s + " for <number of records to create>");
             System.out.println("Usage: CreateMeasurements <number of records to create>");
             System.exit(1);
         }
