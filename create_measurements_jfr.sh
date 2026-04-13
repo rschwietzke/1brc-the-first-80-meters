@@ -13,7 +13,8 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
-CP=target/classes/
-
-java -agentpath:libasyncProfiler.so=start,event=cpu,flamegraph,file=$1-cpu.html -cp $CP org.rschwietzke.devoxxpl24.$1 $2 $3 $4
+# 
+java \
+    -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints  \
+    -XX:StartFlightRecording=filename=profile.jfr,name=infinite,dumponexit=true,settings=profile \
+    -cp target/classes dev.morling.onebrc.CreateOriginalMeasurementsJFR $1 $2

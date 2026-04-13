@@ -14,7 +14,4 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 # 
-java \
-    -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints \
-    -XX:StartFlightRecording=filename=profile.jfr,name=infinite,dumponexit=true,settings=profile \
-    -cp target/classes dev.morling.onebrc.CreateOriginalMeasurements $1 $2
+java -cp target/classes dev.morling.onebrc.CreateOriginalMeasurements $1 $2
