@@ -31,15 +31,20 @@
 GLOBAL_ROUNDS="${ROUNDS:-3}"
 
 # Parse script arguments
+FILE_REGEX=""
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --rounds)
             GLOBAL_ROUNDS="$2"
             shift 2
             ;;
+        --regex)
+            FILE_REGEX="$2"
+            shift 2
+            ;;
         -*)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--rounds N] <src_dir|file.java> [additional_args...]"
+            echo "Usage: $0 [--rounds N] [--regex PATTERN] <src_dir|file.java> [additional_args...]"
             exit 1
             ;;
         *)
@@ -50,7 +55,7 @@ done
 
 if [ -z "$1" ]; then
     echo "Error: The first parameter must be the source directory or a specific Java file."
-    echo "Usage: $0 [--rounds N] <src_dir|file.java> [additional_args...]"
+    echo "Usage: $0 [--rounds N] [--regex PATTERN] <src_dir|file.java> [additional_args...]"
     exit 1
 fi
 
@@ -78,7 +83,22 @@ echo "Results will be saved to $OUTPUT_CSV"
 if [ -f "$TARGET" ]; then
     FILES=("$TARGET")
 elif [ -d "$TARGET" ]; then
-    FILES=("$TARGET"/*.java)
+    if [ -n "$FILE_REGEX" ]; then
+        FILES=()
+        for f in "$TARGET"/*.java; do
+            [ -e "$f" ] || continue
+            basename=$(basename "$f")
+            if [[ "$basename" =~ $FILE_REGEX ]]; then
+                FILES+=("$f")
+            fi
+        done
+        if [ ${#FILES[@]} -eq 0 ]; then
+            echo "Error: No files matched regex '$FILE_REGEX' in $TARGET"
+            exit 1
+        fi
+    else
+        FILES=("$TARGET"/*.java)
+    fi
 else
     echo "Target $TARGET is neither a file nor a directory. Please run this script from the project root."
     exit 1

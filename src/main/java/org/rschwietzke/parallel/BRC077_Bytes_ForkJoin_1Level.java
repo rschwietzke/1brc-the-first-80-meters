@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
+import java.util.zip.GZIPInputStream;
 
 import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
@@ -45,6 +46,7 @@ import org.rschwietzke.util.PositionableByteReader.Line;
  */
 public class BRC077_Bytes_ForkJoin_1Level extends Benchmark
 {
+ GZIPInputStream foo;
     private static class City
     {
         private int min;

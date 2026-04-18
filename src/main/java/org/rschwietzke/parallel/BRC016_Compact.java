@@ -28,7 +28,9 @@ import org.rschwietzke.Benchmark;
 
 /**
  * This is a baseline implementation using only Java standard library to perform the task.
- * This matches the original version by Gunnar but it is the single threaded version only.
+ * This matches the original version by Gunnar. W
+ * 
+ * Change: We String::split before the constructor in the same map operation.
  * 
  * https://github.com/gunnarmorling/1brc/blob/main/src/main/java/dev/morling/onebrc/CalculateAverage_baseline.java
  * 
