@@ -83,7 +83,7 @@ LOW_MEM="-Xmx10m -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC $JVM_OPTS"
 HIGH_MEM="-Xms2g -Xmx2g $JVM_OPTS"
 
 # Prepare CSV Header
-echo "Class,Name,JVM_OPTS,PARAMS,TASKSET,MedianRuntimeMs,Checksum,Instructions,Cycles,Branches,BranchMisses,TaskClock,ContextSwitches,IPC,SecElapsed,SecUser,SecSys" > "$OUTPUT_CSV"
+echo "Class,Name,JVM_OPTS,PARAMS,TASKSET,MedianRuntimeMs,Checksum,Instructions,Cycles,Branches,BranchMisses,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys" > "$OUTPUT_CSV"
 
 echo "Command line arguments passed: $DEFAULT"
 echo "Default JVM parameters: $JVM_OPTS"
@@ -196,7 +196,7 @@ run_benchmark() {
     fi
     local perf_file=$(mktemp)
     local time_file=$(mktemp)
-    local perf_cmd=(env LC_ALL=C perf stat -x, -o "$perf_file" -e instructions,cycles,branches,branch-misses,task-clock,context-switches "${cmd_base[@]}")
+    local perf_cmd=(env LC_ALL=C perf stat -x, -o "$perf_file" -e instructions,cycles,branches,branch-misses,task-clock,context-switches,cpu-migrations "${cmd_base[@]}")
     
     # Capture metrics natively without JVM stdout disruption
     /usr/bin/time -o "$time_file" -f "%e,%U,%S" "${perf_cmd[@]}" >/dev/null 2>&1
@@ -208,6 +208,7 @@ run_benchmark() {
     local branch_misses=$(awk -F, '$3 == "branch-misses" {print $1}' "$perf_file")
     local task_clock=$(awk -F, '$3 == "task-clock" {print $1}' "$perf_file")
     local context_switches=$(awk -F, '$3 == "context-switches" {print $1}' "$perf_file")
+    local cpu_migrations=$(awk -F, '$3 == "cpu-migrations" {print $1}' "$perf_file")
     
     local ipc=$(awk -F, '/insn per cycle/ {print $6}' "$perf_file")
     
@@ -225,7 +226,7 @@ run_benchmark() {
     rm -f "$perf_file" "$time_file"
 
     # Save to CSV
-    echo "\"$classname\",\"$run_name\",\"$jvm_opts\",\"$params\",\"$task_opts\",$median,$last_checksum,$instructions,$cycles,$branches,$branch_misses,$task_clock,$context_switches,$ipc,$seconds_elapsed,$seconds_user,$seconds_sys" >> "$OUTPUT_CSV"
+    echo "\"$classname\",\"$run_name\",\"$jvm_opts\",\"$params\",\"$task_opts\",$median,$last_checksum,$instructions,$cycles,$branches,$branch_misses,$task_clock,$context_switches,$cpu_migrations,$ipc,$seconds_elapsed,$seconds_user,$seconds_sys" >> "$OUTPUT_CSV"
 }
 
 for file in "${FILES[@]}"; do
