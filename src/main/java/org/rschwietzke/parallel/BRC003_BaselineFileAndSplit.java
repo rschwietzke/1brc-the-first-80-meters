@@ -24,12 +24,14 @@ import java.util.stream.Collector;
 import org.rschwietzke.Benchmark;
 
 /**
- * This is a baseline implementation using only Java standard library to perform the task.
- * This matches the original version by Gunnar but it is the single threaded version only.
- * 
- * https://github.com/gunnarmorling/1brc/blob/main/src/main/java/dev/morling/onebrc/CalculateAverage_baseline.java
- * 
- * It has been slightly modified to use our Benchmark framework and fit my personal formatting style.
+ * Demo for measuring the overhead of reading and splitting lines.
+ *
+ * Attention: Produces partial results!!!
+ *
+ * Difference to BRC002_BaselineFileOnly: Added `.map(l -> l.split(";"))` back in.
+ *
+ * @author Gunnar Morling
+ * @author René Schwietzke
  */
 public class BRC003_BaselineFileAndSplit extends Benchmark 
 {

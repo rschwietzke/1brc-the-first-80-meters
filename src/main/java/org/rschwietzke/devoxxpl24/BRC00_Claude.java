@@ -25,7 +25,8 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * This is an empty shell to check the framework overhead.
+ * This is an attempt by Claude to solve it in 2024 before
+ * the the challenge result were known.
  */
 public class BRC00_Claude extends Benchmark
 {

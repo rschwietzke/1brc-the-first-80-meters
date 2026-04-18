@@ -32,11 +32,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Same batched 1-N architecture as BRC032, but all threads (reader and workers) are
- * Java Virtual Threads (Project Loom). Tests whether Loom's lightweight scheduling
- * offers any advantage for CPU-bound, queue-based workloads.
+ * 1-N pattern utilizing Java Virtual Threads.
  *
- * @author Rene Schwietzke
+ * Difference to BRC032_1_N_Batched: Switched to `Thread.ofVirtual().start(...)` for managing concurrency.
+ *
+ * @author René Schwietzke
  */
 public class BRC034_1_N_Virtual extends Benchmark
 {

@@ -36,10 +36,13 @@ import org.rschwietzke.util.PositionableByteReader;
 import org.rschwietzke.util.PositionableByteReader.Line;
 
 /**
- * Eliminates all String and char processing from the hot path. PositionableByteReader reads
- * raw bytes. We are just checking our speed for the moment.
+ * Demo for measuring the overhead of concurrent reading at the byte level rather than characters/lines.
  *
- * @author Rene Schwietzke
+ * Attention: Produces partial results!!!
+ *
+ * Difference to BRC072_Mutate_BetterReader: Optimized the parallel byte seeking and array manipulation.
+ *
+ * @author René Schwietzke
  */
 public class BRC075_Bytes_ConcurrentRead extends Benchmark
 {

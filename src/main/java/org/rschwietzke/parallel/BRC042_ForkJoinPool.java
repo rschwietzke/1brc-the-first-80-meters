@@ -35,11 +35,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Uses ForkJoinPool with explicit Mapper and Reducer RecursiveTasks. A coordinating FileChunker
- * splits the file into N equal byte-range chunks, invokes all Mappers in parallel, then delegates
- * merging to a dedicated Reducer task, keeping map and reduce as distinct fork/join operations.
+ * Implements work-stealing using ForkJoinPool.
  *
- * @author Rene Schwietzke
+ * Difference to BRC040_N_ConcurrentRead: Replaced `newFixedThreadPool` with `ForkJoinPool` and introduced a `FileChunker` task.
+ *
+ * @author René Schwietzke
  */
 public class BRC042_ForkJoinPool extends Benchmark
 {

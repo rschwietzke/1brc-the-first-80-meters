@@ -33,11 +33,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Main thread reads the file and submits 100,000-line batches as Callable tasks to a
- * fixed-size ExecutorService. Includes manual backpressure: drains completed futures when
- * the in-flight queue exceeds 100. Shows the standard Java task submission pattern.
+ * 1-N pattern using standard Executor thread pools.
  *
- * @author Rene Schwietzke
+ * Difference to BRC034_1_N_Virtual: Switched to `Executors.newFixedThreadPool(...)`.
+ *
+ * @author René Schwietzke
  */
 public class BRC036_1_N_ExecutorPool extends Benchmark
 {

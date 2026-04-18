@@ -32,11 +32,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Same 1-N architecture as BRC030, but the reader enqueues batches of 1,000 lines rather
- * than individual strings. Reduces queue lock contention and improves cache locality
- * by processing related data together.
+ * 1-N pattern with batched work distribution.
  *
- * @author Rene Schwietzke
+ * Difference to BRC030_1_N: Switched to passing lists/batches into the BlockingQueues.
+ *
+ * @author René Schwietzke
  */
 public class BRC032_1_N_Batched extends Benchmark
 {

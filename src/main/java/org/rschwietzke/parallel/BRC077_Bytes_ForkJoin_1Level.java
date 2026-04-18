@@ -37,12 +37,12 @@ import org.rschwietzke.util.PositionableByteReader;
 import org.rschwietzke.util.PositionableByteReader.Line;
 
 /**
- * Same byte-level processing as BRC075 but replaces binary recursive splitting with a flat
- * pre-computed chunk split: the root Mapper task divides the file into N equal chunks upfront
- * and submits all N leaf tasks at once via invokeAll(), avoiding deep recursion and redundant
- * splitting overhead. Includes per-thread memory tracking via ThreadMXBean.
+ * Byte-level ForkJoin constrained to a single level of depth.
+ * treating it more like an ExecutorService.
  *
- * @author Rene Schwietzke
+ * Difference to BRC076_Bytes_ForkJoin_Full: Prevents the ForkJoin tasks from recursing deeper than 1 level,
+ *
+ * @author René Schwietzke
  */
 public class BRC077_Bytes_ForkJoin_1Level extends Benchmark
 {

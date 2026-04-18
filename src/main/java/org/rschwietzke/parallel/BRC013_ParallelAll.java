@@ -27,12 +27,12 @@ import java.util.stream.Collectors;
 import org.rschwietzke.Benchmark;
 
 /**
- * This is a baseline implementation using only Java standard library to perform the task.
- * This matches the original version by Gunnar but it is the single threaded version only.
- * 
- * https://github.com/gunnarmorling/1brc/blob/main/src/main/java/dev/morling/onebrc/CalculateAverage_baseline.java
- * 
- * It has been slightly modified to use our Benchmark framework and fit my personal formatting style.
+ * Fully parallelized stream pipeline.
+ *
+ * Difference to BRC012_ParallelBoth: Added an additional `.parallel()` step.
+ *
+ * @author Gunnar Morling
+ * @author René Schwietzke
  */
 public class BRC013_ParallelAll extends Benchmark 
 {

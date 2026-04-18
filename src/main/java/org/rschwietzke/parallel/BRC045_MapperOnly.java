@@ -33,11 +33,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Fixed thread pool with N pre-computed file chunks via RandomAccessFile. Each Mapper thread
- * independently reads and aggregates its chunk using PositionableReader, returning a HashMap.
- * Main thread merges results sequentially. The simplest full-pipeline parallel implementation.
+ * Focuses optimization entirely on the mapping phase.
  *
- * @author Rene Schwietzke
+ * Difference to BRC044_ForkJoinPool_SelfSplitting: Stripped down the ForkJoin complexity into a standalone mapper.
+ *
+ * @author René Schwietzke
  */
 public class BRC045_MapperOnly extends Benchmark
 {

@@ -27,14 +27,12 @@ import java.util.stream.Collectors;
 import org.rschwietzke.Benchmark;
 
 /**
- * This is a baseline implementation using only Java standard library to perform the task.
- * This matches the original version by Gunnar. W
- * 
- * Change: We String::split before the constructor in the same map operation.
- * 
- * https://github.com/gunnarmorling/1brc/blob/main/src/main/java/dev/morling/onebrc/CalculateAverage_baseline.java
- * 
- * It has been slightly modified to use our Benchmark framework and fit my personal formatting style.
+ * Compacted code style of the parallel implementation.
+ *
+ * Difference to BRC015_Parallel_NoCollector: Reintroduced standard stream collectors and condensed `split` + `Measurement` into one line.
+ *
+ * @author Gunnar Morling
+ * @author René Schwietzke
  */
 public class BRC016_Compact extends Benchmark 
 {

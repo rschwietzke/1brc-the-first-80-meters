@@ -31,11 +31,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Same 4-stage pipeline as BRC025, but with queue capacities increased from 100 to 100,000.
- * Tests whether larger in-flight buffers between stages reduce blocking overhead or expose
- * that the pipeline is CPU-bound rather than queue-bound.
+ * 1-N-N-1 pattern utilizing larger data buffers.
  *
- * @author Rene Schwietzke
+ * Difference to BRC025_1_N_N_1: Increased `BlockingQueue` capacities from 100 to 100,000.
+ *
+ * @author René Schwietzke
  */
 public class BRC026_1_N_N_1_LargeBuffers extends Benchmark
 {

@@ -21,8 +21,11 @@ import java.io.IOException;
 import org.rschwietzke.Benchmark;
 
 /**
- * This is an empty shell to check the framework overhead. We expect almost zero runtime here.
- * The only thing we might see is the Java framework overhead when coming up.
+ * Demo for framework overhead. The benchmark framework has no overhead.
+ *
+ * Attention: Produces partial results!!!
+ *
+ * @author René Schwietzke
  */
 public class BRC000_Empty extends Benchmark
 {

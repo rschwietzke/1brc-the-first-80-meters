@@ -33,12 +33,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Introduces mutable aggregation: Temperatures.merge(int) updates fields in-place
- * rather than allocating a new immutable object per merge. Uses Map.compute() to
- * distinguish first-encounter (new object) from subsequent merges (mutate existing),
- * dramatically reducing GC pressure in the hot aggregation loop.
+ * Mutates existing objects to reduce GC overhead instead of allocating new ones.
  *
- * @author Rene Schwietzke
+ * Difference to BRC068_ParsingWithoutALoop: `Temperatures` object now directly updates its internal `min`/`max`/`count`/`sum` values instead of creating new instances.
+ *
+ * @author René Schwietzke
  */
 public class BRC070_Mutate extends Benchmark
 {

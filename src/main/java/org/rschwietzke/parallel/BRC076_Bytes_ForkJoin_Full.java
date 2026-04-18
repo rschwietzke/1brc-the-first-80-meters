@@ -36,11 +36,11 @@ import org.rschwietzke.util.PositionableByteReader;
 import org.rschwietzke.util.PositionableByteReader.Line;
 
 /**
- * Eliminates all String and char processing from the hot path. PositionableByteReader reads
- * raw bytes and pre-computes a city hash per line. Aggregation uses a byte[]-keyed City object
- * with custom equals/hashCode. String conversion happens only at the final TreeMap output step.
+ * Byte-level processing using a full ForkJoin architecture.
  *
- * @author Rene Schwietzke
+ * Difference to BRC075_Bytes_ConcurrentRead: Extracted the logic back into a recursive `ForkJoinTask` hierarchy.
+ *
+ * @author René Schwietzke
  */
 public class BRC076_Bytes_ForkJoin_Full extends Benchmark
 {

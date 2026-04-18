@@ -27,12 +27,11 @@ import java.util.stream.Collectors;
 import org.rschwietzke.Benchmark;
 
 /**
- * This is a baseline implementation using only Java standard library to perform the task.
- * This matches the original version by Gunnar but it is the single threaded version only.
- * 
- * https://github.com/gunnarmorling/1brc/blob/main/src/main/java/dev/morling/onebrc/CalculateAverage_baseline.java
- * 
- * It has been slightly modified to use our Benchmark framework and fit my personal formatting style.
+ * Initial single-threaded baseline implementation. Returns the full correct result.
+ *
+ * Difference to BRC000_Empty: Added measurement processing and ResultRow.
+ *
+ * @author Gunnar Morling
  */
 public class BRC001_Baseline extends Benchmark 
 {

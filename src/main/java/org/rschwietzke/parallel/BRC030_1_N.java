@@ -33,11 +33,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * 1 Reader, N independent Workers: each worker reads from a shared queue, parses,
- * and aggregates into its own private HashMap. Results are merged by the main thread
- * after all workers finish. Eliminates the dedicated reducer thread.
+ * 1 producer, N worker threads pattern.
  *
- * @author Rene Schwietzke
+ * Difference to BRC028_1_N_1: Removed the background ReaderThread entirely.
+ *
+ * @author René Schwietzke
  */
 public class BRC030_1_N extends Benchmark
 {

@@ -34,11 +34,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Same batch-task approach as BRC036, but uses Executors.newVirtualThreadPerTaskExecutor()
- * so each 100,000-line task runs on its own virtual thread. Allows unbounded concurrency
- * (up to 1,000 in-flight futures) to test if Loom can replace explicit pool sizing.
+ * Maps individual tasks directly to Virtual Threads.
  *
- * @author Rene Schwietzke
+ * Difference to BRC036_1_N_ExecutorPool: Switched to `Executors.newVirtualThreadPerTaskExecutor()`.
+ *
+ * @author René Schwietzke
  */
 public class BRC038_1_N_VThreadsAreTasks extends Benchmark
 {

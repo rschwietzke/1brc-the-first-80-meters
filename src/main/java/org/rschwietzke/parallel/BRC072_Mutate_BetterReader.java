@@ -33,11 +33,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader2;
 
 /**
- * Same mutable aggregation approach as BRC070 but substitutes PositionableReader2 for
- * PositionableReader in the file reading layer. Intended to measure whether an improved
- * I/O reader implementation provides additional throughput gains on top of the parser changes.
+ * Combines mutation optimizations with a more efficient file reader.
  *
- * @author Rene Schwietzke
+ * Difference to BRC070_Mutate: Integrated a memory-mapped file `MappedByteBuffer` approach.
+ *
+ * @author René Schwietzke
  */
 public class BRC072_Mutate_BetterReader extends Benchmark
 {

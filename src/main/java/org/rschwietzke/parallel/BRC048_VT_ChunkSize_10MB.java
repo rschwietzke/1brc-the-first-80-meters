@@ -33,11 +33,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Virtual Thread variant (like BRC047) but file chunks are a fixed 10 MB each, independent of
- * thread count. This produces more tasks than threads, relying on the Loom scheduler to
- * multiplex many virtual thread tasks efficiently without explicit pool configuration.
+ * Virtual Threads processing 10MB chunks of data.
  *
- * @author Rene Schwietzke
+ * Difference to BRC047_VirtualThreads: Modified the chunk splitting algorithm to specifically target 10MB chunks.
+ *
+ * @author René Schwietzke
  */
 public class BRC048_VT_ChunkSize_10MB extends Benchmark
 {

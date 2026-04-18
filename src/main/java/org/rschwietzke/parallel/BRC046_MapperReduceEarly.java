@@ -34,11 +34,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Same structure as BRC045 but workers publish their partial result maps to a BlockingQueue
- * as soon as they finish. The main thread reduces results eagerly in arrival order, overlapping
- * reduction with still-running mappers rather than waiting for all to complete.
+ * Performs map and reduce operations earlier in the pipeline.
  *
- * @author Rene Schwietzke
+ * Difference to BRC045_MapperOnly: Modified the core loop to merge dictionaries inline as it parses.
+ *
+ * @author René Schwietzke
  */
 public class BRC046_MapperReduceEarly extends Benchmark
 {

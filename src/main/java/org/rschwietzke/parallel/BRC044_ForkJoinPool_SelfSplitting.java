@@ -34,11 +34,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * A single self-splitting RecursiveTask: if the assigned byte range exceeds 20 MB, the Mapper
- * forks itself recursively into two halves. Leaf tasks below 20 MB do the actual parsing.
- * This is the canonical ForkJoin divide-and-conquer pattern applied directly to file processing.
+ * ForkJoin tasks handle their own file chunk splitting.
  *
- * @author Rene Schwietzke
+ * Difference to BRC043_ForkJoinPool_NoReducer: Introduced a recursive `Mapper` task that splits work in half until chunk sizes are small enough.
+ *
+ * @author René Schwietzke
  */
 public class BRC044_ForkJoinPool_SelfSplitting extends Benchmark
 {

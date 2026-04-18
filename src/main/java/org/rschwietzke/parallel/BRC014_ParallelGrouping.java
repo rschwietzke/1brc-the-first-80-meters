@@ -27,12 +27,12 @@ import java.util.stream.Collectors;
 import org.rschwietzke.Benchmark;
 
 /**
- * This is a baseline implementation using only Java standard library to perform the task.
- * This matches the original version by Gunnar but it is the single threaded version only.
- * 
- * https://github.com/gunnarmorling/1brc/blob/main/src/main/java/dev/morling/onebrc/CalculateAverage_baseline.java
- * 
- * It has been slightly modified to use our Benchmark framework and fit my personal formatting style.
+ * Uses concurrent grouping in the parallel stream collector.
+ *
+ * Difference to BRC013_ParallelAll: Replaced `groupingBy` with `groupingByConcurrent`.
+ *
+ * @author Gunnar Morling
+ * @author René Schwietzke
  */
 public class BRC014_ParallelGrouping extends Benchmark 
 {

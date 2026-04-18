@@ -32,11 +32,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Same 4-stage pipeline as BRC025, but stages pass batches of 100,000 lines instead of
- * individual items. Reduces queue contention by amortizing lock overhead across many items
- * per enqueue/dequeue operation.
+ * 1-N-N-1 pattern grouping work into batches.
  *
- * @author Rene Schwietzke
+ * Difference to BRC026_1_N_N_1_LargeBuffers: Switched queues to pass `List<String>` instead of individual strings.
+ *
+ * @author René Schwietzke
  */
 public class BRC027_1_N_N_1_Batches extends Benchmark
 {

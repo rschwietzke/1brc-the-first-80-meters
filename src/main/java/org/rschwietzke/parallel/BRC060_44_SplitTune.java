@@ -34,11 +34,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Same self-splitting ForkJoin as BRC044 but replaces String.split(";") with indexOf(';')
- * and substring() for line splitting. Eliminates regex compilation and array allocation
- * overhead, establishing this as the performance baseline for subsequent parsing improvements.
+ * Fine-tunes the chunk splitting logic of BRC044.
  *
- * @author Rene Schwietzke
+ * Difference to BRC048_VT_ChunkSize_10MB: Implemented manual byte-scanning `seekToNextNewline` behavior instead of `BufferedReader`.
+ *
+ * @author René Schwietzke
  */
 public class BRC060_44_SplitTune extends Benchmark
 {

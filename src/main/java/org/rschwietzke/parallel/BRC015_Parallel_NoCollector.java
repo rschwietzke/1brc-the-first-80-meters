@@ -28,12 +28,14 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.parallel.BRC042_ForkJoinPool.Temperatures;
 
 /**
- * This is a baseline implementation using only Java standard library to perform the task.
- * This matches the original version by Gunnar but it is the single threaded version only.
- * 
- * https://github.com/gunnarmorling/1brc/blob/main/src/main/java/dev/morling/onebrc/CalculateAverage_baseline.java
- * 
- * It has been slightly modified to use our Benchmark framework and fit my personal formatting style.
+ * Demo for measuring the overhead of parallel streams without collecting the results.
+ *
+ * Attention: Produces partial results!!!
+ *
+ * Difference to BRC014_ParallelGrouping: Removed the collector and instead uses an empty `forEach`.
+ *
+ * @author Gunnar Morling
+ * @author René Schwietzke
  */
 public class BRC015_Parallel_NoCollector extends Benchmark 
 {

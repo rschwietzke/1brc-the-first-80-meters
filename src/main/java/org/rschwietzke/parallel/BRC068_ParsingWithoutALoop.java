@@ -33,12 +33,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Builds on BRC066's integer arithmetic with a branchless, loop-free parseInteger().
- * Reads characters at known positions (end-1, end-3, end-4) by exploiting the fixed
- * temperature format, reducing parsing to at most two conditional branches covering all
- * four possible input patterns: 9.9, 99.9, -9.9, -99.9.
+ * Unrolls or optimizes parsing loops for speed.
  *
- * @author Rene Schwietzke
+ * Difference to BRC066_Integer: Further eliminates boundaries checks in the parsing loops.
+ *
+ * @author René Schwietzke
  */
 public class BRC068_ParsingWithoutALoop extends Benchmark
 {

@@ -34,11 +34,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Builds on BRC060 by replacing Double.parseDouble() with a custom parser that accumulates
- * digits as a long and applies a pre-computed decimal multiplier. Exploits the known format
- * (-99.9 to 99.9) to avoid the full IEEE 754 parsing overhead of the JDK method.
+ * Optimizes numerical parsing using custom Double parsing.
  *
- * @author Rene Schwietzke
+ * Difference to BRC060_44_SplitTune: Replaced `Double.parseDouble` with a custom ascii-byte-to-double unrolled loop.
+ *
+ * @author René Schwietzke
  */
 public class BRC062_ParseDouble extends Benchmark
 {

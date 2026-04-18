@@ -31,12 +31,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Classic 4-stage pipeline: 1 Reader, N Splitters, N Measurers, 1 Reducer.
- * Each stage is connected via a BlockingQueue with capacity 100. The splitting
- * (line -> String[]) and measurement (String[] -> Temperatures object) are separate
- * thread stages, demonstrating where pipeline overhead occurs.
+ * 1 producer, N processors, N aggregators, 1 final reducer pattern.
  *
- * @author Rene Schwietzke
+ * Difference to BRC021_NoStreamFileOnly: Added multiple BlockingQueues, SplittingThreads, MeasurementThreads, and a final MapReducerThread.
+ *
+ * @author René Schwietzke
  */
 public class BRC025_1_N_N_1 extends Benchmark
 {

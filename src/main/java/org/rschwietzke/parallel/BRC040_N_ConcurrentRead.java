@@ -31,11 +31,13 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * N threads concurrently read distinct byte-range chunks of the file using RandomAccessFile
- * and a custom PositionableReader. This is a read-throughput probe only: lines are counted
- * but not parsed, to measure whether concurrent reads can saturate available I/O bandwidth.
+ * Demo for measuring the overhead of N threads concurrently reading from the same file.
  *
- * @author Rene Schwietzke
+ * Attention: Produces partial results!!!
+ *
+ * Difference to BRC038_1_N_VThreadsAreTasks: Computes `chunkSize` based on total file size, allowing multiple threads to seek and read.
+ *
+ * @author René Schwietzke
  */
 public class BRC040_N_ConcurrentRead extends Benchmark
 {

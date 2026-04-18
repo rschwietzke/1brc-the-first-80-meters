@@ -27,12 +27,12 @@ import java.util.stream.Collectors;
 import org.rschwietzke.Benchmark;
 
 /**
- * This is a baseline implementation using only Java standard library to perform the task.
- * This matches the original version by Gunnar but it is the single threaded version only.
- * 
- * https://github.com/gunnarmorling/1brc/blob/main/src/main/java/dev/morling/onebrc/CalculateAverage_baseline.java
- * 
- * It has been slightly modified to use our Benchmark framework and fit my personal formatting style.
+ * Parallelizes both reading and mapping stages.
+ *
+ * Difference to BRC011_ParallelAfterMapping: Added `.parallel()` in both places.
+ *
+ * @author Gunnar Morling
+ * @author René Schwietzke
  */
 public class BRC012_ParallelBoth extends Benchmark 
 {

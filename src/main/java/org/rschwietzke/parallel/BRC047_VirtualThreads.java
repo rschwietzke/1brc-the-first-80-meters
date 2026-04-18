@@ -33,11 +33,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Same pre-computed file chunking and separate-HashMap-per-thread approach as BRC045,
- * but tasks run on Java Virtual Threads via newVirtualThreadPerTaskExecutor(). Measures
- * whether virtual threads offer any benefit for purely CPU-bound file chunk processing.
+ * Replaces traditional threads with Virtual Threads for concurrency.
  *
- * @author Rene Schwietzke
+ * Difference to BRC046_MapperReduceEarly: Brought back `newVirtualThreadPerTaskExecutor` instead of `ForkJoinPool`.
+ *
+ * @author René Schwietzke
  */
 public class BRC047_VirtualThreads extends Benchmark
 {

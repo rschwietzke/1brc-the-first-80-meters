@@ -31,11 +31,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Simplified 3-stage pipeline: 1 Reader, N Workers (parse + aggregate), 1 Reducer.
- * Merges the splitting and measurement stages from BRC025 into a single worker thread
- * to reduce inter-stage queue traffic and object allocation overhead.
+ * 1 producer, N processors, 1 aggregator pattern.
  *
- * @author Rene Schwietzke
+ * Difference to BRC027_1_N_N_1_Batches: Removed SplittingThread layer; ReaderThread feeds MeasurementThreads directly.
+ *
+ * @author René Schwietzke
  */
 public class BRC028_1_N_1 extends Benchmark
 {

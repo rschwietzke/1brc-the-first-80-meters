@@ -33,11 +33,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Builds on BRC062 by eliminating the substring() call for the temperature portion.
- * The custom parseDouble() now accepts the full line string with offset/end parameters,
- * avoiding one String allocation per measurement line.
+ * Eliminates unnecessary String allocations during parsing.
  *
- * @author Rene Schwietzke
+ * Difference to BRC062_ParseDouble: Avoids substring creation, parsing fields directly from the underlying byte array indices.
+ *
+ * @author René Schwietzke
  */
 public class BRC064_NoExtraString extends Benchmark
 {

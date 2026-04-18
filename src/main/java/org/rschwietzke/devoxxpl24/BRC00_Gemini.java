@@ -26,7 +26,7 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * This is an empty shell to check the framework overhead.
+ *  That is the AI Gemini solution from 2024.
  */
 public class BRC00_Gemini extends Benchmark
 {

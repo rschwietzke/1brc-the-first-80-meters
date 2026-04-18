@@ -33,11 +33,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Replaces all double arithmetic with fixed-point integer arithmetic. Temperatures are
- * stored as integers (e.g. 12.3 -> 123) and a custom parseInteger() reads digits directly
- * past the decimal point without any floating-point conversion, eliminating FPU overhead.
+ * Switches from double to integer arithmetic for temperatures (e.g. 12.3 -> 123).
  *
- * @author Rene Schwietzke
+ * Difference to BRC064_NoExtraString: Reads temperatures as integers to avoid floating point math overhead.
+ *
+ * @author René Schwietzke
  */
 public class BRC066_Integer extends Benchmark
 {

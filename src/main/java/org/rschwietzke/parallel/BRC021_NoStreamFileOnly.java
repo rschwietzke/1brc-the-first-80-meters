@@ -25,9 +25,13 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * Just see how fast we can read the data without processing.
+ * Demo for measuring traditional loop-based file reading without processing.
  *
- * @author Rene Schwietzke
+ * Attention: Produces partial results!!!
+ *
+ * Difference to BRC020_NoStream: Removed the math/aggregation logic, keeping only the file reading loop.
+ *
+ * @author René Schwietzke
  */
 public class BRC021_NoStreamFileOnly extends Benchmark
 {

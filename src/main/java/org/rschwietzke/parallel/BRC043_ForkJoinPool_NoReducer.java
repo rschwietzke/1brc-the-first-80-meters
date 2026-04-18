@@ -34,11 +34,11 @@ import org.rschwietzke.util.MathUtil;
 import org.rschwietzke.util.PositionableReader;
 
 /**
- * Same ForkJoinPool structure as BRC042 but eliminates the dedicated Reducer RecursiveTask.
- * The FileChunker merges all mapper results inline using stream().forEach() after invokeAll(),
- * reducing the number of task allocations and fork/join overhead.
+ * ForkJoinPool approach without a dedicated reducer step.
  *
- * @author Rene Schwietzke
+ * Difference to BRC042_ForkJoinPool: Replaced the dedicated `Reducer` ForkJoin task with inline stream mapping and reduction.
+ *
+ * @author René Schwietzke
  */
 public class BRC043_ForkJoinPool_NoReducer extends Benchmark
 {

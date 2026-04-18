@@ -27,11 +27,11 @@ import org.rschwietzke.Benchmark;
 import org.rschwietzke.util.MathUtil;
 
 /**
- * We are tuning the single threaded performance first, because
- * it is easier to profile. Just make this code nice first and tune
- * from there.
+ * Replaces Java Streams with traditional loop-based processing.
  *
- * @author Rene Schwietzke
+ * Difference to BRC016_Compact: Introduces a `Temperatures` record with min/max/total and removes `java.util.stream` usage entirely.
+ *
+ * @author René Schwietzke
  */
 public class BRC020_NoStream extends Benchmark
 {
