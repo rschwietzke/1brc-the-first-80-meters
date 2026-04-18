@@ -32,6 +32,7 @@ GLOBAL_ROUNDS="${ROUNDS:-3}"
 
 # Parse script arguments
 FILE_REGEX=""
+OUTPUT_CSV=""
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --rounds)
@@ -42,9 +43,13 @@ while [[ "$#" -gt 0 ]]; do
             FILE_REGEX="$2"
             shift 2
             ;;
+        --output|-o)
+            OUTPUT_CSV="$2"
+            shift 2
+            ;;
         -*)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--rounds N] [--regex PATTERN] <src_dir|file.java> [additional_args...]"
+            echo "Usage: $0 [--rounds N] [--regex PATTERN] --output <file.csv> <src_dir|file.java> [additional_args...]"
             exit 1
             ;;
         *)
@@ -53,9 +58,15 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
+if [ -z "$OUTPUT_CSV" ]; then
+    echo "Error: Output file must be specified using --output <file.csv>"
+    echo "Usage: $0 [--rounds N] [--regex PATTERN] --output <file.csv> <src_dir|file.java> [additional_args...]"
+    exit 1
+fi
+
 if [ -z "$1" ]; then
     echo "Error: The first parameter must be the source directory or a specific Java file."
-    echo "Usage: $0 [--rounds N] [--regex PATTERN] <src_dir|file.java> [additional_args...]"
+    echo "Usage: $0 [--rounds N] [--regex PATTERN] --output <file.csv> <src_dir|file.java> [additional_args...]"
     exit 1
 fi
 
@@ -65,7 +76,6 @@ DEFAULT="$@"
 
 # Default configuration
 CLASSPATH="target/classes"
-OUTPUT_CSV="results.csv"
 
 # JVM parameters defined as requested (easy to adjust, same for all)
 JVM_OPTS=""
