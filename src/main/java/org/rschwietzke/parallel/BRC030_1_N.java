@@ -1,5 +1,4 @@
 // JVM_OPTS: $HIGH_MEM
-// ignore
 /*
  *  Copyright 2023 The original authors
  *
@@ -89,7 +88,7 @@ public class BRC030_1_N extends Benchmark
     {
         // let't do a raw and basic old-school implementation without
         // most modern Java help
-        BlockingQueue<String> measureQueueInput = new LinkedBlockingDeque<>(1000000);
+        BlockingQueue<String> measureQueueInput = new LinkedBlockingDeque<>(1_000_000);
 
         var maxThreadCount = this.getThreadCount();
 
