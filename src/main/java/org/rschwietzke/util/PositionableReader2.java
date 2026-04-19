@@ -6,6 +6,9 @@ import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+/**
+ * Avoid unwanted case operations
+ */
 public class PositionableReader2 implements Closeable
 {
     private final long to;
