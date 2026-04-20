@@ -34,7 +34,8 @@ import org.rschwietzke.util.MathUtil;
 /**
  * 1-N pattern utilizing Java Virtual Threads.
  *
- * Difference to BRC032_1_N_Batched: Switched to `Thread.ofVirtual().start(...)` for managing concurrency.
+ * Difference to BRC032_1_N_Batched: Switched to `Thread.ofVirtual().start(...)` 
+ * for managing concurrency.
  *
  * @author René Schwietzke
  */

@@ -36,7 +36,8 @@ import org.rschwietzke.util.MathUtil;
 /**
  * Maps individual tasks directly to Virtual Threads.
  *
- * Difference to BRC036_1_N_ExecutorPool: Switched to `Executors.newVirtualThreadPerTaskExecutor()`.
+ * Difference to BRC036_1_N_ExecutorPool: Switched to 
+ * `Executors.newVirtualThreadPerTaskExecutor()`.
  *
  * @author René Schwietzke
  */

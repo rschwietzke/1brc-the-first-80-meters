@@ -37,7 +37,8 @@ import org.rschwietzke.util.PositionableReader;
 /**
  * Implements work-stealing using ForkJoinPool.
  *
- * Difference to BRC040_N_ConcurrentRead: Replaced `newFixedThreadPool` with `ForkJoinPool` and introduced a `FileChunker` task.
+ * Difference to BRC040_N_ConcurrentRead: Replaced `newFixedThreadPool` 
+ * with `ForkJoinPool` and introduced a `FileChunker` task.
  *
  * @author René Schwietzke
  */

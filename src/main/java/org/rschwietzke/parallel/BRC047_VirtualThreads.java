@@ -36,6 +36,7 @@ import org.rschwietzke.util.PositionableReader;
  * Replaces traditional threads with Virtual Threads for concurrency.
  *
  * Difference to BRC046_MapperReduceEarly: Brought back `newVirtualThreadPerTaskExecutor` instead of `ForkJoinPool`.
+ * Uses number of cpus to use chunk count
  *
  * @author René Schwietzke
  */

@@ -36,6 +36,8 @@ import org.rschwietzke.util.PositionableReader;
  * Virtual Threads processing 10MB chunks of data.
  *
  * Difference to BRC047_VirtualThreads: Modified the chunk splitting algorithm to specifically target 10MB chunks.
+ * So, instead of using a fixed number of chunks (number of CPUs), we cut it down further until it is 
+ * small enough.
  *
  * @author René Schwietzke
  */

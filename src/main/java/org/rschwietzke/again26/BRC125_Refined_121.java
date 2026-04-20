@@ -165,23 +165,6 @@ public class BRC125_Refined_121 extends Benchmark
         }
     }
 
-    @Override
-    public String run(final String fileName) throws IOException
-    {
-        // open the file
-        try (var file = new RandomAccessFile(fileName, "r"); 
-                var channel = file.getChannel())
-        {
-            // our transport container for a lot of intel at once
-            final Line line = new Line(channel);
-
-            var cities = line.process();
-
-            // ok, we got everything, now we need to order it
-            return cities.toTreeMap().toString();
-        }
-    }
-
     public static class LightSet
     {
         private City[] data;
@@ -645,6 +628,23 @@ public class BRC125_Refined_121 extends Benchmark
             return new String(ba);
         }
 
+    }
+
+    @Override
+    public String run(final String fileName) throws IOException
+    {
+        // open the file
+        try (var file = new RandomAccessFile(fileName, "r"); 
+                var channel = file.getChannel())
+        {
+            // our transport container for a lot of intel at once
+            final Line line = new Line(channel);
+
+            var cities = line.process();
+
+            // ok, we got everything, now we need to order it
+            return cities.toTreeMap().toString();
+        }
     }
 
 

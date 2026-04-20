@@ -114,7 +114,7 @@ public class PositionableByteReader implements Closeable
             }
             hash = hash * 31 + c;
             
-            // Resize our lightweight buffer if it gets too small
+            // Resize our lightweight buffer if it is too small
             if (line.length == line.bytes.length) 
             {
                 line.bytes = Arrays.copyOf(line.bytes, line.bytes.length * 2);
@@ -162,6 +162,12 @@ public class PositionableByteReader implements Closeable
         public int length = 0;
         public int semicolon = 0;
         public int cityHash = 0;
+        public int temperature = 0;
+        
+        public String toString()
+        {
+            return new String(bytes, 0, semicolon);
+        }
     }
 }
 
