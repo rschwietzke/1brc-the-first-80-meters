@@ -1,0 +1,190 @@
+package org.rschwietzke.util;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.Arrays;
+
+public class PositionableByteReader2 implements Closeable
+{
+    public static final long RELOAD_LIMIT = 1000;
+    
+    private final long to;
+    private RandomAccessFile raf;
+    private final Line line = new Line();
+    
+    // Buffering fields
+    private static final int BUFFER_SIZE = 250000;
+    private final byte[] buffer = new byte[BUFFER_SIZE];
+    private int bufferPos = 0;
+    private int bufferLimit = 0;
+    private long currentPos; // Tracks our logical position in the file
+
+    public PositionableByteReader2(String filePath, long from, long to) throws IOException
+    {
+        this.to = to;
+        this.raf = new RandomAccessFile(filePath, "r");
+
+        // position
+        this.raf.seek(from);
+        this.currentPos = from;
+        
+        // if we are not from 0, we read the first "half line" and throw it away
+        if (from > 0)
+        {
+            // We use our own buffered read method here instead of raf.readLine()
+            // so our buffer and logical pointer (currentPos) stay perfectly synchronized.
+            skipLine();
+        }
+    }
+
+    /**
+     * Reads a single byte from the internal buffer, refilling it if necessary.
+     */
+    private byte readByte() throws IOException
+    {
+        // If we have consumed all bytes in our buffer, fetch the next chunk
+        if (bufferPos >= bufferLimit)
+        {
+            bufferLimit = raf.read(buffer);
+            bufferPos = 0;
+            
+            if (bufferLimit == -1)
+            {
+                return -1; // EOF reached
+            }
+        }
+        
+        currentPos++; // Advance our logical file pointer
+        
+        return buffer[bufferPos++]; 
+    }
+
+    /**
+     * Read the next line and returns it. In case of end of file, we simply
+     * return null.
+     * @return Read string or null when EOF
+     * @throws IOException
+     */
+    public Line readln() throws IOException 
+    {
+        // Check our logical position against the limit
+        if (this.currentPos < to) 
+        {
+            return readLine();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    /**
+     * Skip over the first things till \n
+     */
+    private void skipLine() throws IOException 
+    {
+        byte c;
+
+        // read the rest
+        while ((c = readByte()) != -1) 
+        {
+            if (c == '\n') 
+            {
+                break;
+            }
+        }
+    }
+    
+    /**
+     * Helper method to read raw bytes into our lightweight array until a '\n' is found.
+     */
+    private Line readLine() throws IOException 
+    {
+        byte c;
+        line.length = 0; // Reset line length for the new line
+        int hash = 0;
+
+        // see if we have to load and have data
+        if (this.bufferLimit - this.bufferPos < RELOAD_LIMIT)
+        {
+            if (fillBuffer() == 1)
+            {
+                // we are either at the end of the file or
+                // are over the "to"
+            }
+        } 
+        
+        // read till semicolon
+        while ((c = readByte()) != -1) 
+        {
+            if (c == ';') 
+            {
+                line.semicolon = line.length++;
+                line.cityHash = hash;
+                break;
+            }
+            hash = hash * 31 + c;
+            
+            // Resize our lightweight buffer if it is too small
+            if (line.length == line.bytes.length) 
+            {
+                line.bytes = Arrays.copyOf(line.bytes, line.bytes.length * 2);
+            }
+            
+            line.bytes[line.length++] = c;
+        }
+        
+        // read the rest
+        while ((c = readByte()) != -1) 
+        {
+            if (c == '\n') 
+            {
+                break;
+            }
+            
+            // Resize our lightweight buffer if it gets too small
+            if (line.length == line.bytes.length) 
+            {
+                line.bytes = Arrays.copyOf(line.bytes, line.bytes.length * 2);
+            }
+            
+            line.bytes[line.length++] = c;
+        }
+
+        // If we hit EOF immediately and collected no bytes, return null
+        if (c == -1 && line.length == 0) 
+        {
+            return null;
+        }
+
+        return line;
+    }
+    
+    @Override
+    public void close() throws IOException 
+    {
+        raf.close();
+    }
+    
+    public static class Line
+    {
+        // we expose the buffer to avoid copying data
+        public byte[] buffer;
+        
+        public int start = 0;
+        public int length = 0;
+        public int semicolon = 0;
+        public int cityHash = 0;
+
+        // this is odd, but it is easier to transport data that way
+        // into our storage structure
+        public int temperature = 0;
+        
+        public String toString()
+        {
+            return new String(buffer, start, semicolon);
+        }
+    }
+}
+
