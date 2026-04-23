@@ -65,6 +65,8 @@ You can restrict when a specific class is executed, or mark it with special badg
 
 For a complete reference of all supported annotations (e.g. `// RUN:`, `// ignore`, `// baseline`), please see the dedicated [Benchmark Source Annotations](benchmark-annotations.md) documentation.
 
+For a comprehensive breakdown of what happens during a test execution and exactly what hardware/JVM metrics are captured, please see the [Benchmark Execution & Metrics](benchmark-metrics.md) documentation.
+
 ## How Configurations Evolve into Tests
 
 ### Generation Cycle
