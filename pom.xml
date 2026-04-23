@@ -32,10 +32,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.12.1</version>
                     <configuration>
-                        <source>25</source>
-                    <target>25</target>
                         <compilerArgs>
-                            <arg>--enable-preview</arg>
+                            <arg>-Xlint:-options</arg>
                             <arg>--add-exports</arg>
                             <arg>java.base/jdk.internal.util=ALL-UNNAMED</arg>
                         </compilerArgs>
@@ -44,4 +42,26 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>jdk21-preview</id>
+            <activation>
+                <jdk>[21,22)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <compilerArgs combine.children="append">
+                                <arg>--enable-preview</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

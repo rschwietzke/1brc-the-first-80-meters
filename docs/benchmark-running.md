@@ -21,25 +21,49 @@ The configuration file uses an INI-style format with explicit sections for defin
 - `[TASKSETS]`: Arguments for the Linux `taskset` command for CPU pinning (e.g., `CORES_8 = -c 0-7`).
 - `[DATASETS]`: Target data files (e.g., `DATASET_10M = 10000000.txt`).
 
-**Combinable Parameters (Runs):**
-Instead of a generic cross-product matrix, you explicitly define what combinations to run in the `[RUNS]` section.
+**Global Variables:**
+You can define arbitrary variables at the top of the file (before any `[SECTION]` headers) and reuse them throughout your configuration using `${VAR_NAME}` or `$VAR_NAME`.
 
 ```ini
-[RUNS]
-# Format: RUN_NAME = JDK_LABEL ; GC_LABEL ; VM_LABEL ; TASKSET_LABEL ; PROG_LABEL ; DATASET_LABEL ; CLASS_FILTER
-NIGHTLY_ZGC = JDK_21_OPEN ; ZGC ; MEM_2G ; CORES_8 ; DEFAULT ; DATASET_10M ; *
-DEBUG_PKG   = JDK_21_OPEN ; G1 ; DEFAULT ; ALL ; DEFAULT ; DATASET_10M ; org.rschwietzke.st.*
-ALL_MATRIX  = * ; * ; * ; * ; * ; * ; *
+# --- Global Variables ---
+MY_CLASSES = org.onebrc.*
+# ------------------------
+
+[RUN:DEFAULT]
+CLASS_FILTER = ${MY_CLASSES}
 ```
-- `RUN_NAME`: An internal identifier for the run. This name can be used in class annotations to restrict a class to this run.
-- `CLASS_FILTER`: A specific class name (`BRC13_HardcodedSetST`), a package prefix (`org.rschwietzke.st.*`), or `*` for all classes.
-- Wildcards (`*`): In any parameter slot, a `*` evaluates to all defined properties in that category.
+
+**Combinable Parameters (Runs):**
+Instead of a generic cross-product matrix, you explicitly define what combinations to run using `[RUN:NAME]` blocks.
+
+```ini
+[RUN:NIGHTLY_ZGC]
+JDK_FILTER = JDK_21_OPEN
+GC_FILTER = ZGC
+VM_FILTER = MEM_2G
+TASKSET_FILTER = CORES_8
+PROG_FILTER = DEFAULT
+DATA_FILTER = 10M
+CLASS_FILTER = *
+
+[RUN:DEBUG_PKG]
+JDK_FILTER = JDK_21_OPEN
+GC_FILTER = G1
+DATA_FILTER = 10M
+CLASS_FILTER = org.rschwietzke.st.*
+
+[RUN:ALL_MATRIX]
+# Empty run block inherits '*' for all filters
+```
+- `[RUN:NAME]`: The internal identifier for the run. This name can be used in class annotations to restrict a class to this run.
+- `CLASS_FILTER`: A specific class name (`BRC13_HardcodedSetST`), a package prefix (`org.rschwietzke.st.*`), a regular expression (`.*FileOnly$`), or `*` for all classes.
+- **Regex Support**: All `_FILTER` properties natively support Java Regular Expressions. If a filter string doesn't exactly match an available key or class, it is compiled as a regex. For example, `DATA_FILTER = .*k$` will match both `DATASET_1k` and `DATASET_10k`.
+- Omitted filters automatically default to `*`.
 
 ### Class Annotations for Exclusions/Inclusions
-You can restrict when a specific class is executed by adding special comments inside the `.java` file:
-- `// RUN: NIGHTLY_ZGC` - The class will ONLY run when evaluating the `NIGHTLY_ZGC` run.
-- `// -RUN: NIGHTLY_ZGC` - The class will skip the `NIGHTLY_ZGC` run.
-- `// -JDK:21` - The class will skip any run that uses a JDK starting with `21`.
+You can restrict when a specific class is executed, or mark it with special badges (like `baseline` or `incomplete`), by adding special comments inside the `.java` file. 
+
+For a complete reference of all supported annotations (e.g. `// RUN:`, `// ignore`, `// baseline`), please see the dedicated [Benchmark Source Annotations](benchmark-annotations.md) documentation.
 
 ## How Configurations Evolve into Tests
 
@@ -54,12 +78,18 @@ You can restrict when a specific class is executed by adding special comments in
 
 ## Execution
 
-Once your `.conf` files are set up, start the benchmark matrix:
+Once your `.conf` files are set up, you must provide an explicit command to start the benchmark matrix:
 
 ```bash
-./benchmark-matrix.sh
+./benchmark-matrix.sh run
 ```
 
-**Arguments:**
-- `--dry-run`: Generates the execution script (`<timestamp>-run.sh`) but does not execute it. Useful for verifying your configuration matrix.
-- `--jfr`: Enables Java Flight Recorder during benchmarking, saving `.jfr` profiles for each run.
+### Available Commands:
+*   `run`: Generates the execution script and immediately executes the full matrix.
+*   `dry-run`: Generates the dry-run console output to test your matrix filters, but stops before writing or executing anything.
+*   `analyze <timestamp>`: Regenerates the HTML and Markdown reports for a specific run without re-executing any benchmarks.
+*   `compare <t1> <t2>`: Compares two distinct benchmark runs (To be implemented).
+
+### Additional Arguments
+When using `run`, you can also append additional flags to the end of the command:
+*   `--jfr`: Enables Java Flight Recorder during benchmarking, saving `.jfr` profiles for each executed class configuration.

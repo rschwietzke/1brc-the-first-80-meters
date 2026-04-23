@@ -31,10 +31,23 @@ ALL =
 DATASET_10M = 10000000.txt
 DATASET_1B = 1000M.txt
 
-[RUNS]
-# Format: RUN_NAME = JDK_LABEL ; GC_LABEL ; VM_LABEL ; TASKSET_LABEL ; PROG_LABEL ; DATASET_LABEL ; CLASS_FILTER
-# Use * as a wildcard to run all available valid elements for that dimension.
-# CLASS_FILTER can be a specific class (e.g., BRC13_HardcodedSetST), a package (e.g., org.rschwietzke.st.*), or * for all valid classes.
-NIGHTLY_ZGC = JDK_21_OPEN ; ZGC ; MEM_2G ; CORES_8 ; DEFAULT ; DATASET_10M ; *
-DEBUG_ST    = JDK_21_OPEN ; G1 ; DEFAULT ; ALL ; DEFAULT ; DATASET_10M ; org.rschwietzke.st.*
-ALL_MATRIX  = * ; * ; * ; * ; * ; * ; *
+[RUN:NIGHTLY_ZGC]
+JDK_FILTER = JDK_21_OPEN
+GC_FILTER = ZGC
+VM_FILTER = MEM_2G
+TASKSET_FILTER = CORES_8
+PROG_FILTER = DEFAULT
+DATA_FILTER = 10M
+CLASS_FILTER = *
+
+[RUN:DEBUG_PKG]
+JDK_FILTER = JDK_21_OPEN
+GC_FILTER = G1
+VM_FILTER = DEFAULT
+TASKSET_FILTER = ALL
+PROG_FILTER = DEFAULT
+DATA_FILTER = 10M
+CLASS_FILTER = org.rschwietzke.st.*
+
+[RUN:ALL_MATRIX]
+# By omitting filters, they default to '*' and evaluate all combinable parameters.

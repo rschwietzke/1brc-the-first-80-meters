@@ -41,6 +41,15 @@ public class BenchmarkMatrix {
     private static void generate(List<String> args) throws IOException {
         boolean dryRun = args.contains("--dry-run");
         boolean isJfr = args.contains("--jfr");
+        boolean isInfo = args.contains("--info");
+        
+        String comment = "";
+        for (int i = 0; i < args.size(); i++) {
+            if (args.get(i).equals("--comment") && i + 1 < args.size()) {
+                comment = args.get(i + 1);
+                break;
+            }
+        }
 
         Path srcDir = Paths.get("1brc-implementations", "src", "main", "java");
         List<ClassConfig> classes = SourceAnnotationParser.parseDirectory(srcDir);
@@ -53,7 +62,7 @@ public class BenchmarkMatrix {
             System.exit(1);
         }
 
-        Path scriptPath = ScriptGenerator.generate(classes, config, isJfr, dryRun);
+        Path scriptPath = ScriptGenerator.generate(classes, config, isJfr, dryRun, isInfo, comment);
         
         // Output the script path on the final line for benchmark-matrix.sh to pick up
         System.out.println(scriptPath.toAbsolutePath().toString());
@@ -72,6 +81,7 @@ public class BenchmarkMatrix {
         
         HtmlReportWriter.write(timestamp, matrix);
         MarkdownReportWriter.write(timestamp, matrix);
+        OverviewWriter.write();
     }
 
     private static void listRuns(List<String> args) {

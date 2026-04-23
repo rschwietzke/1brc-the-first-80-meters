@@ -65,6 +65,16 @@ public class ResultMatrix {
             this.allocatedBytes = allocatedBytes;
             this.jitCompilationMs = jitCompilationMs;
         }
+
+        public long getMedianRuntimeMs() { return medianRuntimeMs; }
+        public long getInstructions() { return instructions; }
+        public long getCycles() { return cycles; }
+        public long getBranches() { return branches; }
+        public long getBranchMisses() { return branchMisses; }
+        public double getIpc() { return ipc; }
+        public long getGcPauseMs() { return gcPauseMs; }
+        public long getAllocatedBytes() { return allocatedBytes; }
+        public long getJitCompilationMs() { return jitCompilationMs; }
     }
 
     private final Map<Key, RowData> matrix = new HashMap<>();
@@ -85,6 +95,10 @@ public class ResultMatrix {
             String line = lines.get(i).trim();
             if (line.isEmpty()) continue;
             String[] parts = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+            if (parts.length < 8) {
+                System.err.println("Warning: skipping fragmented or invalid row " + i + ": " + line);
+                continue;
+            }
             
             try {
                 String jdk = getVal(parts, colMap, "JDK");

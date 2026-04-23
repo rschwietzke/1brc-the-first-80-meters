@@ -9,22 +9,48 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 public class ScriptGenerator {
 
     private static List<String> getMatches(String filter, Set<String> available) {
         if (filter.equals("*")) {
             return new ArrayList<>(available);
         }
-        return available.contains(filter) ? Collections.singletonList(filter) : Collections.emptyList();
+        List<String> matched = new ArrayList<>();
+        Pattern p = null;
+        try {
+            p = Pattern.compile(filter);
+        } catch (PatternSyntaxException e) {
+            // Not a valid regex, fallback to exact match only
+        }
+        for (String item : available) {
+            if (item.equals(filter) || (p != null && p.matcher(item).matches())) {
+                matched.add(item);
+            }
+        }
+        return matched;
     }
 
     private static boolean matchesClass(ClassConfig cls, String classFilter) {
         if (classFilter.equals("*")) return true;
         if (classFilter.endsWith(".*")) {
             String pkgPrefix = classFilter.substring(0, classFilter.length() - 2);
-            return cls.fqcn.startsWith(pkgPrefix);
+            if (cls.fqcn.startsWith(pkgPrefix)) return true;
         }
-        return cls.className.equals(classFilter) || cls.fqcn.equals(classFilter);
+        if (cls.className.equals(classFilter) || cls.fqcn.equals(classFilter)) {
+            return true;
+        }
+        try {
+            Pattern p = Pattern.compile(classFilter);
+            if (p.matcher(cls.className).matches() || p.matcher(cls.fqcn).matches()) {
+                return true;
+            }
+        } catch (PatternSyntaxException e) {
+            // Ignore
+        }
+        return false;
     }
 
     public static class RunCombination {
@@ -68,14 +94,54 @@ public class ScriptGenerator {
     }
 
     public static Path generate(List<ClassConfig> classes, BenchmarkConfig config,
-                                boolean isJfr, boolean dryRun) throws IOException {
+                                boolean isJfr, boolean dryRun, boolean isInfo, String comment) throws IOException {
+
+        System.out.println("Starting Benchmark Matrix Generation...");
+        System.out.println("Loaded Configurations:");
+        System.out.printf("  JDKs:       %d%n", config.jdks.size());
+        System.out.printf("  GC Configs: %d%n", config.gcOpts.size());
+        System.out.printf("  VM Configs: %d%n", config.vmOpts.size());
+        System.out.printf("  Prog Opts:  %d%n", config.progOpts.size());
+        System.out.printf("  Tasksets:   %d%n", config.tasksets.size());
+        System.out.printf("  Datasets:   %d%n", config.datasets.size());
+        System.out.printf("  Run Matrix: %d explicit runs defined%n", config.runs.size());
+        System.out.printf("  Classes:    %d active (%d disabled)%n", 
+            classes.stream().filter(c -> !c.ignore).count(),
+            classes.stream().filter(c -> c.ignore).count());
+
+        System.out.println("\nEvaluating Run Matrix combinations...");
 
         List<RunCombination> validCombinations = new ArrayList<>();
 
-        for (ClassConfig cls : classes) {
-            if (cls.ignore) continue;
+        for (RunDefinition runDef : config.runs) {
+            System.out.printf("  Run: %s%n", runDef.name);
 
-            for (RunDefinition runDef : config.runs) {
+            List<String> matchJdks = getMatches(runDef.jdkFilter, config.jdks.keySet());
+            List<String> matchGcs = getMatches(runDef.gcFilter, config.gcOpts.keySet());
+            List<String> matchVms = getMatches(runDef.vmFilter, config.vmOpts.keySet());
+            List<String> matchTasksets = getMatches(runDef.tasksetFilter, config.tasksets.keySet());
+            List<String> matchProgs = getMatches(runDef.progFilter, config.progOpts.keySet());
+            List<String> matchDatasets = getMatches(runDef.dataFilter, config.datasets.keySet());
+
+            long matchingClasses = classes.stream()
+                .filter(c -> !c.ignore)
+                .filter(c -> matchesClass(c, runDef.classFilter))
+                .count();
+
+            System.out.printf("    Matches -> JDKs: %d, GCs: %d, VMs: %d, Tasksets: %d, Progs: %d, Datasets: %d, Classes: %d%n",
+                matchJdks.size(), matchGcs.size(), matchVms.size(),
+                matchTasksets.size(), matchProgs.size(), matchDatasets.size(), matchingClasses);
+
+            if (matchJdks.isEmpty()) System.out.printf("    ! Warning: JDK filter '%s' matched nothing.%n", runDef.jdkFilter);
+            if (matchGcs.isEmpty()) System.out.printf("    ! Warning: GC filter '%s' matched nothing.%n", runDef.gcFilter);
+            if (matchVms.isEmpty()) System.out.printf("    ! Warning: VM filter '%s' matched nothing.%n", runDef.vmFilter);
+            if (matchTasksets.isEmpty()) System.out.printf("    ! Warning: Taskset filter '%s' matched nothing.%n", runDef.tasksetFilter);
+            if (matchProgs.isEmpty()) System.out.printf("    ! Warning: Prog filter '%s' matched nothing.%n", runDef.progFilter);
+            if (matchDatasets.isEmpty()) System.out.printf("    ! Warning: Dataset filter '%s' matched nothing.%n", runDef.dataFilter);
+            if (matchingClasses == 0) System.out.printf("    ! Warning: Class filter '%s' matched nothing.%n", runDef.classFilter);
+
+            for (ClassConfig cls : classes) {
+                if (cls.ignore) continue;
                 if (!matchesClass(cls, runDef.classFilter)) continue;
 
                 boolean excludedRun = cls.exclusions.stream().anyMatch(e -> e.equals("RUN:" + runDef.name));
@@ -84,15 +150,8 @@ public class ScriptGenerator {
                 boolean hasRunInclusions = cls.inclusions.stream().anyMatch(e -> e.startsWith("RUN:"));
                 if (hasRunInclusions) {
                     boolean includedRun = cls.inclusions.stream().anyMatch(e -> e.equals("RUN:" + runDef.name));
-                    if (!includedRun) continue; 
+                    if (!includedRun) continue;
                 }
-
-                List<String> matchJdks = getMatches(runDef.jdkFilter, config.jdks.keySet());
-                List<String> matchGcs = getMatches(runDef.gcFilter, config.gcOpts.keySet());
-                List<String> matchVms = getMatches(runDef.vmFilter, config.vmOpts.keySet());
-                List<String> matchTasksets = getMatches(runDef.tasksetFilter, config.tasksets.keySet());
-                List<String> matchProgs = getMatches(runDef.progFilter, config.progOpts.keySet());
-                List<String> matchDatasets = getMatches(runDef.dataFilter, config.datasets.keySet());
 
                 for (String jdkL : matchJdks) {
                     JdkConfig jdkConfig = config.jdks.get(jdkL);
@@ -113,7 +172,7 @@ public class ScriptGenerator {
                                         boolean excludedDs = cls.exclusions.stream().anyMatch(e -> e.equals("DATA:" + dsL));
                                         if (excludedDs) continue;
 
-                                        validCombinations.add(new RunCombination(
+                                        RunCombination rc = new RunCombination(
                                                 cls, runDef.name,
                                                 jdkL, jdkConfig,
                                                 gcL, config.gcOpts.get(gcL),
@@ -121,7 +180,15 @@ public class ScriptGenerator {
                                                 tsL, config.tasksets.get(tsL),
                                                 progL, config.progOpts.get(progL),
                                                 dsL, config.datasets.get(dsL)
-                                        ));
+                                        );
+                                        validCombinations.add(rc);
+                                        
+                                        if (dryRun || isInfo) {
+                                            String taskPrefix = rc.taskset.isEmpty() ? "" : ("taskset " + rc.taskset + " ");
+                                            String jvmArgs = (rc.gcOpts + " " + rc.vmOpts).trim();
+                                            System.out.printf("      -> CMD: %sjava %s -cp target/classes %s %s %s%n",
+                                                    taskPrefix, jvmArgs, rc.classConfig.fqcn, rc.dataConfig.path, rc.progOpts);
+                                        }
                                     }
                                 }
                             }
@@ -140,10 +207,20 @@ public class ScriptGenerator {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         Path outPath = Paths.get("data", "benchmark-history", timestamp + "-run.sh");
         Files.createDirectories(outPath.getParent());
+        
+        if (!dryRun) {
+            String safeComment = comment == null ? "" : comment.replace("\"", "\\\"");
+            String metaJson = String.format("{\n  \"timestamp\": \"%s\",\n  \"totalRuns\": %d,\n  \"comment\": \"%s\"\n}", 
+                                           timestamp, validCombinations.size(), safeComment);
+            Files.writeString(Paths.get("data", "benchmark-history", timestamp + "-meta.json"), metaJson);
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append("#!/bin/bash\n\n");
         sb.append("echo \"Starting benchmark matrix run\"\n\n");
+        sb.append("TOTAL_RUNS=").append(validCombinations.size()).append("\n");
+        sb.append("CURRENT_RUN=0\n");
+        sb.append("START_TIME=$(date +%s)\n\n");
         
         sb.append("source $HOME/.sdkman/bin/sdkman-init.sh 2>/dev/null || true\n\n");
 
@@ -166,7 +243,7 @@ public class ScriptGenerator {
                 String sdkVersion = jdk.pathOrSdkman.substring("sdkman:".length());
                 sb.append("sdk install java ").append(sdkVersion).append("\n");
                 sb.append("sdk use java ").append(sdkVersion).append("\n");
-                sb.append("export JAVA_HOME=\"$SDKMAN_DIR/candidates/java/current\"\n");
+                sb.append("export JAVA_HOME=\"$SDKMAN_DIR/candidates/java/").append(sdkVersion).append("\"\n");
             } else {
                 sb.append("export JAVA_HOME=\"").append(jdk.pathOrSdkman).append("\"\n");
             }
@@ -174,7 +251,12 @@ public class ScriptGenerator {
 
             int releaseVersion = jdk.majorVersion > 0 ? jdk.majorVersion : 25; // fallback
             sb.append("echo \"Compiling for JDK release ").append(releaseVersion).append("\"\n");
-            sb.append("mvn clean compile -pl 1brc-implementations -Dmaven.compiler.release=").append(releaseVersion).append("\n\n");
+            
+            String mavenCmd = "mvn clean compile -pl 1brc-implementations -Dmaven.compiler.source=" + releaseVersion + " -Dmaven.compiler.target=" + releaseVersion;
+            if (releaseVersion == 21) {
+                mavenCmd += " -Pjdk21-preview";
+            }
+            sb.append(mavenCmd).append("\n\n");
 
             for (RunCombination combo : combos) {
                 String jvmOpts = (combo.gcOpts + " " + combo.vmOpts).trim();
@@ -192,7 +274,20 @@ public class ScriptGenerator {
                 sb.append("export TASKSET=\"").append(combo.taskset).append("\"\n");
                 sb.append("export PROG_OPTS=\"").append(combo.progOpts).append("\"\n");
 
-                sb.append("echo \"Running ").append(combo.classConfig.className).append(" (Run: ").append(combo.runName).append(")\"\n");
+                sb.append("CURRENT_RUN=$((CURRENT_RUN + 1))\n");
+                sb.append("ELAPSED=$(($(date +%s) - START_TIME))\n");
+                sb.append("if [ $CURRENT_RUN -gt 1 ]; then\n");
+                sb.append("    AVG_TIME=$((ELAPSED / (CURRENT_RUN - 1)))\n");
+                sb.append("    REMAINING_RUNS=$((TOTAL_RUNS - CURRENT_RUN + 1))\n");
+                sb.append("    ETA_SEC=$((AVG_TIME * REMAINING_RUNS))\n");
+                sb.append("    ETA_MIN=$((ETA_SEC / 60))\n");
+                sb.append("    ETA_S=$((ETA_SEC % 60))\n");
+                sb.append("    echo \"[${CURRENT_RUN}/${TOTAL_RUNS}] Running ").append(combo.classConfig.className)
+                  .append(" (Run: ").append(combo.runName).append(") - ETA: ${ETA_MIN}m ${ETA_S}s\"\n");
+                sb.append("else\n");
+                sb.append("    echo \"[${CURRENT_RUN}/${TOTAL_RUNS}] Running ").append(combo.classConfig.className)
+                  .append(" (Run: ").append(combo.runName).append(") - ETA: calculating...\"\n");
+                sb.append("fi\n");
                 sb.append("echo -n \"").append(combo.jdkLabel).append(",")
                   .append("\\\"").append(combo.gcOpts).append("\\\",")
                   .append("\\\"").append(combo.vmOpts).append("\\\",")

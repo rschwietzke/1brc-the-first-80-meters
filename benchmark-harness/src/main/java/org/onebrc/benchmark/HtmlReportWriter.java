@@ -37,7 +37,8 @@ public class HtmlReportWriter {
         for (String ds : datasets) {
             for (String cls : classes) {
                 for (String env : environments) {
-                    String[] parts = env.split(" \\| ");
+                    String[] parts = env.split(" \\| ", -1);
+                    if (parts.length < 5) continue; // Safety check
                     ResultMatrix.Key k = new ResultMatrix.Key(parts[0], parts[1], parts[2], parts[3], parts[4], ds, cls);
                     ResultMatrix.RowData rd = matrix.get(k);
                     if (rd != null) {
@@ -47,6 +48,10 @@ public class HtmlReportWriter {
             }
         }
         root.put("matrix", flatMatrix);
+
+        com.google.gson.Gson gson = new com.google.gson.Gson();
+        String jsonPayload = gson.toJson(flatMatrix);
+        root.put("jsonData", jsonPayload);
 
         Template template = cfg.getTemplate("report.html.ftl");
 

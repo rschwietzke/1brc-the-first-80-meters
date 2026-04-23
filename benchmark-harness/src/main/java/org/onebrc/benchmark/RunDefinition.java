@@ -10,23 +10,14 @@ public class RunDefinition {
     public final String dataFilter;
     public final String classFilter;
 
-    public RunDefinition(String name, String valueString) {
+    public RunDefinition(String name, java.util.Map<String, String> properties) {
         this.name = name;
-        String[] parts = valueString.split(";");
-        
-        this.jdkFilter = getPart(parts, 0);
-        this.gcFilter = getPart(parts, 1);
-        this.vmFilter = getPart(parts, 2);
-        this.tasksetFilter = getPart(parts, 3);
-        this.progFilter = getPart(parts, 4);
-        this.dataFilter = getPart(parts, 5);
-        this.classFilter = getPart(parts, 6);
-    }
-
-    private String getPart(String[] parts, int index) {
-        if (index < parts.length) {
-            return parts[index].trim();
-        }
-        return "*";
+        this.jdkFilter = properties.getOrDefault("JDK_FILTER", "*");
+        this.gcFilter = properties.getOrDefault("GC_FILTER", "*");
+        this.vmFilter = properties.getOrDefault("VM_FILTER", "*");
+        this.tasksetFilter = properties.getOrDefault("TASKSET_FILTER", "*");
+        this.progFilter = properties.getOrDefault("PROG_FILTER", "*");
+        this.dataFilter = properties.getOrDefault("DATA_FILTER", "*");
+        this.classFilter = properties.getOrDefault("CLASS_FILTER", "*");
     }
 }
