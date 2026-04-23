@@ -19,7 +19,7 @@ public class OverviewWriter {
     public static void write() throws IOException {
         Path outPath = Paths.get("data", "benchmark-history", "index.html");
 
-        List<HistoryAggregator.RunSummary> summaries = HistoryAggregator.aggregate();
+        HistoryAggregator.AggregateResult result = HistoryAggregator.aggregate();
 
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_32);
         cfg.setClassForTemplateLoading(OverviewWriter.class, "/templates");
@@ -27,11 +27,11 @@ public class OverviewWriter {
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
         Map<String, Object> root = new HashMap<>();
-        root.put("summaries", summaries);
+        root.put("summaries", result.summaries);
         root.put("generatedAt", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
         // To feed ECharts, we want chronological order (oldest to newest)
-        List<HistoryAggregator.RunSummary> chronological = new java.util.ArrayList<>(summaries);
+        List<HistoryAggregator.RunSummary> chronological = new java.util.ArrayList<>(result.summaries);
         java.util.Collections.reverse(chronological);
         root.put("chronological", chronological);
 
@@ -43,5 +43,8 @@ public class OverviewWriter {
         } catch (Exception e) {
             throw new IOException("Failed to process Freemarker template", e);
         }
+
+        // Generate the static site for permutations
+        PermutationWriter.write(result);
     }
 }

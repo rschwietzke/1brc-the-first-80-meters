@@ -17,7 +17,10 @@ tr:hover { background-color: #f5f5f5; }
 </style>
 </head>
 <body>
-<h1>1BRC Historical Overview Dashboard</h1>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1>1BRC Historical Overview Dashboard</h1>
+    <a href="permutations/index.html" class="btn" style="background: #28a745; font-weight: bold;">Browse Test Permutations &rarr;</a>
+</div>
 <p>Generated: ${generatedAt}</p>
 
 <div class="card">
@@ -32,21 +35,27 @@ tr:hover { background-color: #f5f5f5; }
             <tr>
                 <th>Timestamp</th>
                 <th>Comment / Objective</th>
+                <th>Machine</th>
                 <th>Matrix Size</th>
                 <th>Champion Class</th>
                 <th>Median Runtime</th>
-                <th>Action</th>
             </tr>
         </thead>
         <tbody>
             <#list summaries as run>
             <tr>
-                <td><strong>${run.timestamp}</strong></td>
+                <td><strong><a href="${run.timestamp}.html">${run.timestamp}</a></strong></td>
                 <td class="comment"><#if run.comment?has_content>${run.comment}<#else>-</#if></td>
+                <td>
+                    <#if run.sysInfo?has_content>
+                        <small>${run.sysInfo['CPU']!'Unknown CPU'}<br>${run.sysInfo['Memory']!'Unknown'} RAM</small>
+                    <#else>
+                        -
+                    </#if>
+                </td>
                 <td>${run.totalCombinations} runs</td>
                 <td>${run.fastestClass}</td>
                 <td class="fast"><#if (run.fastestMedianMs > 0)>${run.fastestMedianMs} ms<#else>-</#if></td>
-                <td><a href="${run.timestamp}.html" class="btn">View Details</a></td>
             </tr>
             </#list>
             <#if summaries?size == 0>

@@ -1,4 +1,3 @@
-// JVM_OPTS: $HIGH_MEM
 /*
  *  Copyright 2023 The original authors
  *

@@ -45,6 +45,7 @@ public class ResultMatrix {
 
     public static class RowData {
         public final long medianRuntimeMs;
+        public final String checksum;
         public final long instructions;
         public final long cycles;
         public final long branches;
@@ -54,8 +55,9 @@ public class ResultMatrix {
         public final long allocatedBytes;
         public final long jitCompilationMs;
 
-        public RowData(long medianRuntimeMs, long instructions, long cycles, long branches, long branchMisses, double ipc, long gcPauseMs, long allocatedBytes, long jitCompilationMs) {
+        public RowData(long medianRuntimeMs, String checksum, long instructions, long cycles, long branches, long branchMisses, double ipc, long gcPauseMs, long allocatedBytes, long jitCompilationMs) {
             this.medianRuntimeMs = medianRuntimeMs;
+            this.checksum = checksum;
             this.instructions = instructions;
             this.cycles = cycles;
             this.branches = branches;
@@ -67,6 +69,7 @@ public class ResultMatrix {
         }
 
         public long getMedianRuntimeMs() { return medianRuntimeMs; }
+        public String getChecksum() { return checksum; }
         public long getInstructions() { return instructions; }
         public long getCycles() { return cycles; }
         public long getBranches() { return branches; }
@@ -110,6 +113,7 @@ public class ResultMatrix {
                 String cls = getVal(parts, colMap, "Class");
 
                 long median = parseLong(getVal(parts, colMap, "MedianRuntimeMs"));
+                String checksum = getVal(parts, colMap, "Checksum");
                 long inst = parseLong(getVal(parts, colMap, "Instructions"));
                 long cycl = parseLong(getVal(parts, colMap, "Cycles"));
                 long br = parseLong(getVal(parts, colMap, "Branches"));
@@ -119,7 +123,7 @@ public class ResultMatrix {
                 long alloc = parseLong(getVal(parts, colMap, "AllocatedBytes"));
                 long jit = parseLong(getVal(parts, colMap, "JitCompilationMs"));
 
-                matrix.put(new Key(jdk, gcOpts, vmOpts, progOpts, taskset, data, cls), new RowData(median, inst, cycl, br, brMiss, ipc, gc, alloc, jit));
+                matrix.put(new Key(jdk, gcOpts, vmOpts, progOpts, taskset, data, cls), new RowData(median, checksum, inst, cycl, br, brMiss, ipc, gc, alloc, jit));
             } catch (Exception e) {
                 System.err.println("Warning: skipping invalid row " + i + ": " + e.getMessage());
             }

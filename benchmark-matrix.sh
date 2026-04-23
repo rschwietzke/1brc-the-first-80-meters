@@ -7,7 +7,7 @@ if [ -z "$COMMAND" ]; then
     echo "Commands:"
     echo "  run                   Generate and execute the benchmark matrix"
     echo "  dry-run               Generate the script without executing it"
-    echo "  analyze <timestamp>   Regenerate HTML/MD reports for a specific run"
+    echo "  analyze [timestamp]   Regenerate HTML/MD reports for all runs, or a specific run"
     echo "  compare <t1> <t2>     Compare two benchmark runs (To be implemented)"
     exit 1
 fi

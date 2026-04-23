@@ -13,11 +13,29 @@ th { background-color: #f2f2f2; }
 .badge { font-size: 0.8em; padding: 2px 6px; border-radius: 10px; margin-left: 8px; }
 .badge-baseline { background: #ffd700; color: #000; }
 .badge-incomplete { background: #ffcccc; color: #900; }
+.rotate-th {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    padding: 10px 5px;
+    max-height: 150px;
+    text-align: left;
+}
 </style>
 </head>
 <body>
 <h1>1BRC Benchmark Report</h1>
 <p><strong>Run Timestamp:</strong> ${timestamp}</p>
+<#if sysInfo?has_content>
+<div class="card" style="margin-bottom: 20px; background: #f0f8ff;">
+    <h3 style="margin-top: 0;">Machine Hardware Profile</h3>
+    <ul style="list-style-type: none; padding: 0; margin: 0; display: flex; gap: 20px; flex-wrap: wrap;">
+        <#list sysInfo?keys as k>
+        <li><strong>${k}:</strong> ${sysInfo[k]}</li>
+        </#list>
+    </ul>
+</div>
+</#if>
 
 <div id="matrix-view">
     <div class="dashboard">
@@ -26,29 +44,33 @@ th { background-color: #f2f2f2; }
 
     <#list datasets as ds>
     <h2>Dataset: ${ds}</h2>
-    <table>
-    <tr><th>Class</th>
-    <#list environments as env>
-    <th>${env}</th>
-    </#list>
-    </tr>
+    <div style="overflow-x: auto;">
+        <table>
+        <tr>
+            <th>Environment (JDK | GC | VM Options | Taskset)</th>
+            <#list classes as cls>
+            <th class="rotate-th">${cls}</th>
+            </#list>
+        </tr>
 
-    <#list classes as cls>
-    <tr><td>${cls}</td>
-    <#list environments as env>
-    <#assign k = env + " | " + ds + " | " + cls>
-    <#assign rd = matrix[k]!>
-    <#if rd?has_content>
-    <td style="cursor: pointer; background-color: #f8fbf8;" onclick="showDetails('${k?js_string}')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
-        ${rd.medianRuntimeMs} ms<#if (rd.gcPauseMs > 0)><br><small>GC: ${rd.gcPauseMs}ms</small></#if>
-    </td>
-    <#else>
-    <td>-</td>
-    </#if>
-    </#list>
-    </tr>
-    </#list>
-    </table>
+        <#list environments as env>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">${env}</td>
+            <#list classes as cls>
+            <#assign k = env + " | " + ds + " | " + cls>
+            <#assign rd = matrix[k]!>
+            <#if rd?has_content>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('${k?js_string}')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                ${rd.medianRuntimeMs} ms<#if (rd.gcPauseMs > 0)><br><small style="color: #666;">GC: ${rd.gcPauseMs}ms</small></#if>
+            </td>
+            <#else>
+            <td style="text-align: center; color: #aaa;">-</td>
+            </#if>
+            </#list>
+        </tr>
+        </#list>
+        </table>
+    </div>
 
     <div id="chart-${ds?index}" style="width: 100%; height: 400px; margin-bottom: 50px;"></div>
     <script>
@@ -88,6 +110,8 @@ th { background-color: #f2f2f2; }
 
 <script>
 const benchmarkData = ${jsonData!'{}'};
+const classStatuses = ${classStatusesJson!'{}'};
+const baselineChecksums = ${baselineChecksumsJson!'{}'};
 
 function showDetails(key) {
     const data = benchmarkData[key];
@@ -101,10 +125,46 @@ function showDetails(key) {
     
     document.getElementById('detail-title').innerText = 'Metrics: ' + key;
 
+    const parts = key.split(" | ");
+    const envDs = parts.slice(0, 6).join(" | ");
+    const cls = parts[6];
+    const status = classStatuses[cls] || "complete";
+    const baselineChecksum = baselineChecksums[envDs];
+
+<#noparse>
+    let checksumHtml = `<code style="background:#eee;padding:2px 4px;border-radius:3px;">${data.checksum}</code>`;
+    
+    if (status === "baseline") {
+        checksumHtml += ' <span style="color:#0056b3; font-weight:bold;">[Ground Truth]</span>';
+    } else if (status === "incomplete") {
+        checksumHtml += ' <span style="color:#6c757d; font-weight:bold;">[Skip: Known Incorrect]</span>';
+    } else if (status === "complete") {
+        if (baselineChecksum) {
+            if (data.checksum === baselineChecksum) {
+                checksumHtml += ' <span style="color:#28a745; font-weight:bold;">[Pass]</span>';
+            } else {
+                checksumHtml += ' <span style="color:#dc3545; font-weight:bold;">[Fail]</span>';
+            }
+        } else {
+             checksumHtml += ' <span style="color:#fd7e14; font-weight:bold;">[No Baseline to compare]</span>';
+        }
+    }
+</#noparse>
+
     const tbody = document.getElementById('detail-body');
 <#noparse>
+    // Java String.hashCode() equivalent
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) {
+        hash = ((hash << 5) - hash) + key.charCodeAt(i);
+        hash |= 0;
+    }
+    if (hash < 0) hash = 0xFFFFFFFF + hash + 1;
+    const hashHex = hash.toString(16);
+
     tbody.innerHTML = `
         <tr><th>Median Runtime</th><td><strong>${data.medianRuntimeMs} ms</strong></td></tr>
+        <tr><th>Checksum</th><td>${checksumHtml}</td></tr>
         <tr><th>Instructions Executed</th><td>${data.instructions.toLocaleString()}</td></tr>
         <tr><th>CPU Cycles</th><td>${data.cycles.toLocaleString()}</td></tr>
         <tr><th>Branches</th><td>${data.branches.toLocaleString()}</td></tr>
@@ -113,6 +173,9 @@ function showDetails(key) {
         <tr><th>GC Pause Time</th><td>${data.gcPauseMs} ms</td></tr>
         <tr><th>Allocated Bytes</th><td>${data.allocatedBytes.toLocaleString()} bytes</td></tr>
         <tr><th>JIT Compilation Time</th><td>${data.jitCompilationMs} ms</td></tr>
+        <tr><td colspan="2" style="text-align: center; padding-top: 20px;">
+            <a href="permutations/history-${hashHex}.html" class="btn" style="background: #28a745;">&#128200; View Historical Trend for this Test</a>
+        </td></tr>
     `;
 </#noparse>
     window.scrollTo(0, 0);

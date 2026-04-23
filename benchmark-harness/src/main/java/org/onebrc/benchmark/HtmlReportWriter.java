@@ -25,6 +25,23 @@ public class HtmlReportWriter {
         Map<String, Object> root = new HashMap<>();
         root.put("timestamp", timestamp);
 
+        java.util.Map<String, String> sysInfo = new java.util.LinkedHashMap<>();
+        Path sysInfoFile = Paths.get("data", "benchmark-history", timestamp + "-sysinfo.txt");
+        if (java.nio.file.Files.exists(sysInfoFile)) {
+            try {
+                java.util.List<String> lines = java.nio.file.Files.readAllLines(sysInfoFile);
+                for (String line : lines) {
+                    int idx = line.indexOf(":");
+                    if (idx > 0) {
+                        sysInfo.put(line.substring(0, idx).trim(), line.substring(idx + 1).trim());
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to parse sysinfo.txt: " + sysInfoFile);
+            }
+        }
+        root.put("sysInfo", sysInfo);
+
         Set<String> datasets = matrix.getDatasets();
         Set<String> classes = matrix.getClasses();
         Set<String> environments = matrix.getEnvironments();
@@ -49,9 +66,42 @@ public class HtmlReportWriter {
         }
         root.put("matrix", flatMatrix);
 
+        Path srcDir = Paths.get("1brc-implementations", "src", "main", "java");
+        java.util.List<ClassConfig> classConfigs = SourceAnnotationParser.parseDirectory(srcDir);
+        Map<String, String> classStatuses = new HashMap<>();
+        for (ClassConfig cc : classConfigs) {
+            classStatuses.put(cc.className, cc.status);
+        }
+        root.put("classStatuses", classStatuses);
+
+        Map<String, String> baselineChecksums = new HashMap<>();
+        for (String ds : datasets) {
+            for (String env : environments) {
+                String baselineClass = null;
+                for (String cls : classes) {
+                    if ("baseline".equals(classStatuses.get(cls))) {
+                        baselineClass = cls;
+                        break;
+                    }
+                }
+                if (baselineClass != null) {
+                    String[] parts = env.split(" \\| ", -1);
+                    if (parts.length >= 5) {
+                        ResultMatrix.Key k = new ResultMatrix.Key(parts[0], parts[1], parts[2], parts[3], parts[4], ds, baselineClass);
+                        ResultMatrix.RowData rd = matrix.get(k);
+                        if (rd != null && rd.checksum != null && !rd.checksum.equals("ERROR")) {
+                            baselineChecksums.put(env + " | " + ds, rd.checksum);
+                        }
+                    }
+                }
+            }
+        }
+
         com.google.gson.Gson gson = new com.google.gson.Gson();
         String jsonPayload = gson.toJson(flatMatrix);
         root.put("jsonData", jsonPayload);
+        root.put("classStatusesJson", gson.toJson(classStatuses));
+        root.put("baselineChecksumsJson", gson.toJson(baselineChecksums));
 
         Template template = cfg.getTemplate("report.html.ftl");
 

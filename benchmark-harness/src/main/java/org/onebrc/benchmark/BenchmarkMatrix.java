@@ -70,10 +70,31 @@ public class BenchmarkMatrix {
 
     private static void analyze(List<String> args) throws IOException {
         if (args.isEmpty()) {
-            System.err.println("Error: analyze requires a timestamp argument.");
-            System.exit(1);
+            System.out.println("No timestamp provided. Scanning history and regenerating all reports...");
+            Path historyDir = Paths.get("data", "benchmark-history");
+            if (java.nio.file.Files.exists(historyDir)) {
+                try (java.util.stream.Stream<Path> paths = java.nio.file.Files.list(historyDir)) {
+                    paths.filter(p -> p.toString().endsWith(".csv") && !p.getFileName().toString().contains("-meta"))
+                         .forEach(p -> {
+                             String ts = p.getFileName().toString().replace(".csv", "");
+                             try {
+                                 processSingleRun(ts);
+                             } catch (IOException e) {
+                                 System.err.println("Failed to process run " + ts + ": " + e.getMessage());
+                             }
+                         });
+                }
+            }
+        } else {
+            String timestamp = args.get(0);
+            processSingleRun(timestamp);
         }
-        String timestamp = args.get(0);
+        
+        System.out.println("Generating Global Overview Dashboards...");
+        OverviewWriter.write();
+    }
+
+    private static void processSingleRun(String timestamp) throws IOException {
         CsvMerger.merge(timestamp);
         
         ResultMatrix matrix = new ResultMatrix();
@@ -81,7 +102,6 @@ public class BenchmarkMatrix {
         
         HtmlReportWriter.write(timestamp, matrix);
         MarkdownReportWriter.write(timestamp, matrix);
-        OverviewWriter.write();
     }
 
     private static void listRuns(List<String> args) {

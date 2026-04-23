@@ -224,6 +224,17 @@ public class ScriptGenerator {
         
         sb.append("source $HOME/.sdkman/bin/sdkman-init.sh 2>/dev/null || true\n\n");
 
+        sb.append("echo \"Capturing system information...\"\n");
+        sb.append("SYSINFO_FILE=\"data/benchmark-history/").append(timestamp).append("-sysinfo.txt\"\n");
+        sb.append("echo \"Kernel: $(uname -r)\" > $SYSINFO_FILE\n");
+        sb.append("if [ -f /etc/os-release ]; then\n");
+        sb.append("    . /etc/os-release\n");
+        sb.append("    echo \"OS: $PRETTY_NAME\" >> $SYSINFO_FILE\n");
+        sb.append("fi\n");
+        sb.append("echo \"CPU: $(lscpu | grep 'Model name' | awk -F ':' '{print $2}' | xargs)\" >> $SYSINFO_FILE\n");
+        sb.append("echo \"CPU Cores: $(nproc)\" >> $SYSINFO_FILE\n");
+        sb.append("echo \"Memory: $(free -h | awk '/^Mem:/ {print $2}')\" >> $SYSINFO_FILE\n\n");
+
         sb.append("echo \"JDK,GC_OPTS,VM_OPTS,PROG_OPTS,TASKSET,DATA,RunTimestamp,Class,MedianRuntimeMs,Checksum,Instructions,Cycles,Branches,BranchMisses,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys\" > data/benchmark-history/").append(timestamp).append(".csv\n\n");
 
         Map<JdkConfig, List<RunCombination>> groupedByJdk = new LinkedHashMap<>();
