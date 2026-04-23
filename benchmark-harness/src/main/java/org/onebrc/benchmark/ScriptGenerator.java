@@ -26,12 +26,20 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
+ * Generates the execution scripts based on the active permutation matrix.
+ * It uses FreeMarker to dynamically build the bash scripts.
  * @author Antigravity
  */
 public class ScriptGenerator {
@@ -180,6 +188,9 @@ public class ScriptGenerator {
         public String getJfrFile() { return jfrFile; }
     }
 
+    /**
+     * Evaluates all permutations and generates the execution bash script.
+     */
     public static Path generate(List<ClassConfig> classes, BenchmarkConfig config,
                                 boolean isJfr, boolean dryRun, boolean isInfo, String comment) throws IOException {
 

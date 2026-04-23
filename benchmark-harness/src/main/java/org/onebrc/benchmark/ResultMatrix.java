@@ -22,9 +22,16 @@ package org.onebrc.benchmark;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
+ * Parses the resulting CSV data to populate a multidimensional performance matrix.
  * @author Antigravity
  */
 public class ResultMatrix {
@@ -125,6 +132,9 @@ public class ResultMatrix {
 
     private final Map<Key, RowData> matrix = new HashMap<>();
 
+    /**
+     * Loads and parses the benchmark execution CSV file.
+     */
     public void loadCsv(Path csvFile) throws IOException {
         if (!Files.exists(csvFile)) return;
         List<String> lines = Files.readAllLines(csvFile);

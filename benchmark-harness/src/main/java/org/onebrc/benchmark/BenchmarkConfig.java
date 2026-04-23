@@ -22,9 +22,14 @@ package org.onebrc.benchmark;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
+ * Represents the parsed benchmark configuration defining the execution matrix (JDKs, GCs, Bindings, etc.).
  * @author Antigravity
  */
 public class BenchmarkConfig {
@@ -38,6 +43,9 @@ public class BenchmarkConfig {
     public final Map<String, String> variables = new LinkedHashMap<>();
     public final List<RunDefinition> runs = new ArrayList<>();
 
+    /**
+     * Parses the benchmark.conf file into a structured configuration.
+     */
     public static BenchmarkConfig load(Path configFile) throws IOException {
         BenchmarkConfig config = new BenchmarkConfig();
         if (!Files.exists(configFile)) return config;
