@@ -89,7 +89,7 @@ Once your `.conf` files are set up, you must provide an explicit command to star
 ### Available Commands:
 *   `run`: Generates the execution script and immediately executes the full matrix.
 *   `dry-run`: Generates the dry-run console output to test your matrix filters, but stops before writing or executing anything.
-*   `analyze <timestamp>`: Regenerates the HTML and Markdown reports for a specific run without re-executing any benchmarks.
+*   `analyze [timestamp]`: Regenerates the HTML and Markdown reports. If no timestamp is provided, it scans the entire history folder and automatically regenerates all historical reports and global dashboards.
 *   `compare <t1> <t2>`: Compares two distinct benchmark runs (To be implemented).
 
 ### Additional Arguments
