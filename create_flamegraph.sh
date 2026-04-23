@@ -14,6 +14,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-CP=target/classes/
+CP=1brc-implementations/target/classes/
 
 java -agentpath:libasyncProfiler.so=start,event=cpu,flamegraph,file=$1-cpu.html -cp $CP org.rschwietzke.devoxxpl24.$1 $2 $3 $4

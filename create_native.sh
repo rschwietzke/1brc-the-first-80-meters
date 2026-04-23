@@ -14,7 +14,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-CLASSPATH=target/classes
+CLASSPATH=1brc-implementations/target/classes
 LOWER=org.rschwietzke.devoxxpl24.$(echo $1 | tr '[:upper:]' '[:lower:]')
 CLASS=org.rschwietzke.devoxxpl24.$1
 

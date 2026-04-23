@@ -75,7 +75,7 @@ shift
 DEFAULT="$@"
 
 # Default configuration
-CLASSPATH="target/classes"
+CLASSPATH="1brc-implementations/target/classes"
 
 # JVM parameters defined as requested (easy to adjust, same for all)
 JVM_OPTS=""

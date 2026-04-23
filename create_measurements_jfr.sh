@@ -17,4 +17,4 @@
 java \
     -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints  \
     -XX:StartFlightRecording=filename=profile.jfr,name=infinite,dumponexit=true,settings=profile \
-    -cp target/classes dev.morling.onebrc.CreateOriginalMeasurementsJFR $1 $2
+    -cp 1brc-implementations/target/classes dev.morling.onebrc.CreateOriginalMeasurementsJFR $1 $2

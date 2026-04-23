@@ -14,7 +14,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-CLASSPATH=target/classes/
+CLASSPATH=1brc-implementations/target/classes/
 echo "File: $1"
 echo "Warmups: $2"
 echo "Measurements: $3"

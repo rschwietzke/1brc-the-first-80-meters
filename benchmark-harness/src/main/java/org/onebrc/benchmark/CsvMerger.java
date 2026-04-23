@@ -1,0 +1,73 @@
+package org.onebrc.benchmark;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CsvMerger {
+
+    public static void merge(String timestamp) throws IOException {
+        Path csvFile = Paths.get("data", "benchmark-history", timestamp + ".csv");
+        if (!Files.exists(csvFile)) {
+            System.err.println("Error: CSV file not found: " + csvFile);
+            return;
+        }
+
+        List<String> lines = Files.readAllLines(csvFile);
+        if (lines.isEmpty()) return;
+
+        String header = lines.get(0);
+        if (!header.startsWith("JDK,GC_OPTS,VM_OPTS,PROG_OPTS,TASKSET,DATA,RunTimestamp,Class")) {
+            System.err.println("Warning: CSV header mismatch. Expected standard schema.");
+            return;
+        }
+
+        boolean hasJfr = Files.exists(Paths.get("data", "benchmark-jfr"));
+        if (hasJfr) {
+            header += ",GcPauseMs,AllocatedBytes,JitCompilationMs";
+        }
+
+        List<String> newLines = new ArrayList<>();
+        newLines.add(header);
+
+        for (int i = 1; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (line.trim().isEmpty()) continue;
+
+            if (hasJfr) {
+                // Parse line to find dimensions
+                String[] parts = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                if (parts.length >= 8) {
+                    String jdk = parts[0].replace("\"", "");
+                    String gcOpts = parts[1].replace("\"", "");
+                    String vmOpts = parts[2].replace("\"", "");
+                    String taskset = parts[4].replace("\"", "");
+                    String data = parts[5].replace("\"", "");
+                    String ts = parts[6].replace("\"", "");
+                    String cls = parts[7].replace("\"", "");
+
+                    // The fqcn is in Class, but ScriptGenerator used className for the JFR filename
+                    // So we extract the simple class name
+                    String simpleClass = cls;
+                    if (cls.contains(".")) {
+                        simpleClass = cls.substring(cls.lastIndexOf('.') + 1);
+                    }
+
+                    String sanitizedEnv = (gcOpts + "_" + vmOpts + "_" + taskset).replaceAll("[^a-zA-Z0-9.-]", "_");
+                    Path jfrFile = Paths.get("data", "benchmark-jfr", ts + "-" + simpleClass + "-" + jdk + "-" + sanitizedEnv + "-" + data + ".jfr");
+                    JfrConsumer.JfrMetrics metrics = JfrConsumer.consume(jfrFile);
+
+                    line += "," + metrics.totalGcPauseMs + "," + metrics.totalAllocatedBytes + "," + metrics.totalJitCompilationMs;
+                }
+            }
+            newLines.add(line);
+        }
+
+        // Overwrite the CSV with the merged JFR data
+        Files.write(csvFile, newLines);
+        System.out.println("Merged JFR data into " + csvFile);
+    }
+}

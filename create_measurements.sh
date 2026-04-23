@@ -14,4 +14,4 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 # 
-java -cp target/classes dev.morling.onebrc.CreateOriginalMeasurements $1 $2
+java -cp 1brc-implementations/target/classes dev.morling.onebrc.CreateOriginalMeasurements $1 $2
