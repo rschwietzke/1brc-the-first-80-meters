@@ -1,3 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.onebrc.benchmark;
 
 import java.io.IOException;
@@ -12,6 +31,9 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+/**
+ * @author Antigravity
+ */
 public class ScriptGenerator {
 
     private static List<String> getMatches(String filter, Set<String> available) {
@@ -91,6 +113,71 @@ public class ScriptGenerator {
             this.dataLabel = dataLabel;
             this.dataConfig = dataConfig;
         }
+    }
+
+    public static class JdkBlock {
+        public final JdkConfig jdk;
+        public final String sdkVersion;
+        public final int releaseVersion;
+        public final String mavenCmd;
+        public final List<ComboView> combos;
+
+        public JdkBlock(JdkConfig jdk, String sdkVersion, int releaseVersion, String mavenCmd, List<ComboView> combos) {
+            this.jdk = jdk;
+            this.sdkVersion = sdkVersion;
+            this.releaseVersion = releaseVersion;
+            this.mavenCmd = mavenCmd;
+            this.combos = combos;
+        }
+
+        public JdkConfig getJdk() { return jdk; }
+        public String getSdkVersion() { return sdkVersion; }
+        public int getReleaseVersion() { return releaseVersion; }
+        public String getMavenCmd() { return mavenCmd; }
+        public List<ComboView> getCombos() { return combos; }
+    }
+
+    public static class ComboView {
+        public final String runName;
+        public final String jdkLabel;
+        public final String gcOpts;
+        public final String vmOpts;
+        public final String binding;
+        public final String progOpts;
+        public final String dataLabel;
+        public final String className;
+        public final String simpleClassName;
+        public final String data;
+        public final String jvmOpts;
+        public final String jfrFile;
+
+        public ComboView(RunCombination rc, String jfrFile) {
+            this.runName = rc.runName;
+            this.jdkLabel = rc.jdkLabel;
+            this.gcOpts = rc.gcOpts;
+            this.vmOpts = rc.vmOpts;
+            this.binding = rc.binding;
+            this.progOpts = rc.progOpts;
+            this.dataLabel = rc.dataLabel;
+            this.className = rc.classConfig.fqcn;
+            this.simpleClassName = rc.classConfig.className;
+            this.data = rc.dataConfig.path;
+            this.jvmOpts = (rc.gcOpts + " " + rc.vmOpts).trim();
+            this.jfrFile = jfrFile;
+        }
+
+        public String getRunName() { return runName; }
+        public String getJdkLabel() { return jdkLabel; }
+        public String getGcOpts() { return gcOpts; }
+        public String getVmOpts() { return vmOpts; }
+        public String getBinding() { return binding; }
+        public String getProgOpts() { return progOpts; }
+        public String getDataLabel() { return dataLabel; }
+        public String getClassName() { return className; }
+        public String getSimpleClassName() { return simpleClassName; }
+        public String getData() { return data; }
+        public String getJvmOpts() { return jvmOpts; }
+        public String getJfrFile() { return jfrFile; }
     }
 
     public static Path generate(List<ClassConfig> classes, BenchmarkConfig config,
@@ -215,109 +302,60 @@ public class ScriptGenerator {
             Files.writeString(Paths.get("data", "benchmark-history", timestamp + "-meta.json"), metaJson);
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("#!/bin/bash\n\n");
-        sb.append("echo \"Starting benchmark matrix run\"\n\n");
-        sb.append("TOTAL_RUNS=").append(validCombinations.size()).append("\n");
-        sb.append("CURRENT_RUN=0\n");
-        sb.append("START_TIME=$(date +%s)\n\n");
-        
-        String iterations = config.variables.getOrDefault("ITERATIONS", "3");
-        sb.append("export ITERATIONS=").append(iterations).append("\n\n");
-
-        sb.append("source $HOME/.sdkman/bin/sdkman-init.sh 2>/dev/null || true\n\n");
-
-        sb.append("echo \"Capturing system information...\"\n");
-        sb.append("SYSINFO_FILE=\"data/benchmark-history/").append(timestamp).append("-sysinfo.txt\"\n");
-        sb.append("echo \"Kernel: $(uname -r)\" > $SYSINFO_FILE\n");
-        sb.append("if [ -f /etc/os-release ]; then\n");
-        sb.append("    . /etc/os-release\n");
-        sb.append("    echo \"OS: $PRETTY_NAME\" >> $SYSINFO_FILE\n");
-        sb.append("fi\n");
-        sb.append("echo \"CPU: $(lscpu | grep 'Model name' | awk -F ':' '{print $2}' | xargs)\" >> $SYSINFO_FILE\n");
-        sb.append("echo \"CPU Cores: $(nproc)\" >> $SYSINFO_FILE\n");
-        sb.append("echo \"Memory: $(free -h | awk '/^Mem:/ {print $2}')\" >> $SYSINFO_FILE\n\n");
-
-        sb.append("echo \"JDK,GC_OPTS,VM_OPTS,PROG_OPTS,BINDING,DATA,RunTimestamp,Class,MedianRuntimeMs,Checksum,PerfRuntimeMs,JfrRuntimeMs,Instructions,Cycles,Branches,BranchMisses,L1Misses,LLCMisses,PageFaults,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys\" > data/benchmark-history/").append(timestamp).append(".csv\n\n");
-
         Map<JdkConfig, List<RunCombination>> groupedByJdk = new LinkedHashMap<>();
         for (RunCombination rc : validCombinations) {
             groupedByJdk.computeIfAbsent(rc.jdkConfig, k -> new ArrayList<>()).add(rc);
         }
 
+        List<JdkBlock> jdkBlocks = new ArrayList<>();
         for (Map.Entry<JdkConfig, List<RunCombination>> entry : groupedByJdk.entrySet()) {
             JdkConfig jdk = entry.getKey();
             List<RunCombination> combos = entry.getValue();
 
-            sb.append("echo \"==================================================\"\n");
-            sb.append("echo \"JDK Block: ").append(jdk.label).append("\"\n");
-            sb.append("echo \"==================================================\"\n");
-
+            String sdkVersion = "";
             if (jdk.isSdkman) {
-                String sdkVersion = jdk.pathOrSdkman.substring("sdkman:".length());
-                sb.append("sdk install java ").append(sdkVersion).append("\n");
-                sb.append("sdk use java ").append(sdkVersion).append("\n");
-                sb.append("export JAVA_HOME=\"$SDKMAN_DIR/candidates/java/").append(sdkVersion).append("\"\n");
-            } else {
-                sb.append("export JAVA_HOME=\"").append(jdk.pathOrSdkman).append("\"\n");
+                sdkVersion = jdk.pathOrSdkman.substring("sdkman:".length());
             }
-            sb.append("export PATH=\"$JAVA_HOME/bin:$PATH\"\n\n");
 
-            int releaseVersion = jdk.majorVersion > 0 ? jdk.majorVersion : 25; // fallback
-            sb.append("echo \"Compiling for JDK release ").append(releaseVersion).append("\"\n");
-            
+            int releaseVersion = jdk.majorVersion > 0 ? jdk.majorVersion : 25;
             String mavenCmd = "mvn clean compile -pl 1brc-implementations -Dmaven.compiler.source=" + releaseVersion + " -Dmaven.compiler.target=" + releaseVersion;
             if (releaseVersion == 21) {
                 mavenCmd += " -Pjdk21-preview";
             }
-            sb.append(mavenCmd).append("\n\n");
 
+            List<ComboView> comboViews = new ArrayList<>();
             for (RunCombination combo : combos) {
-                String jvmOpts = (combo.gcOpts + " " + combo.vmOpts).trim();
-                
                 Path jfrDir = Paths.get("data", "benchmark-jfr");
                 Files.createDirectories(jfrDir);
                 String sanitizedEnv = (combo.gcOpts + "_" + combo.vmOpts + "_" + combo.binding).replaceAll("[^a-zA-Z0-9.-]", "_");
                 String jfrFile = jfrDir.resolve(timestamp + "-" + combo.classConfig.className + "-" + combo.jdkLabel + "-" + sanitizedEnv + "-" + combo.dataLabel + ".jfr").toString();
-
-                sb.append("export CLASS=\"").append(combo.classConfig.fqcn).append("\"\n");
-                sb.append("export DATA=\"").append(combo.dataConfig.path).append("\"\n");
-                sb.append("export JVM_OPTS=\"").append(jvmOpts).append("\"\n");
-                sb.append("export BINDING=\"").append(combo.binding).append("\"\n");
-                sb.append("export PROG_OPTS=\"").append(combo.progOpts).append("\"\n");
-                sb.append("export JFR_FILE=\"").append(jfrFile).append("\"\n");
-
-                sb.append("CURRENT_RUN=$((CURRENT_RUN + 1))\n");
-                sb.append("ELAPSED=$(($(date +%s) - START_TIME))\n");
-                sb.append("if [ $CURRENT_RUN -gt 1 ]; then\n");
-                sb.append("    AVG_TIME=$((ELAPSED / (CURRENT_RUN - 1)))\n");
-                sb.append("    REMAINING_RUNS=$((TOTAL_RUNS - CURRENT_RUN + 1))\n");
-                sb.append("    ETA_SEC=$((AVG_TIME * REMAINING_RUNS))\n");
-                sb.append("    ETA_MIN=$((ETA_SEC / 60))\n");
-                sb.append("    ETA_S=$((ETA_SEC % 60))\n");
-                sb.append("    echo \"[${CURRENT_RUN}/${TOTAL_RUNS}] Running ").append(combo.classConfig.className)
-                  .append(" (Run: ").append(combo.runName).append(") - ETA: ${ETA_MIN}m ${ETA_S}s\"\n");
-                sb.append("else\n");
-                sb.append("    echo \"[${CURRENT_RUN}/${TOTAL_RUNS}] Running ").append(combo.classConfig.className)
-                  .append(" (Run: ").append(combo.runName).append(") - ETA: calculating...\"\n");
-                sb.append("fi\n");
-                sb.append("echo -n \"").append(combo.jdkLabel).append(",")
-                  .append("\\\"").append(combo.gcOpts).append("\\\",")
-                  .append("\\\"").append(combo.vmOpts).append("\\\",")
-                  .append("\\\"").append(combo.progOpts).append("\\\",")
-                  .append("\\\"").append(combo.binding).append("\\\",")
-                  .append(combo.dataLabel).append(",")
-                  .append(timestamp).append(",\" >> data/benchmark-history/").append(timestamp).append(".csv\n");
-                sb.append("./execute-scenario.sh >> data/benchmark-history/").append(timestamp).append(".csv\n\n");
+                
+                comboViews.add(new ComboView(combo, jfrFile));
             }
+
+            jdkBlocks.add(new JdkBlock(jdk, sdkVersion, releaseVersion, mavenCmd, comboViews));
         }
 
-        // Post-processing
-        sb.append("echo \"Analyzing results\"\n");
-        sb.append("mvn -q exec:java -pl benchmark-harness -Dexec.mainClass=\"org.onebrc.benchmark.BenchmarkMatrix\" -Dexec.args=\"analyze ").append(timestamp).append("\"\n");
+        Map<String, Object> model = new HashMap<>();
+        model.put("timestamp", timestamp);
+        model.put("totalRuns", validCombinations.size());
+        model.put("iterations", config.variables.getOrDefault("ITERATIONS", "3"));
+        model.put("jdkBlocks", jdkBlocks);
 
-        Files.writeString(outPath, sb.toString());
-        
+        try {
+            freemarker.template.Configuration cfg = new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_32);
+            cfg.setClassForTemplateLoading(ScriptGenerator.class, "/templates");
+            cfg.setDefaultEncoding("UTF-8");
+            
+            freemarker.template.Template template = cfg.getTemplate("run-script.sh.ftl");
+            
+            try (java.io.FileWriter writer = new java.io.FileWriter(outPath.toFile())) {
+                template.process(model, writer);
+            }
+        } catch (freemarker.template.TemplateException e) {
+            throw new IOException("Failed to generate shell script from FreeMarker template", e);
+        }
+
         Set<PosixFilePermission> perms = new HashSet<>(Files.getPosixFilePermissions(outPath));
         perms.add(PosixFilePermission.OWNER_EXECUTE);
         Files.setPosixFilePermissions(outPath, perms);
@@ -325,3 +363,4 @@ public class ScriptGenerator {
         return outPath;
     }
 }
+
