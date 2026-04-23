@@ -62,8 +62,8 @@ public class ScriptGenerator {
         public final String gcOpts;
         public final String vmLabel;
         public final String vmOpts;
-        public final String tasksetLabel;
-        public final String taskset;
+        public final String bindingLabel;
+        public final String binding;
         public final String progLabel;
         public final String progOpts;
         public final String dataLabel;
@@ -73,7 +73,7 @@ public class ScriptGenerator {
                               String jdkLabel, JdkConfig jdkConfig,
                               String gcLabel, String gcOpts,
                               String vmLabel, String vmOpts,
-                              String tasksetLabel, String taskset,
+                              String bindingLabel, String binding,
                               String progLabel, String progOpts,
                               String dataLabel, DatasetConfig dataConfig) {
             this.classConfig = classConfig;
@@ -84,8 +84,8 @@ public class ScriptGenerator {
             this.gcOpts = gcOpts;
             this.vmLabel = vmLabel;
             this.vmOpts = vmOpts;
-            this.tasksetLabel = tasksetLabel;
-            this.taskset = taskset;
+            this.bindingLabel = bindingLabel;
+            this.binding = binding;
             this.progLabel = progLabel;
             this.progOpts = progOpts;
             this.dataLabel = dataLabel;
@@ -102,7 +102,7 @@ public class ScriptGenerator {
         System.out.printf("  GC Configs: %d%n", config.gcOpts.size());
         System.out.printf("  VM Configs: %d%n", config.vmOpts.size());
         System.out.printf("  Prog Opts:  %d%n", config.progOpts.size());
-        System.out.printf("  Tasksets:   %d%n", config.tasksets.size());
+        System.out.printf("  Bindings:   %d%n", config.bindings.size());
         System.out.printf("  Datasets:   %d%n", config.datasets.size());
         System.out.printf("  Run Matrix: %d explicit runs defined%n", config.runs.size());
         System.out.printf("  Classes:    %d active (%d disabled)%n", 
@@ -119,7 +119,7 @@ public class ScriptGenerator {
             List<String> matchJdks = getMatches(runDef.jdkFilter, config.jdks.keySet());
             List<String> matchGcs = getMatches(runDef.gcFilter, config.gcOpts.keySet());
             List<String> matchVms = getMatches(runDef.vmFilter, config.vmOpts.keySet());
-            List<String> matchTasksets = getMatches(runDef.tasksetFilter, config.tasksets.keySet());
+            List<String> matchBindings = getMatches(runDef.bindingFilter, config.bindings.keySet());
             List<String> matchProgs = getMatches(runDef.progFilter, config.progOpts.keySet());
             List<String> matchDatasets = getMatches(runDef.dataFilter, config.datasets.keySet());
 
@@ -128,14 +128,14 @@ public class ScriptGenerator {
                 .filter(c -> matchesClass(c, runDef.classFilter))
                 .count();
 
-            System.out.printf("    Matches -> JDKs: %d, GCs: %d, VMs: %d, Tasksets: %d, Progs: %d, Datasets: %d, Classes: %d%n",
+            System.out.printf("    Matches -> JDKs: %d, GCs: %d, VMs: %d, Bindings: %d, Progs: %d, Datasets: %d, Classes: %d%n",
                 matchJdks.size(), matchGcs.size(), matchVms.size(),
-                matchTasksets.size(), matchProgs.size(), matchDatasets.size(), matchingClasses);
+                matchBindings.size(), matchProgs.size(), matchDatasets.size(), matchingClasses);
 
             if (matchJdks.isEmpty()) System.out.printf("    ! Warning: JDK filter '%s' matched nothing.%n", runDef.jdkFilter);
             if (matchGcs.isEmpty()) System.out.printf("    ! Warning: GC filter '%s' matched nothing.%n", runDef.gcFilter);
             if (matchVms.isEmpty()) System.out.printf("    ! Warning: VM filter '%s' matched nothing.%n", runDef.vmFilter);
-            if (matchTasksets.isEmpty()) System.out.printf("    ! Warning: Taskset filter '%s' matched nothing.%n", runDef.tasksetFilter);
+            if (matchBindings.isEmpty()) System.out.printf("    ! Warning: Binding filter '%s' matched nothing.%n", runDef.bindingFilter);
             if (matchProgs.isEmpty()) System.out.printf("    ! Warning: Prog filter '%s' matched nothing.%n", runDef.progFilter);
             if (matchDatasets.isEmpty()) System.out.printf("    ! Warning: Dataset filter '%s' matched nothing.%n", runDef.dataFilter);
             if (matchingClasses == 0) System.out.printf("    ! Warning: Class filter '%s' matched nothing.%n", runDef.classFilter);
@@ -166,7 +166,7 @@ public class ScriptGenerator {
 
                     for (String gcL : matchGcs) {
                         for (String vmL : matchVms) {
-                            for (String tsL : matchTasksets) {
+                            for (String bdL : matchBindings) {
                                 for (String progL : matchProgs) {
                                     for (String dsL : matchDatasets) {
                                         boolean excludedDs = cls.exclusions.stream().anyMatch(e -> e.equals("DATA:" + dsL));
@@ -177,17 +177,17 @@ public class ScriptGenerator {
                                                 jdkL, jdkConfig,
                                                 gcL, config.gcOpts.get(gcL),
                                                 vmL, config.vmOpts.get(vmL),
-                                                tsL, config.tasksets.get(tsL),
+                                                bdL, config.bindings.get(bdL),
                                                 progL, config.progOpts.get(progL),
                                                 dsL, config.datasets.get(dsL)
                                         );
                                         validCombinations.add(rc);
                                         
                                         if (dryRun || isInfo) {
-                                            String taskPrefix = rc.taskset.isEmpty() ? "" : ("taskset " + rc.taskset + " ");
+                                            String bindingPrefix = rc.binding.isEmpty() ? "" : (rc.binding + " ");
                                             String jvmArgs = (rc.gcOpts + " " + rc.vmOpts).trim();
                                             System.out.printf("      -> CMD: %sjava %s -cp target/classes %s %s %s%n",
-                                                    taskPrefix, jvmArgs, rc.classConfig.fqcn, rc.dataConfig.path, rc.progOpts);
+                                                    bindingPrefix, jvmArgs, rc.classConfig.fqcn, rc.dataConfig.path, rc.progOpts);
                                         }
                                     }
                                 }
@@ -222,6 +222,9 @@ public class ScriptGenerator {
         sb.append("CURRENT_RUN=0\n");
         sb.append("START_TIME=$(date +%s)\n\n");
         
+        String iterations = config.variables.getOrDefault("ITERATIONS", "3");
+        sb.append("export ITERATIONS=").append(iterations).append("\n\n");
+
         sb.append("source $HOME/.sdkman/bin/sdkman-init.sh 2>/dev/null || true\n\n");
 
         sb.append("echo \"Capturing system information...\"\n");
@@ -235,7 +238,7 @@ public class ScriptGenerator {
         sb.append("echo \"CPU Cores: $(nproc)\" >> $SYSINFO_FILE\n");
         sb.append("echo \"Memory: $(free -h | awk '/^Mem:/ {print $2}')\" >> $SYSINFO_FILE\n\n");
 
-        sb.append("echo \"JDK,GC_OPTS,VM_OPTS,PROG_OPTS,TASKSET,DATA,RunTimestamp,Class,MedianRuntimeMs,Checksum,Instructions,Cycles,Branches,BranchMisses,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys\" > data/benchmark-history/").append(timestamp).append(".csv\n\n");
+        sb.append("echo \"JDK,GC_OPTS,VM_OPTS,PROG_OPTS,BINDING,DATA,RunTimestamp,Class,MedianRuntimeMs,Checksum,PerfRuntimeMs,JfrRuntimeMs,Instructions,Cycles,Branches,BranchMisses,L1Misses,LLCMisses,PageFaults,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys\" > data/benchmark-history/").append(timestamp).append(".csv\n\n");
 
         Map<JdkConfig, List<RunCombination>> groupedByJdk = new LinkedHashMap<>();
         for (RunCombination rc : validCombinations) {
@@ -271,19 +274,18 @@ public class ScriptGenerator {
 
             for (RunCombination combo : combos) {
                 String jvmOpts = (combo.gcOpts + " " + combo.vmOpts).trim();
-                if (isJfr) {
-                    Path jfrDir = Paths.get("data", "benchmark-jfr");
-                    Files.createDirectories(jfrDir);
-                    String sanitizedEnv = (combo.gcOpts + "_" + combo.vmOpts + "_" + combo.taskset).replaceAll("[^a-zA-Z0-9.-]", "_");
-                    String jfrFile = jfrDir.resolve(timestamp + "-" + combo.classConfig.className + "-" + combo.jdkLabel + "-" + sanitizedEnv + "-" + combo.dataLabel + ".jfr").toString();
-                    jvmOpts += " -XX:StartFlightRecording=filename=" + jfrFile + ",settings=profile";
-                }
+                
+                Path jfrDir = Paths.get("data", "benchmark-jfr");
+                Files.createDirectories(jfrDir);
+                String sanitizedEnv = (combo.gcOpts + "_" + combo.vmOpts + "_" + combo.binding).replaceAll("[^a-zA-Z0-9.-]", "_");
+                String jfrFile = jfrDir.resolve(timestamp + "-" + combo.classConfig.className + "-" + combo.jdkLabel + "-" + sanitizedEnv + "-" + combo.dataLabel + ".jfr").toString();
 
                 sb.append("export CLASS=\"").append(combo.classConfig.fqcn).append("\"\n");
                 sb.append("export DATA=\"").append(combo.dataConfig.path).append("\"\n");
                 sb.append("export JVM_OPTS=\"").append(jvmOpts).append("\"\n");
-                sb.append("export TASKSET=\"").append(combo.taskset).append("\"\n");
+                sb.append("export BINDING=\"").append(combo.binding).append("\"\n");
                 sb.append("export PROG_OPTS=\"").append(combo.progOpts).append("\"\n");
+                sb.append("export JFR_FILE=\"").append(jfrFile).append("\"\n");
 
                 sb.append("CURRENT_RUN=$((CURRENT_RUN + 1))\n");
                 sb.append("ELAPSED=$(($(date +%s) - START_TIME))\n");
@@ -303,7 +305,7 @@ public class ScriptGenerator {
                   .append("\\\"").append(combo.gcOpts).append("\\\",")
                   .append("\\\"").append(combo.vmOpts).append("\\\",")
                   .append("\\\"").append(combo.progOpts).append("\\\",")
-                  .append("\\\"").append(combo.taskset).append("\\\",")
+                  .append("\\\"").append(combo.binding).append("\\\",")
                   .append(combo.dataLabel).append(",")
                   .append(timestamp).append(",\" >> data/benchmark-history/").append(timestamp).append(".csv\n");
                 sb.append("./execute-scenario.sh >> data/benchmark-history/").append(timestamp).append(".csv\n\n");

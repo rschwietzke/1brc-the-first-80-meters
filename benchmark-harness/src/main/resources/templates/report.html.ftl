@@ -163,16 +163,29 @@ function showDetails(key) {
     const hashHex = hash.toString(16);
 
     tbody.innerHTML = `
-        <tr><th>Median Runtime</th><td><strong>${data.medianRuntimeMs} ms</strong></td></tr>
+        <tr><th colspan="2" style="background:#e9ecef;text-align:center;">Runtime Profiling (3 Stages)</th></tr>
+        <tr><th>Clean P50 Median Runtime</th><td><strong>${data.medianRuntimeMs} ms</strong></td></tr>
+        <tr><th>Perf Stat Overhead Run</th><td>${data.perfRuntimeMs} ms <small style="color:#666;">(+${data.perfRuntimeMs - data.medianRuntimeMs} ms)</small></td></tr>
+        <tr><th>JFR Agent Overhead Run</th><td>${data.jfrRuntimeMs} ms <small style="color:#666;">(+${data.jfrRuntimeMs - data.medianRuntimeMs} ms)</small></td></tr>
         <tr><th>Checksum</th><td>${checksumHtml}</td></tr>
+        
+        <tr><th colspan="2" style="background:#e9ecef;text-align:center;">Hardware Telemetry (Perf Stat)</th></tr>
         <tr><th>Instructions Executed</th><td>${data.instructions.toLocaleString()}</td></tr>
         <tr><th>CPU Cycles</th><td>${data.cycles.toLocaleString()}</td></tr>
+        <tr><th>Instructions Per Cycle (IPC)</th><td>${data.ipc}</td></tr>
         <tr><th>Branches</th><td>${data.branches.toLocaleString()}</td></tr>
         <tr><th>Branch Misses</th><td>${data.branchMisses.toLocaleString()}</td></tr>
-        <tr><th>Instructions Per Cycle (IPC)</th><td>${data.ipc}</td></tr>
+        <tr><th>L1 Data Cache Misses</th><td>${data.l1Misses ? data.l1Misses.toLocaleString() : '0'}</td></tr>
+        <tr><th>Last Level Cache Misses</th><td>${data.llcMisses ? data.llcMisses.toLocaleString() : '0'}</td></tr>
+        <tr><th>Page Faults</th><td>${data.pageFaults ? data.pageFaults.toLocaleString() : '0'}</td></tr>
+        <tr><th>Context Switches</th><td>${data.contextSwitches ? data.contextSwitches.toLocaleString() : '0'}</td></tr>
+        <tr><th>CPU Migrations</th><td>${data.cpuMigrations ? data.cpuMigrations.toLocaleString() : '0'}</td></tr>
+        
+        <tr><th colspan="2" style="background:#e9ecef;text-align:center;">JVM Profiling (Java Flight Recorder)</th></tr>
         <tr><th>GC Pause Time</th><td>${data.gcPauseMs} ms</td></tr>
         <tr><th>Allocated Bytes</th><td>${data.allocatedBytes.toLocaleString()} bytes</td></tr>
         <tr><th>JIT Compilation Time</th><td>${data.jitCompilationMs} ms</td></tr>
+        
         <tr><td colspan="2" style="text-align: center; padding-top: 20px;">
             <a href="permutations/history-${hashHex}.html" class="btn" style="background: #28a745;">&#128200; View Historical Trend for this Test</a>
         </td></tr>

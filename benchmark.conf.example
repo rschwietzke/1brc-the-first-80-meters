@@ -1,6 +1,10 @@
 # Unified Benchmark Configuration
 # This file defines the properties and matrix combinations for benchmarking.
 
+# --- Global Variables ---
+ITERATIONS = 3
+# ------------------------
+
 [JDKS]
 # Format: LABEL = PATH_OR_SDKMAN_ID
 JDK_21_OPEN = sdkman:21.0.2-open
@@ -21,9 +25,9 @@ DEFAULT =
 DEFAULT = 
 DEBUG = --debug
 
-[TASKSETS]
+[BINDINGS]
 # Format: LABEL = TASKSET PARAMS
-CORES_8 = -c 0-7
+CORES_8 = taskset -c 0-7
 ALL = 
 
 [DATASETS]
@@ -35,7 +39,7 @@ DATASET_1B = 1000M.txt
 JDK_FILTER = JDK_21_OPEN
 GC_FILTER = ZGC
 VM_FILTER = MEM_2G
-TASKSET_FILTER = CORES_8
+BINDING_FILTER = CORES_8
 PROG_FILTER = DEFAULT
 DATA_FILTER = 10M
 CLASS_FILTER = *

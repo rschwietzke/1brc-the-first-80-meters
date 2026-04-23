@@ -1,5 +1,7 @@
 # Benchmark Execution & Metrics Collection
 
+**Project Mission:** The core objective of this benchmarking harness is to check for JDK and GC regressions at scale. By running dozens of wildly different Java implementations (ranging from basic Streams to SWAR & Unsafe Memory Mapped NIO) against different JVM parameters, we can detect if a new JDK release accidentally regresses specific micro-architectural optimizations.
+
 This document details exactly what happens during a benchmark run for a given Java test class, and explains the full suite of metrics captured by the 1BRC reporting harness.
 
 ## 1. What Happens During a Run?
@@ -8,12 +10,12 @@ When you execute `./benchmark-matrix.sh run`, the system does not run a simple g
 
 For *every single* Java implementation class (e.g., `BRC001_Baseline`, `BRC042_NioChunking`), the harness performs a dedicated execution for *each* valid permutation of your configuration variables. 
 
-A single "Run Permutation" consists of:
-1. **JVM Spin-up**: The harness boots a completely fresh JVM using the specific `JDK`, `GC_OPTS`, and `VM_OPTS` defined for that permutation.
-2. **Resource Constraints**: If a `TASKSET` is defined (e.g., locking the run to 8 CPU cores), the Linux `taskset` utility is applied to the JVM process.
-3. **Hardware Telemetry Profiling**: The execution is wrapped in the Linux `perf stat` utility and the GNU `/usr/bin/time` utility to capture deep hardware counters from the CPU.
-4. **JFR Recording (Optional)**: If `--jfr` is passed, the JVM enables Java Flight Recorder to trace deep internal JVM events (like GC cycles and object allocations).
-5. **Execution & Checksum Output**: The Java class executes the 1BRC challenge against the specified `DATASET`. The class is responsible for printing its final execution time and calculated Checksum to standard output.
+To ensure our deep hardware profiling doesn't skew the true baseline runtime, a single "Run Permutation" consists of a 4-stage pipeline:
+
+1. **OS Cache Warming**: The harness silently reads the massive dataset (`cat > /dev/null`) to force the Linux Kernel to eagerly load it into the OS Page Cache (RAM), eliminating disk I/O variance.
+2. **Clean Median Calculation (`ITERATIONS=N`)**: The harness executes the Java class natively $N$ times (default 3) with *zero* profilers attached. It captures the runtimes, sorts them, and mathematically selects the true P50 Median Runtime.
+3. **Dedicated Perf Stat Run**: The harness executes the class one more time, completely wrapped in `perf stat`. It captures deep hardware counters (Cache misses, Page Faults) and saves this run's duration as `PerfRuntimeMs` so we can explicitly track profiler overhead.
+4. **Dedicated JFR Run**: Finally, the harness runs the class with the Java Flight Recorder (`-XX:StartFlightRecording`) attached. It produces the binary `.jfr` file and saves this run's duration as `JfrRuntimeMs` to track JVM agent overhead.
 
 ---
 

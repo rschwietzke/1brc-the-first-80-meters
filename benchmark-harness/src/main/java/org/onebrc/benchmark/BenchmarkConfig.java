@@ -11,7 +11,7 @@ public class BenchmarkConfig {
     public final Map<String, String> gcOpts = new LinkedHashMap<>();
     public final Map<String, String> vmOpts = new LinkedHashMap<>();
     public final Map<String, String> progOpts = new LinkedHashMap<>();
-    public final Map<String, String> tasksets = new LinkedHashMap<>();
+    public final Map<String, String> bindings = new LinkedHashMap<>();
     public final Map<String, DatasetConfig> datasets = new LinkedHashMap<>();
     public final Map<String, String> variables = new LinkedHashMap<>();
     public final List<RunDefinition> runs = new ArrayList<>();
@@ -77,7 +77,8 @@ public class BenchmarkConfig {
                                 config.progOpts.put(parts[0].trim(), val);
                                 break;
                             case "TASKSETS":
-                                config.tasksets.put(parts[0].trim(), val);
+                            case "BINDINGS":
+                                config.bindings.put(parts[0].trim(), val);
                                 break;
                             case "DATASETS":
                                 String originalKey = parts[0].trim();

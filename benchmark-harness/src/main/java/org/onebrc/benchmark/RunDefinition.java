@@ -5,7 +5,7 @@ public class RunDefinition {
     public final String jdkFilter;
     public final String gcFilter;
     public final String vmFilter;
-    public final String tasksetFilter;
+    public final String bindingFilter;
     public final String progFilter;
     public final String dataFilter;
     public final String classFilter;
@@ -15,7 +15,7 @@ public class RunDefinition {
         this.jdkFilter = properties.getOrDefault("JDK_FILTER", "*");
         this.gcFilter = properties.getOrDefault("GC_FILTER", "*");
         this.vmFilter = properties.getOrDefault("VM_FILTER", "*");
-        this.tasksetFilter = properties.getOrDefault("TASKSET_FILTER", "*");
+        this.bindingFilter = properties.getOrDefault("BINDING_FILTER", properties.getOrDefault("TASKSET_FILTER", "*"));
         this.progFilter = properties.getOrDefault("PROG_FILTER", "*");
         this.dataFilter = properties.getOrDefault("DATA_FILTER", "*");
         this.classFilter = properties.getOrDefault("CLASS_FILTER", "*");
