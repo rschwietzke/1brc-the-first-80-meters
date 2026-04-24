@@ -31,6 +31,8 @@ import java.util.stream.Stream;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Antigravity
@@ -44,12 +46,12 @@ public class HistoryAggregator {
         public final String fastestClass;
         public final long fastestMedianMs;
         public final double fastestIpc;
-        public final java.util.Map<String, String> sysInfo;
+        public final Map<String, String> sysInfo;
 
         /**
          * Constructs a new RunSummary instance.
          */
-        public RunSummary(String timestamp, String comment, int totalCombinations, String fastestClass, long fastestMedianMs, double fastestIpc, java.util.Map<String, String> sysInfo) {
+        public RunSummary(String timestamp, String comment, int totalCombinations, String fastestClass, long fastestMedianMs, double fastestIpc, Map<String, String> sysInfo) {
             this.timestamp = timestamp;
             this.comment = comment;
             this.totalCombinations = totalCombinations;
@@ -65,7 +67,7 @@ public class HistoryAggregator {
         public String getFastestClass() { return fastestClass; }
         public long getFastestMedianMs() { return fastestMedianMs; }
         public double getFastestIpc() { return fastestIpc; }
-        public java.util.Map<String, String> getSysInfo() { return sysInfo; }
+        public Map<String, String> getSysInfo() { return sysInfo; }
     }
 
     public static class HistoricalDataPoint {
@@ -86,12 +88,12 @@ public class HistoryAggregator {
 
     public static class AggregateResult {
         public final List<RunSummary> summaries;
-        public final java.util.Map<String, List<HistoricalDataPoint>> permutations;
+        public final Map<String, List<HistoricalDataPoint>> permutations;
 
         /**
          * Constructs a new AggregateResult instance.
          */
-        public AggregateResult(List<RunSummary> summaries, java.util.Map<String, List<HistoricalDataPoint>> permutations) {
+        public AggregateResult(List<RunSummary> summaries, Map<String, List<HistoricalDataPoint>> permutations) {
             this.summaries = summaries;
             this.permutations = permutations;
         }
@@ -102,7 +104,7 @@ public class HistoryAggregator {
      */
     public static AggregateResult aggregate() {
         List<RunSummary> summaries = new ArrayList<>();
-        java.util.Map<String, List<HistoricalDataPoint>> permutations = new java.util.HashMap<>();
+        Map<String, List<HistoricalDataPoint>> permutations = new java.util.HashMap<>();
         
         Path historyDir = Paths.get("data", "benchmark-history");
         if (!Files.exists(historyDir)) return new AggregateResult(summaries, permutations);
@@ -133,7 +135,7 @@ public class HistoryAggregator {
                         }
                     }
 
-                    java.util.Map<String, String> sysInfo = new java.util.LinkedHashMap<>();
+                    Map<String, String> sysInfo = new LinkedHashMap<>();
                     Path sysInfoFile = historyDir.resolve(timestamp + "-sysinfo.txt");
                     if (Files.exists(sysInfoFile)) {
                         try {

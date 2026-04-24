@@ -25,6 +25,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.nio.file.Files;
 
 /**
  * The central CLI entry point for the 1BRC Benchmark Harness.
@@ -135,9 +137,9 @@ public class BenchmarkMatrix {
             // Mode A: No specific timestamp provided, trigger a full history rebuild
             System.out.println("No timestamp provided. Scanning history and regenerating all reports...");
             Path historyDir = Paths.get("data", "benchmark-history");
-            if (java.nio.file.Files.exists(historyDir)) {
+            if (Files.exists(historyDir)) {
                 // Find all raw CSV result files, excluding the metadata tracking files
-                try (java.util.stream.Stream<Path> paths = java.nio.file.Files.list(historyDir)) {
+                try (Stream<Path> paths = Files.list(historyDir)) {
                     paths.filter(p -> p.toString().endsWith(".csv") && !p.getFileName().toString().contains("-meta"))
                          .forEach(p -> {
                              // Extract the raw timestamp from the filename and process it

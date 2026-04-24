@@ -32,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 /**
  * @author Antigravity
@@ -57,7 +58,7 @@ public class OverviewWriter {
 
         // To feed ECharts, we want chronological order (oldest to newest)
         List<HistoryAggregator.RunSummary> chronological = new java.util.ArrayList<>(result.summaries);
-        java.util.Collections.reverse(chronological);
+        Collections.reverse(chronological);
         root.put("chronological", chronological);
 
         Template template = cfg.getTemplate("index.html.ftl");

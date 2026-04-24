@@ -18,6 +18,7 @@
  */
 
 package org.onebrc.benchmark;
+import java.util.Map;
 
 /**
  * @author Antigravity
@@ -35,7 +36,7 @@ public class RunDefinition {
     /**
      * Constructs a new RunDefinition instance.
      */
-    public RunDefinition(String name, java.util.Map<String, String> properties) {
+    public RunDefinition(String name, Map<String, String> properties) {
         this.name = name;
         this.jdkFilter = properties.getOrDefault("JDK_FILTER", "*");
         this.gcFilter = properties.getOrDefault("GC_FILTER", "*");

@@ -25,6 +25,7 @@ import jdk.jfr.consumer.RecordingFile;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.nio.file.Files;
 
 /**
  * @author Antigravity
@@ -42,7 +43,7 @@ public class JfrConsumer {
      */
     public static JfrMetrics consume(Path jfrFile) {
         JfrMetrics metrics = new JfrMetrics();
-        if (jfrFile == null || !java.nio.file.Files.exists(jfrFile)) {
+        if (jfrFile == null || !Files.exists(jfrFile)) {
             return metrics;
         }
 
