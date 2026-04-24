@@ -161,6 +161,7 @@ public class ResultMatrix {
             colMap.put(headers[i].trim(), i);
         }
 
+        // Iterate over all result rows, skipping the header (index 0)
         for (int i = 1; i < lines.size(); i++) {
             String line = lines.get(i).trim();
             if (line.isEmpty()) continue;

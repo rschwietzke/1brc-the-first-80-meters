@@ -83,6 +83,7 @@ public class PermutationWriter {
         String generatedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         List<Map<String, String>> indexEntries = new ArrayList<>();
 
+        // Generate an individual historical HTML dashboard for every single permutation
         for (Map.Entry<String, List<HistoryAggregator.HistoricalDataPoint>> entry : result.permutations.entrySet()) {
             String permutationKey = entry.getKey();
             List<HistoryAggregator.HistoricalDataPoint> history = entry.getValue();
@@ -91,6 +92,7 @@ public class PermutationWriter {
             String[] parts = permutationKey.split(" \\| ");
             String className = parts[parts.length - 1];
             
+            // Generate a deterministic filesystem-safe filename using a hash of the permutation key
             String fileId = "history-" + hash(permutationKey);
             String filename = fileId + ".html";
             Path outPath = permutationsDir.resolve(filename);

@@ -75,10 +75,12 @@ public class BenchmarkConfig {
         Map<String, String> currentRunProps = null;
 
         List<String> lines = Files.readAllLines(configFile);
+        // Parse the configuration file line-by-line
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i).trim();
             boolean isLastLine = (i == lines.size() - 1);
 
+            // Handle section header transitions (e.g., [JDKS], [RUN:fast])
             if (line.startsWith("[") && line.endsWith("]")) {
                 if (currentRunName != null) {
                     config.runs.add(new RunDefinition(currentRunName, currentRunProps));

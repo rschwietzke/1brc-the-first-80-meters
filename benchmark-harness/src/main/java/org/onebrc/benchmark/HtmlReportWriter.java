@@ -60,6 +60,7 @@ public class HtmlReportWriter {
         Map<String, Object> root = new HashMap<>();
         root.put("timestamp", timestamp);
 
+        // Initialize the sysinfo map and attempt to load hardware telemetry
         java.util.Map<String, String> sysInfo = new java.util.LinkedHashMap<>();
         Path sysInfoFile = Paths.get("data", "benchmark-history", timestamp + "-sysinfo.txt");
         if (java.nio.file.Files.exists(sysInfoFile)) {

@@ -68,6 +68,7 @@ public class CsvMerger {
         List<String> newLines = new ArrayList<>();
         newLines.add(header);
 
+        // Iterate over the raw CSV output to append JFR data if available
         for (int i = 1; i < lines.size(); i++) {
             String line = lines.get(i);
             if (line.trim().isEmpty()) continue;

@@ -234,6 +234,7 @@ public class ScriptGenerator {
         for (RunDefinition runDef : config.runs) {
             System.out.printf("  Run: %s%n", runDef.name);
 
+            // Step 1: Resolve all wildcard filters to explicit sets of labels
             List<String> matchJdks = getMatches(runDef.jdkFilter, config.jdks.keySet());
             List<String> matchGcs = getMatches(runDef.gcFilter, config.gcOpts.keySet());
             List<String> matchVms = getMatches(runDef.vmFilter, config.vmOpts.keySet());
@@ -241,6 +242,7 @@ public class ScriptGenerator {
             List<String> matchProgs = getMatches(runDef.progFilter, config.progOpts.keySet());
             List<String> matchDatasets = getMatches(runDef.dataFilter, config.datasets.keySet());
 
+            // Count how many implementations matched before filtering
             long matchingClasses = classes.stream()
                 .filter(c -> !c.ignore)
                 .filter(c -> matchesClass(c, runDef.classFilter))
@@ -250,6 +252,7 @@ public class ScriptGenerator {
                 matchJdks.size(), matchGcs.size(), matchVms.size(),
                 matchBindings.size(), matchProgs.size(), matchDatasets.size(), matchingClasses);
 
+            // Log warnings for empty dimensions, which will result in 0 permutations
             if (matchJdks.isEmpty()) System.out.printf("    ! Warning: JDK filter '%s' matched nothing.%n", runDef.jdkFilter);
             if (matchGcs.isEmpty()) System.out.printf("    ! Warning: GC filter '%s' matched nothing.%n", runDef.gcFilter);
             if (matchVms.isEmpty()) System.out.printf("    ! Warning: VM filter '%s' matched nothing.%n", runDef.vmFilter);
@@ -258,21 +261,28 @@ public class ScriptGenerator {
             if (matchDatasets.isEmpty()) System.out.printf("    ! Warning: Dataset filter '%s' matched nothing.%n", runDef.dataFilter);
             if (matchingClasses == 0) System.out.printf("    ! Warning: Class filter '%s' matched nothing.%n", runDef.classFilter);
 
+            // Step 2: Cartesian Product Loop
+            // Iterate over all active classes that match the run definition
             for (ClassConfig cls : classes) {
                 if (cls.ignore) continue;
                 if (!matchesClass(cls, runDef.classFilter)) continue;
 
+                // Evaluate @BenchmarkExclude("RUN:xyz")
                 boolean excludedRun = cls.exclusions.stream().anyMatch(e -> e.equals("RUN:" + runDef.name));
                 if (excludedRun) continue;
 
+                // Evaluate @BenchmarkOnly("RUN:xyz")
                 boolean hasRunInclusions = cls.inclusions.stream().anyMatch(e -> e.startsWith("RUN:"));
                 if (hasRunInclusions) {
                     boolean includedRun = cls.inclusions.stream().anyMatch(e -> e.equals("RUN:" + runDef.name));
                     if (!includedRun) continue;
                 }
 
+                // Iterate over all resolved JDK installations
                 for (String jdkL : matchJdks) {
                     JdkConfig jdkConfig = config.jdks.get(jdkL);
+                    
+                    // Evaluate @BenchmarkExclude("JDK:17")
                     boolean excludedJdk = cls.exclusions.stream().anyMatch(e -> {
                         if (e.startsWith("JDK:")) {
                             String excludedVal = e.substring("JDK:".length());
