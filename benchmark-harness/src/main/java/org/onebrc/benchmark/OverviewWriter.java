@@ -38,6 +38,9 @@ import java.util.Map;
  */
 public class OverviewWriter {
 
+    /**
+     * Helper method: write.
+     */
     public static void write() throws IOException {
         Path outPath = Paths.get("data", "benchmark-history", "index.html");
 

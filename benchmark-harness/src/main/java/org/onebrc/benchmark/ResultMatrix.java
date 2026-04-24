@@ -49,6 +49,9 @@ public class ResultMatrix {
         public final String data;
         public final String className;
 
+        /**
+         * Constructs a new Key instance.
+         */
         public Key(String jdk, String gcOpts, String vmOpts, String progOpts, String binding, String data, String className) {
             this.jdk = jdk;
             this.gcOpts = gcOpts;
@@ -99,6 +102,9 @@ public class ResultMatrix {
         public final long allocatedBytes;
         public final long jitCompilationMs;
 
+        /**
+         * Constructs a new RowData instance.
+         */
         public RowData(long medianRuntimeMs, String checksum, long perfRuntimeMs, long jfrRuntimeMs, long instructions, long cycles, long branches, long branchMisses, long l1Misses, long llcMisses, long pageFaults, long contextSwitches, long cpuMigrations, double ipc, long gcPauseMs, long allocatedBytes, long jitCompilationMs) {
             this.medianRuntimeMs = medianRuntimeMs;
             this.checksum = checksum;
@@ -200,6 +206,9 @@ public class ResultMatrix {
         }
     }
 
+    /**
+     * Helper method: getVal.
+     */
     private String getVal(String[] parts, Map<String, Integer> colMap, String colName) {
         Integer idx = colMap.get(colName);
         if (idx != null && idx < parts.length) {
@@ -208,6 +217,9 @@ public class ResultMatrix {
         return "";
     }
 
+    /**
+     * Helper method: parseLong.
+     */
     private long parseLong(String val) {
         if (val == null || val.isEmpty() || val.equals("ERROR")) return 0;
         try {
@@ -217,6 +229,9 @@ public class ResultMatrix {
         }
     }
 
+    /**
+     * Helper method: parseDouble.
+     */
     private double parseDouble(String val) {
         if (val == null || val.isEmpty() || val.equals("ERROR")) return 0.0;
         try {
@@ -226,22 +241,34 @@ public class ResultMatrix {
         }
     }
 
+    /**
+     * Helper method: get.
+     */
     public RowData get(Key k) {
         return matrix.get(k);
     }
     
+    /**
+     * Helper method: getDatasets.
+     */
     public Set<String> getDatasets() {
         Set<String> ds = new TreeSet<>();
         for (Key k : matrix.keySet()) ds.add(k.data);
         return ds;
     }
 
+    /**
+     * Helper method: getClasses.
+     */
     public Set<String> getClasses() {
         Set<String> cls = new TreeSet<>();
         for (Key k : matrix.keySet()) cls.add(k.className);
         return cls;
     }
 
+    /**
+     * Helper method: getEnvironments.
+     */
     public Set<String> getEnvironments() {
         Set<String> set = new TreeSet<>();
         for (Key k : matrix.keySet()) {

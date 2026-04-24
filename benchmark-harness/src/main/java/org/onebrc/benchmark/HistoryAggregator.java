@@ -46,6 +46,9 @@ public class HistoryAggregator {
         public final double fastestIpc;
         public final java.util.Map<String, String> sysInfo;
 
+        /**
+         * Constructs a new RunSummary instance.
+         */
         public RunSummary(String timestamp, String comment, int totalCombinations, String fastestClass, long fastestMedianMs, double fastestIpc, java.util.Map<String, String> sysInfo) {
             this.timestamp = timestamp;
             this.comment = comment;
@@ -69,6 +72,9 @@ public class HistoryAggregator {
         public final String timestamp;
         public final ResultMatrix.RowData data;
 
+        /**
+         * Constructs a new HistoricalDataPoint instance.
+         */
         public HistoricalDataPoint(String timestamp, ResultMatrix.RowData data) {
             this.timestamp = timestamp;
             this.data = data;
@@ -82,12 +88,18 @@ public class HistoryAggregator {
         public final List<RunSummary> summaries;
         public final java.util.Map<String, List<HistoricalDataPoint>> permutations;
 
+        /**
+         * Constructs a new AggregateResult instance.
+         */
         public AggregateResult(List<RunSummary> summaries, java.util.Map<String, List<HistoricalDataPoint>> permutations) {
             this.summaries = summaries;
             this.permutations = permutations;
         }
     }
 
+    /**
+     * Helper method: aggregate.
+     */
     public static AggregateResult aggregate() {
         List<RunSummary> summaries = new ArrayList<>();
         java.util.Map<String, List<HistoricalDataPoint>> permutations = new java.util.HashMap<>();

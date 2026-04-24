@@ -47,6 +47,9 @@ public class ClassConfig {
     /** A list of explicit filter tokens that this class requires (whitelist execution). */
     public final List<String> inclusions = new ArrayList<>();
 
+    /**
+     * Constructs a new ClassConfig instance.
+     */
     public ClassConfig(String className, String fqcn) {
         this.className = className;
         this.fqcn = fqcn;

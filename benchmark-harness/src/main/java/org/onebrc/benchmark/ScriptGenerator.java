@@ -44,6 +44,9 @@ import java.util.regex.PatternSyntaxException;
  */
 public class ScriptGenerator {
 
+    /**
+     * Helper method: getMatches.
+     */
     private static List<String> getMatches(String filter, Set<String> available) {
         if (filter.equals("*")) {
             return new ArrayList<>(available);
@@ -63,6 +66,9 @@ public class ScriptGenerator {
         return matched;
     }
 
+    /**
+     * Helper method: matchesClass.
+     */
     private static boolean matchesClass(ClassConfig cls, String classFilter) {
         if (classFilter.equals("*")) return true;
         if (classFilter.endsWith(".*")) {
@@ -134,6 +140,9 @@ public class ScriptGenerator {
         public final String mavenCmd;
         public final List<ComboView> combos;
 
+        /**
+         * Constructs a new JdkBlock instance.
+         */
         public JdkBlock(JdkConfig jdk, String sdkVersion, int releaseVersion, String mavenCmd, List<ComboView> combos) {
             this.jdk = jdk;
             this.sdkVersion = sdkVersion;
@@ -167,6 +176,9 @@ public class ScriptGenerator {
         public final String jvmOpts;
         public final String jfrFile;
 
+        /**
+         * Constructs a new ComboView instance.
+         */
         public ComboView(RunCombination rc, String jfrFile) {
             this.runName = rc.runName;
             this.jdkLabel = rc.jdkLabel;

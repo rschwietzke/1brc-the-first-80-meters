@@ -41,6 +41,9 @@ public class ArchiveManager {
         public final boolean hasHtml;
         public final boolean hasMd;
 
+        /**
+         * Constructs a new RunArchive instance.
+         */
         public RunArchive(String timestamp, boolean hasScript, boolean hasCsv, boolean hasHtml, boolean hasMd) {
             this.timestamp = timestamp;
             this.hasScript = hasScript;
@@ -55,6 +58,9 @@ public class ArchiveManager {
         }
     }
 
+    /**
+     * Helper method: listRuns.
+     */
     public static List<RunArchive> listRuns() {
         Path historyDir = Paths.get("data", "benchmark-history");
         if (!Files.exists(historyDir)) return Collections.emptyList();
@@ -84,6 +90,9 @@ public class ArchiveManager {
         }
     }
 
+    /**
+     * Helper method: getMostRecentPriorTo.
+     */
     public static String getMostRecentPriorTo(String currentTimestamp) {
         List<RunArchive> runs = listRuns();
         for (RunArchive run : runs) {

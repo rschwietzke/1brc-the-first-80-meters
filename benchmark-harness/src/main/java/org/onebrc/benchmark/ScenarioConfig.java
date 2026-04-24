@@ -34,6 +34,9 @@ public class ScenarioConfig {
     public final String taskset;
     public final String args;
 
+    /**
+     * Constructs a new ScenarioConfig instance.
+     */
     public ScenarioConfig(String label, String valueString) {
         this.label = label;
         // Parse SCENARIO_<LABEL>="JVM_OPTS=...; TASKSET=...; ARGS=..."
@@ -62,6 +65,9 @@ public class ScenarioConfig {
         this.args = parsedArgs;
     }
 
+    /**
+     * Helper method: load.
+     */
     public static Map<String, ScenarioConfig> load(Path configFile) throws IOException {
         Map<String, ScenarioConfig> configs = new LinkedHashMap<>();
         if (!Files.exists(configFile)) return configs;

@@ -39,6 +39,13 @@ public class SourceAnnotationParser {
     private static final Pattern IGNORE_PATTERN = Pattern.compile("^\\s*//\\s*ignore\\s*$");
     private static final Pattern PACKAGE_PATTERN = Pattern.compile("^\\s*package\\s+([a-zA-Z0-9_.]+)\\s*;");
 
+    /**
+     * Scans a directory recursively for Java source files and extracts their benchmark annotations.
+     * 
+     * @param srcDir The root directory containing the implementations to parse.
+     * @return A list of configurations parsed from the annotations.
+     * @throws IOException If walking the directory fails.
+     */
     public static List<ClassConfig> parseDirectory(Path srcDir) throws IOException {
         List<ClassConfig> configs = new ArrayList<>();
         try (Stream<Path> paths = Files.walk(srcDir)) {
@@ -55,6 +62,14 @@ public class SourceAnnotationParser {
         return configs;
     }
 
+    /**
+     * Parses a single Java file to extract class-level benchmark metadata.
+     * Identifies constraints like \@BenchmarkIgnore and \@BenchmarkExclude.
+     * 
+     * @param file The Java file to parse.
+     * @return The extracted configuration for the class.
+     * @throws IOException If reading the source file fails.
+     */
     public static ClassConfig parseFile(Path file) throws IOException {
         String className = file.getFileName().toString().replace(".java", "");
         List<String> lines = Files.readAllLines(file);

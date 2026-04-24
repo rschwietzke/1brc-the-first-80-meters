@@ -32,6 +32,9 @@ public class RunDefinition {
     public final String dataFilter;
     public final String classFilter;
 
+    /**
+     * Constructs a new RunDefinition instance.
+     */
     public RunDefinition(String name, java.util.Map<String, String> properties) {
         this.name = name;
         this.jdkFilter = properties.getOrDefault("JDK_FILTER", "*");

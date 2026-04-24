@@ -37,6 +37,9 @@ public class JfrConsumer {
         public long totalJitCompilationMs = 0;
     }
 
+    /**
+     * Helper method: consume.
+     */
     public static JfrMetrics consume(Path jfrFile) {
         JfrMetrics metrics = new JfrMetrics();
         if (jfrFile == null || !java.nio.file.Files.exists(jfrFile)) {

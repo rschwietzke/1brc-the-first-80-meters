@@ -40,6 +40,9 @@ public class MachineFingerprint {
     public final String cpuMaxMhz;
     public final String totalMemory;
 
+    /**
+     * Helper method: MachineFingerprint.
+     */
     private MachineFingerprint(String hostname, String kernel, String os, String cpuModel, int cpuCores, String cpuMaxMhz, String totalMemory) {
         this.hostname = hostname;
         this.kernel = kernel;
@@ -50,6 +53,9 @@ public class MachineFingerprint {
         this.totalMemory = totalMemory;
     }
 
+    /**
+     * Helper method: collect.
+     */
     public static MachineFingerprint collect() {
         String hn = runCmd("hostname", "unknown_host");
         String kern = runCmd("uname -r", "unknown_kernel");
@@ -97,6 +103,9 @@ public class MachineFingerprint {
         return new MachineFingerprint(hn, kern, o, cModel, cCores, cMaxMhz, mem);
     }
 
+    /**
+     * Helper method: runCmd.
+     */
     private static String runCmd(String cmd, String fallback) {
         try {
             Process p = Runtime.getRuntime().exec(cmd);
@@ -109,6 +118,9 @@ public class MachineFingerprint {
         return fallback;
     }
 
+    /**
+     * Helper method: readOsRelease.
+     */
     private static String readOsRelease() {
         try {
             Path osRelease = Paths.get("/etc/os-release");
@@ -125,6 +137,9 @@ public class MachineFingerprint {
         return "unknown_os";
     }
 
+    /**
+     * Helper method: compare.
+     */
     public MachineMatch compare(MachineFingerprint other) {
         if (other == null) return MachineMatch.DIFFERENT;
         if (this.hostname.equals(other.hostname) &&

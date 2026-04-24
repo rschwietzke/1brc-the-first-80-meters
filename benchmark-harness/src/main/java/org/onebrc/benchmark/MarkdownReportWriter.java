@@ -36,6 +36,9 @@ import java.util.Set;
  */
 public class MarkdownReportWriter {
 
+    /**
+     * Helper method: write.
+     */
     public static void write(String timestamp, ResultMatrix matrix) throws IOException {
         Path outPath = Paths.get("data", "benchmark-history", timestamp + ".md");
 

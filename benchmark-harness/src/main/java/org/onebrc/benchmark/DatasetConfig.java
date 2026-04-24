@@ -38,11 +38,17 @@ public class DatasetConfig {
     /** The actual system path to the measurements file (e.g., 'data/measurements-10000.txt'). */
     public final String path;
 
+    /**
+     * Constructs a new DatasetConfig instance.
+     */
     public DatasetConfig(String label, String path) {
         this.label = label;
         this.path = path;
     }
 
+    /**
+     * Helper method: load.
+     */
     public static Map<String, DatasetConfig> load(Path configFile) throws IOException {
         Map<String, DatasetConfig> configs = new LinkedHashMap<>();
         if (!Files.exists(configFile)) return configs;

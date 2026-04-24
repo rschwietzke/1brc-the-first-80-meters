@@ -150,6 +150,13 @@ public class BenchmarkMatrix {
         OverviewWriter.write();
     }
 
+    /**
+     * Helper method to process a single benchmark run by its timestamp identifier.
+     * Merges JFR data into the CSV, loads it into memory, and delegates to the report writers.
+     * 
+     * @param timestamp The unique execution run identifier.
+     * @throws IOException If reading the CSV or writing the reports fails.
+     */
     private static void processSingleRun(String timestamp) throws IOException {
         CsvMerger.merge(timestamp);
         
@@ -187,6 +194,11 @@ public class BenchmarkMatrix {
         }
     }
 
+    /**
+     * Compares two distinct benchmark runs to calculate performance regressions or improvements.
+     * 
+     * @param args The two timestamps to compare.
+     */
     private static void compareRun(List<String> args) {
         // TODO: Implement compare-run
         System.out.println("Compare run not implemented yet.");

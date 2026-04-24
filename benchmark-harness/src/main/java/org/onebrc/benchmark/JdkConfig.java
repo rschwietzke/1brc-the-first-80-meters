@@ -49,6 +49,9 @@ public class JdkConfig {
     /** True if this configuration relies on SDKMAN for dynamic installation and switching. */
     public final boolean isSdkman;
 
+    /**
+     * Constructs a new JdkConfig instance.
+     */
     public JdkConfig(String label, String pathOrSdkman) {
         this.label = label;
         this.pathOrSdkman = pathOrSdkman;
@@ -56,6 +59,9 @@ public class JdkConfig {
         this.majorVersion = detectMajorVersion();
     }
 
+    /**
+     * Helper method: detectMajorVersion.
+     */
     private int detectMajorVersion() {
         // If it's sdkman and not installed yet, we can try to guess from the version string (e.g. 21.0.1-graal -> 21)
         if (isSdkman) {
@@ -87,6 +93,9 @@ public class JdkConfig {
         return 0; // Unknown
     }
 
+    /**
+     * Helper method: load.
+     */
     public static Map<String, JdkConfig> load(Path configFile) throws IOException {
         Map<String, JdkConfig> configs = new LinkedHashMap<>();
         if (!Files.exists(configFile)) return configs;
