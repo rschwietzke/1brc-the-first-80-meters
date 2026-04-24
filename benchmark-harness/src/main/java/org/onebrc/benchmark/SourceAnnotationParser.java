@@ -71,9 +71,11 @@ public class SourceAnnotationParser {
      * @throws IOException If reading the source file fails.
      */
     public static ClassConfig parseFile(Path file) throws IOException {
+        // Extract the simple class name from the file name
         String className = file.getFileName().toString().replace(".java", "");
         List<String> lines = Files.readAllLines(file);
         
+        // Step 1: Scan the file to determine the package namespace
         String pkg = "";
         for (String line : lines) {
             Matcher m = PACKAGE_PATTERN.matcher(line);
@@ -82,23 +84,30 @@ public class SourceAnnotationParser {
                 break;
             }
         }
+        
+        // Step 2: Construct the Fully Qualified Class Name (FQCN)
         String fqcn = pkg.isEmpty() ? className : pkg + "." + className;
         ClassConfig config = new ClassConfig(className, fqcn);
 
+        // Step 3: Scan every line for known custom benchmarking annotations
         for (String line : lines) {
+            // Check for the '// ignore' marker to skip this class entirely
             if (IGNORE_PATTERN.matcher(line).find()) {
                 config.ignore = true;
             }
+            // Check for execution status (e.g., baseline, incomplete)
             Matcher statusMatcher = STATUS_PATTERN.matcher(line);
             if (statusMatcher.find()) {
                 config.status = statusMatcher.group(1).trim();
             }
+            // Parse explicit exclusions preventing specific permutations
             Matcher excMatcher = EXCLUSION_PATTERN.matcher(line);
             if (excMatcher.find()) {
                 String dim = excMatcher.group(1).trim();
                 String val = excMatcher.group(2).trim();
                 config.exclusions.add(dim + ":" + val);
             }
+            // Parse explicit inclusions requiring specific permutations
             Matcher incMatcher = INCLUSION_PATTERN.matcher(line);
             if (incMatcher.find()) {
                 String dim = incMatcher.group(1).trim();

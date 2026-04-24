@@ -86,10 +86,12 @@ public class BenchmarkMatrix {
      * @throws IOException If parsing configurations or writing the script to disk fails.
      */
     private static void generate(List<String> args) throws IOException {
+        // Parse CLI flags defining execution mode
         boolean dryRun = args.contains("--dry-run");
         boolean isJfr = args.contains("--jfr");
         boolean isInfo = args.contains("--info");
         
+        // Extract optional run comment
         String comment = "";
         for (int i = 0; i < args.size(); i++) {
             if (args.get(i).equals("--comment") && i + 1 < args.size()) {
@@ -98,17 +100,21 @@ public class BenchmarkMatrix {
             }
         }
 
+        // Step 1: Discover and parse all benchmarking annotations from source code
         Path srcDir = Paths.get("1brc-implementations", "src", "main", "java");
         List<ClassConfig> classes = SourceAnnotationParser.parseDirectory(srcDir);
 
+        // Step 2: Load the base execution configurations (JDKs, GCs, Data files)
         BenchmarkConfig config = BenchmarkConfig.load(Paths.get("benchmark.conf"));
 
+        // Validate that we have actionable configurations
         if (config.jdks.isEmpty() || config.runs.isEmpty()) {
             System.err.println("Error: Missing configuration or runs in benchmark.conf.");
             System.err.println("See benchmark.conf.example and create the config first.");
             System.exit(1);
         }
 
+        // Step 3: Compute the Cartesian product and build the FreeMarker script
         Path scriptPath = ScriptGenerator.generate(classes, config, isJfr, dryRun, isInfo, comment);
         
         // Output the script path on the final line for benchmark-matrix.sh to pick up
@@ -126,12 +132,15 @@ public class BenchmarkMatrix {
      */
     private static void analyze(List<String> args) throws IOException {
         if (args.isEmpty()) {
+            // Mode A: No specific timestamp provided, trigger a full history rebuild
             System.out.println("No timestamp provided. Scanning history and regenerating all reports...");
             Path historyDir = Paths.get("data", "benchmark-history");
             if (java.nio.file.Files.exists(historyDir)) {
+                // Find all raw CSV result files, excluding the metadata tracking files
                 try (java.util.stream.Stream<Path> paths = java.nio.file.Files.list(historyDir)) {
                     paths.filter(p -> p.toString().endsWith(".csv") && !p.getFileName().toString().contains("-meta"))
                          .forEach(p -> {
+                             // Extract the raw timestamp from the filename and process it
                              String ts = p.getFileName().toString().replace(".csv", "");
                              try {
                                  processSingleRun(ts);
@@ -142,10 +151,12 @@ public class BenchmarkMatrix {
                 }
             }
         } else {
+            // Mode B: Specifically process the requested timestamp run
             String timestamp = args.get(0);
             processSingleRun(timestamp);
         }
         
+        // Finally, trigger the generation of the global overview and aggregate dashboards
         System.out.println("Generating Global Overview Dashboards...");
         OverviewWriter.write();
     }
