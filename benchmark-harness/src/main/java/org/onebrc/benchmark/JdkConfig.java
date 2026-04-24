@@ -30,12 +30,23 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 /**
+ * Represents a logical Java Development Kit configuration.
+ * Handles both absolute system paths and 'sdkman:' prefixed dynamic installations,
+ * automatically determining the target release version for compilation.
+ * 
  * @author Antigravity
  */
 public class JdkConfig {
+    /** The logical label representing this JDK in the config (e.g., 'JDK 21'). */
     public final String label;
+    
+    /** The absolute file path to the JDK, or the 'sdkman:' identifier string. */
     public final String pathOrSdkman;
+    
+    /** The detected major release version of the target JDK (e.g., 17, 21). */
     public final int majorVersion;
+    
+    /** True if this configuration relies on SDKMAN for dynamic installation and switching. */
     public final boolean isSdkman;
 
     public JdkConfig(String label, String pathOrSdkman) {

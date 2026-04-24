@@ -48,10 +48,24 @@ import java.util.Set;
  */
 public class PermutationWriter {
 
+    /**
+     * Generates a short, filesystem-safe deterministic hash for a permutation key.
+     * This ensures the generated HTML report filenames do not exceed OS path limits or contain illegal characters.
+     * 
+     * @param input The raw permutation key (e.g., 'JDK 21 | G1GC | SerialReader').
+     * @return A hexadecimal string representing the hash.
+     */
     private static String hash(String input) {
         return Integer.toHexString(input.hashCode());
     }
 
+    /**
+     * Writes static HTML dashboard files summarizing the historical performance of specific execution permutations.
+     * Generates both individual historical charts per permutation and a master index directory file.
+     * 
+     * @param result The aggregated historical dataset spanning multiple run configurations.
+     * @throws IOException If FreeMarker templates cannot be loaded or files cannot be written to disk.
+     */
     public static void write(HistoryAggregator.AggregateResult result) throws IOException {
         Path permutationsDir = Paths.get("data", "benchmark-history", "permutations");
         if (!Files.exists(permutationsDir)) {

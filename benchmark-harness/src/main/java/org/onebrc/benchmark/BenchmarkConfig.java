@@ -34,17 +34,37 @@ import java.util.Map;
  */
 public class BenchmarkConfig {
     
+    /** Map of configured JDK installations, parsed from the [JDKS] block. */
     public final Map<String, JdkConfig> jdks = new LinkedHashMap<>();
+    
+    /** Map of Garbage Collector JVM flags, parsed from the [GC_OPTS] block. */
     public final Map<String, String> gcOpts = new LinkedHashMap<>();
+    
+    /** Map of general JVM performance flags, parsed from the [VM_OPTS] block. */
     public final Map<String, String> vmOpts = new LinkedHashMap<>();
+    
+    /** Map of Java application arguments, parsed from the [PROG_OPTS] block. */
     public final Map<String, String> progOpts = new LinkedHashMap<>();
+    
+    /** Map of OS-level execution prefixes (e.g., numactl, taskset), parsed from the [BINDINGS] block. */
     public final Map<String, String> bindings = new LinkedHashMap<>();
+    
+    /** Map of data file configurations (path + dimension definitions), parsed from the [DATASETS] block. */
     public final Map<String, DatasetConfig> datasets = new LinkedHashMap<>();
+    
+    /** Key-value store of globally defined interpolation variables (e.g., ITERATIONS=3). */
     public final Map<String, String> variables = new LinkedHashMap<>();
+    
+    /** Ordered list of explicitly defined execution scenarios to evaluate against the class annotations. */
     public final List<RunDefinition> runs = new ArrayList<>();
 
     /**
-     * Parses the benchmark.conf file into a structured configuration.
+     * Parses the `benchmark.conf` file into a structured, in-memory configuration matrix.
+     * Evaluates global variables and performs token substitution for dynamic pathing.
+     * 
+     * @param configFile The path to the configuration file.
+     * @return A populated BenchmarkConfig object ready for permutation generation.
+     * @throws IOException If the file is inaccessible or unreadable.
      */
     public static BenchmarkConfig load(Path configFile) throws IOException {
         BenchmarkConfig config = new BenchmarkConfig();

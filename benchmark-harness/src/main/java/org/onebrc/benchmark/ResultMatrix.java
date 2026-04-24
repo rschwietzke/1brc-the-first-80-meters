@@ -36,6 +36,10 @@ import java.util.TreeSet;
  */
 public class ResultMatrix {
 
+    /**
+     * Represents the unique execution identity of a single benchmark run.
+     * Used as a hash key to group, merge, and compare specific permutations across different dataset executions.
+     */
     public static class Key {
         public final String jdk;
         public final String gcOpts;
@@ -72,6 +76,10 @@ public class ResultMatrix {
         }
     }
 
+    /**
+     * Stores all raw performance telemetry captured during a benchmark execution pipeline.
+     * Contains the median runtime, the checksum, and deep hardware counters extracted from perf stat.
+     */
     public static class RowData {
         public final long medianRuntimeMs;
         public final String checksum;

@@ -26,10 +26,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
+ * Represents a logical dataset used for benchmark runs, pairing a label with an absolute or relative filepath.
+ * Mapped from the [DATASETS] section of the configuration file.
+ * 
  * @author Antigravity
  */
 public class DatasetConfig {
+    /** The logical label for the dataset (e.g., '10K', '1B'). */
     public final String label;
+    
+    /** The actual system path to the measurements file (e.g., 'data/measurements-10000.txt'). */
     public final String path;
 
     public DatasetConfig(String label, String path) {

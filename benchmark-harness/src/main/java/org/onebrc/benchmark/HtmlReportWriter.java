@@ -32,10 +32,23 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Responsible for generating the primary interactive HTML dashboard for a benchmark run.
+ * 
+ * Uses FreeMarker templates to inject the multi-dimensional {@link ResultMatrix} and the
+ * captured system/hardware telemetry into a static HTML report.
+ * 
  * @author Antigravity
  */
 public class HtmlReportWriter {
 
+    /**
+     * Injects the parsed matrix data into the {@code report.html.ftl} template and writes it to disk.
+     * Also parses the companion {@code -sysinfo.txt} file to display the execution environment hardware.
+     * 
+     * @param timestamp The unique identifier string for the execution run.
+     * @param matrix The fully parsed {@link ResultMatrix} containing all permutations and telemetry.
+     * @throws IOException If the FreeMarker template cannot be loaded or the output file cannot be written.
+     */
     public static void write(String timestamp, ResultMatrix matrix) throws IOException {
         Path outPath = Paths.get("data", "benchmark-history", timestamp + ".html");
 

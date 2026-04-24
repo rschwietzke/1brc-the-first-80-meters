@@ -123,6 +123,10 @@ public class ScriptGenerator {
         }
     }
 
+    /**
+     * Represents a grouped block of executions for a specific JDK version.
+     * This is used by the FreeMarker template to group compilations and avoid redundant JDK switching.
+     */
     public static class JdkBlock {
         public final JdkConfig jdk;
         public final String sdkVersion;
@@ -145,6 +149,10 @@ public class ScriptGenerator {
         public List<ComboView> getCombos() { return combos; }
     }
 
+    /**
+     * Represents a fully resolved execution permutation (a single "run" of the benchmark).
+     * Exposes flattened properties for easy consumption by the FreeMarker shell template.
+     */
     public static class ComboView {
         public final String runName;
         public final String jdkLabel;

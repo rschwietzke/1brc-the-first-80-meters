@@ -27,10 +27,26 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * The central CLI entry point for the 1BRC Benchmark Harness.
+ * 
+ * This class handles routing for all major harness operations including:
+ * <ul>
+ *   <li>{@code generate}: Parses configurations and builds the execution shell scripts.</li>
+ *   <li>{@code analyze}: Parses execution results and generates HTML/Markdown reports.</li>
+ *   <li>{@code list-runs}: Validates and prints the combinations matrix without writing scripts.</li>
+ *   <li>{@code compare-run}: Compares two historical execution runs.</li>
+ * </ul>
+ * 
  * @author Antigravity
  */
 public class BenchmarkMatrix {
 
+    /**
+     * Main execution router. Validates arguments and dispatches to the appropriate operation handler.
+     * 
+     * @param args The command line arguments passed from the Maven invocation.
+     * @throws IOException If any file-system operations fail during generation or analysis.
+     */
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             System.err.println("Usage: BenchmarkMatrix <command> [args]");
@@ -60,6 +76,15 @@ public class BenchmarkMatrix {
         }
     }
 
+    /**
+     * Handles the 'generate' command.
+     * 
+     * Reads the configuration from `benchmark.conf`, scans the source directory for annotated classes,
+     * and evaluates the run permutations. Generates the final execution shell script.
+     * 
+     * @param args Command-line arguments. Supports `--dry-run`, `--info`, `--jfr`, and `--comment <msg>`.
+     * @throws IOException If parsing configurations or writing the script to disk fails.
+     */
     private static void generate(List<String> args) throws IOException {
         boolean dryRun = args.contains("--dry-run");
         boolean isJfr = args.contains("--jfr");
@@ -90,6 +115,15 @@ public class BenchmarkMatrix {
         System.out.println(scriptPath.toAbsolutePath().toString());
     }
 
+    /**
+     * Handles the 'analyze' command.
+     * 
+     * Takes the results from a generated CSV file and merges them with historical metrics. It then uses
+     * the FreeMarker and Markdown writers to generate the static HTML dashboard and tracking files.
+     * 
+     * @param args Expected to contain the timestamp of the run. If empty, scans history and processes all.
+     * @throws IOException If file operations during analysis fail.
+     */
     private static void analyze(List<String> args) throws IOException {
         if (args.isEmpty()) {
             System.out.println("No timestamp provided. Scanning history and regenerating all reports...");
@@ -126,6 +160,14 @@ public class BenchmarkMatrix {
         MarkdownReportWriter.write(timestamp, matrix);
     }
 
+    /**
+     * Handles the 'list-runs' command.
+     * 
+     * Scans the `data/benchmark-history/` directory to identify all previous benchmark executions.
+     * Prints a formatted table indicating the presence of scripts, CSVs, HTML, and MD reports.
+     * 
+     * @param args Unused command-line arguments.
+     */
     private static void listRuns(List<String> args) {
         List<ArchiveManager.RunArchive> runs = ArchiveManager.listRuns();
         if (runs.isEmpty()) {
