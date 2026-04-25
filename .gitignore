@@ -49,9 +49,6 @@ out_expected.txt
 /*-timing.json
 
 # Benchmark History
-data/benchmark-history/
-data/benchmark-jfr/
-benchmark.conf
 100*.txt
 
 # Agent Files

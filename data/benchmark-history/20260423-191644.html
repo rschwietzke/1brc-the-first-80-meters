@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>1BRC Benchmark Report - 20260423-191644</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+body { font-family: system-ui, sans-serif; margin: 20px; background: #f9f9f9; }
+table { border-collapse: collapse; width: 100%; margin-bottom: 30px; background: white; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #f2f2f2; }
+.dashboard { display: flex; gap: 20px; margin-bottom: 30px; }
+.card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex: 1; }
+.badge { font-size: 0.8em; padding: 2px 6px; border-radius: 10px; margin-left: 8px; }
+.badge-baseline { background: #ffd700; color: #000; }
+.badge-incomplete { background: #ffcccc; color: #900; }
+.rotate-th {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    padding: 10px 5px;
+    max-height: 150px;
+    text-align: left;
+}
+</style>
+</head>
+<body>
+<h1>1BRC Benchmark Report</h1>
+<p><strong>Run Timestamp:</strong> 20260423-191644</p>
+
+<div id="matrix-view">
+    <div class="dashboard">
+    <div class="card"><h3>Executive Anomaly Dashboard</h3><p><em>(Regression data placeholder)</em></p></div>
+    </div>
+
+    <h2>Dataset: 10k</h2>
+    <div style="overflow-x: auto;">
+        <table>
+        <tr>
+            <th>Environment (JDK | GC | VM Options | Taskset)</th>
+            <th class="rotate-th">org.onebrc.again26.BRC000_Empty</th>
+            <th class="rotate-th">org.onebrc.again26.BRC001_Baseline</th>
+        </tr>
+
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        </table>
+    </div>
+
+    <div id="chart-0" style="width: 100%; height: 400px; margin-bottom: 50px;"></div>
+    <script>
+    (function() {
+        var chartDom = document.getElementById('chart-0');
+        if (chartDom) {
+            var myChart = echarts.init(chartDom);
+            var option = { title: { text: '10k' }, tooltip: {}, xAxis: { data: [
+            'org.onebrc.again26.BRC000_Empty','org.onebrc.again26.BRC001_Baseline',
+            ] }, yAxis: {}, series: [
+            { name: 'JDK_21_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_21_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_21_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_21_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_21_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            ] };
+            myChart.setOption(option);
+        }
+    })();
+    </script>
+    <h2>Dataset: 1k</h2>
+    <div style="overflow-x: auto;">
+        <table>
+        <tr>
+            <th>Environment (JDK | GC | VM Options | Taskset)</th>
+            <th class="rotate-th">org.onebrc.again26.BRC000_Empty</th>
+            <th class="rotate-th">org.onebrc.again26.BRC001_Baseline</th>
+        </tr>
+
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+            </td>
+        </tr>
+        </table>
+    </div>
+
+    <div id="chart-1" style="width: 100%; height: 400px; margin-bottom: 50px;"></div>
+    <script>
+    (function() {
+        var chartDom = document.getElementById('chart-1');
+        if (chartDom) {
+            var myChart = echarts.init(chartDom);
+            var option = { title: { text: '1k' }, tooltip: {}, xAxis: { data: [
+            'org.onebrc.again26.BRC000_Empty','org.onebrc.again26.BRC001_Baseline',
+            ] }, yAxis: {}, series: [
+            { name: 'JDK_21_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_21_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_21_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_21_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_21_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7', type: 'bar', data: [
+            0,
+            0,
+            ] },
+            ] };
+            myChart.setOption(option);
+        }
+    })();
+    </script>
+</div>
+
+<div id="details-view" style="display: none;">
+    <button onclick="hideDetails()" style="padding: 10px 20px; cursor: pointer; margin-bottom: 20px; font-weight: bold;">&larr; Back to Matrix Overview</button>
+    <div class="card" style="margin-bottom: 30px;">
+        <h2 id="detail-title">Run Details</h2>
+        <table id="detail-table" style="width: 50%; max-width: 600px;">
+            <tbody id="detail-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const benchmarkData = {"JDK_21_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":161363366,"cycles":192766658,"branches":30813939,"branchMisses":2164332,"ipc":0.84,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":4964875353,"cycles":5960668477,"branches":1027131882,"branchMisses":112507510,"ipc":0.83,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":4918018262,"cycles":6074664158,"branches":1012179990,"branchMisses":112685719,"ipc":0.81,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":177580134,"cycles":194403307,"branches":33958885,"branchMisses":2356034,"ipc":0.91,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":2560955678,"cycles":3222009803,"branches":527923354,"branchMisses":57518833,"ipc":0.79,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":4947472189,"cycles":5967335289,"branches":1022290107,"branchMisses":112664336,"ipc":0.83,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":178690537,"cycles":267666728,"branches":34175693,"branchMisses":2572202,"ipc":0.67,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":170230263,"cycles":191763360,"branches":33339719,"branchMisses":2329411,"ipc":0.89,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":1371552922,"cycles":1678711503,"branches":280465042,"branchMisses":29882453,"ipc":0.82,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":1371528959,"cycles":1674548060,"branches":280757287,"branchMisses":29857250,"ipc":0.82,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":161131706,"cycles":179432599,"branches":30743505,"branchMisses":2151972,"ipc":0.9,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":4970812504,"cycles":5923191784,"branches":1029459100,"branchMisses":112404970,"ipc":0.84,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":161389126,"cycles":187433575,"branches":30800129,"branchMisses":2181271,"ipc":0.86,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":1364062182,"cycles":1739511465,"branches":279149801,"branchMisses":29966407,"ipc":0.78,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":176803719,"cycles":201006665,"branches":33736404,"branchMisses":2370140,"ipc":0.88,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":157184256,"cycles":191072934,"branches":30590055,"branchMisses":2073726,"ipc":0.82,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":2578097371,"cycles":3248332911,"branches":532572664,"branchMisses":57580301,"ipc":0.79,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":170809685,"cycles":188350968,"branches":33455944,"branchMisses":2313528,"ipc":0.91,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":157488492,"cycles":171775323,"branches":30660027,"branchMisses":2032239,"ipc":0.92,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":1368220117,"cycles":1692170089,"branches":280404672,"branchMisses":29861956,"ipc":0.81,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":1366611476,"cycles":1728897992,"branches":279927478,"branchMisses":29868161,"ipc":0.79,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":156697896,"cycles":185827898,"branches":30483842,"branchMisses":2066057,"ipc":0.84,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":172727384,"cycles":201858017,"branches":33837871,"branchMisses":2369857,"ipc":0.86,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":152493436,"cycles":167092722,"branches":29735317,"branchMisses":1994735,"ipc":0.91,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":188984289,"cycles":224208809,"branches":36402730,"branchMisses":2653557,"ipc":0.84,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":177707244,"cycles":239206059,"branches":33947918,"branchMisses":2479667,"ipc":0.74,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":189572484,"cycles":260737158,"branches":36511303,"branchMisses":2718962,"ipc":0.73,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":2564714248,"cycles":3081232020,"branches":528175888,"branchMisses":57336906,"ipc":0.83,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":4932217383,"cycles":5932863527,"branches":1017081852,"branchMisses":112570422,"ipc":0.83,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":170203462,"cycles":198008207,"branches":33353747,"branchMisses":2311756,"ipc":0.86,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":2563354185,"cycles":3431636884,"branches":527022908,"branchMisses":57801943,"ipc":0.75,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":4950719254,"cycles":6157507710,"branches":1022379803,"branchMisses":112855230,"ipc":0.8,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":152115163,"cycles":168875663,"branches":29639433,"branchMisses":1997309,"ipc":0.9,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":160930821,"cycles":188554293,"branches":30708604,"branchMisses":2195972,"ipc":0.85,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":1385069557,"cycles":1819966297,"branches":285308040,"branchMisses":30135861,"ipc":0.76,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":189572599,"cycles":223581296,"branches":36452594,"branchMisses":2665484,"ipc":0.85,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":2556948196,"cycles":3163296277,"branches":526121656,"branchMisses":57532576,"ipc":0.81,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":151983613,"cycles":165677147,"branches":29631234,"branchMisses":1980049,"ipc":0.92,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":4942152071,"cycles":6117685520,"branches":1020225370,"branchMisses":112750728,"ipc":0.81,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":2552734057,"cycles":3188355949,"branches":523984687,"branchMisses":57685927,"ipc":0.8,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":2562600401,"cycles":3116914936,"branches":527716653,"branchMisses":57426307,"ipc":0.82,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":190738150,"cycles":266914400,"branches":36738439,"branchMisses":2785934,"ipc":0.71,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseZGC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":4932517927,"cycles":6098604437,"branches":1016444986,"branchMisses":112684494,"ipc":0.81,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":152541984,"cycles":188400773,"branches":29745448,"branchMisses":2032027,"ipc":0.81,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseZGC | -Xms2g -Xmx2g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":2567178093,"cycles":3160835169,"branches":529177607,"branchMisses":57443964,"ipc":0.81,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":1387577476,"cycles":1746434503,"branches":285743285,"branchMisses":30077500,"ipc":0.79,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseZGC | -Xms1g -Xmx1g | -mc 1 -wc 0 -t 8 | -c 0-7 | 1k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":1375584790,"cycles":1708339878,"branches":280961646,"branchMisses":29985500,"ipc":0.81,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms4g -Xmx4g | -mc 1 -wc 0 -t 8 | -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"ERROR","instructions":157025421,"cycles":175487656,"branches":30543734,"branchMisses":2037468,"ipc":0.89,"gcPauseMs":0,"allocatedBytes":0,"jitCompilationMs":0}};
+const classStatuses = {"BRC58_UnnoticedCharSkipping":"complete","BRC41a_FixedFastHashSet":"complete","BRC55_SimplerPutCall":"complete","BRC043_ForkJoinPool_NoReducer":"complete","BRC004_BaselineFileSplitMeasurements":"complete","BRC021_NoStreamFileOnly":"complete","BRC060_ReadingBytes":"complete","BRC01_BaselineST":"complete","BRC127_ParsingTempAI_VOID":"complete","BRC047_VirtualThreads":"complete","PositionableReader":"complete","BRC29g_FixedIntParsing":"complete","BRC07_NoCopyForDoubleST":"complete","BRC036_TurnedIfs":"complete","BRC080_JDKArrayUtils":"complete","BRC068_ParsingWithoutALoop":"complete","BRC40b_ReturnInstead":"complete","BRC040_N_ConcurrentRead":"complete","BRC02_NoGroupingMT":"complete","BRC48_FixedFactor":"complete","BRC08_GoIntST":"complete","BRC30_DangerNoEqualsST":"complete","BRC016_NoExtraString":"complete","BRC091_Reviewed83":"complete","BRC28_FineTuningST":"complete","BRC037_LessNullChecks":"complete","BRC012_SplitRemoved":"complete","IByteSkipMap":"complete","BRC046_MapperReduceEarly":"complete","BRC65_OneMainLoopMethod":"complete","BRC113_EqualsCityMismatchSimple":"complete","BRC24_DifferentBranchInHashCodeST":"complete","BRC032_1_N_Batched":"complete","BRC14d_ReadBytesFixedImproved":"complete","BRC53_SetEqualsNoLocalAssignment":"complete","BRC077_LessAdditions":"complete","BRC14a_ReadBytesBroken":"complete","BRC71_EOFAsReturnValue":"complete","BRC54_LoopVariableBackInLoop":"complete","BRC068_InlineParsing":"complete","BRC11_SizedMapST":"complete","BRC57_SimplerHashing_VOID":"complete","BRC060_44_SplitTune":"complete","BRC030_OpenMap":"complete","BRC048_ImprovedStringHandling":"complete","BRC030_1_N":"complete","BRC031_OpenMapLessCasting":"complete","BRC035_NoLambda":"complete","MathUtil":"complete","BaselineParallel":"complete","BRC15_ParseDoubleFixedST":"complete","BRC020_IntegerValue":"complete","FastHashSet_Benchmark":"complete","BRC26_MoreMapSpaceST":"complete","BRC014_ParallelGrouping":"complete","BRC090_MemorySegment_VOID":"complete","BRC46_TunedHashSet":"complete","BRC095_Hash":"complete","BRC027_SizedMap":"complete","BRC59_ByteBufferDirect":"complete","BRC60_FeedCPUUnrollSemicolonLoop":"complete","BRC50_Short":"complete","Basic_Benchmark":"complete","BRC110_EqualsCitySplit":"complete","BRC14b_ReadBytesFixed":"complete","BRC077_Bytes_ForkJoin_1Level":"complete","RootByteSkipMap":"complete","BRC06b_NewDoubleParsingST":"complete","BRC105_ParseTemp_95":"complete","BRC017_CompactUnordered":"complete","BRC069_InlineParsing_65":"complete","BRC12_NewMapST":"complete","BRC62_IsEqualsWithADifferentBranchApproach":"complete","BRC049_ManualMinMax":"complete","BRC083_MainLoop":"complete","BRC076_Bytes_ForkJoin_Full":"complete","BRC050_LargerSet":"complete","BRC40h_ManualMismatch":"complete","BRC06_NewDoubleParsingST":"complete","BRC29a_ParseDoubleTuningST":"complete","BRC42a_WhileTrue":"complete","BRC00_Empty":"complete","CreateExtendedMeasurements":"complete","BRC41b_ReorderedLineFields":"complete","BRC125_Refined_121":"complete","BRC69_RemovedExtraAdd":"complete","BRC09_NoMergeST":"complete","BRC025_1_N_N_1":"complete","BRC03_NoStreamST":"complete","BRC00_Claude2":"complete","FHS42bV2":"complete","BRC098_ParseTemperature_VOID":"complete","BRC010_ParallelAfterRead":"complete","BRC034_1_N_Virtual":"complete","BRC010_NoStream":"complete","BRC42b_NoReturnBranch":"complete","BRC23_NoMulST":"complete","BRC40d_LongLoop":"complete","BRC106_ParseTemp_105":"complete","BRC001_Baseline":"complete","BRC29e_EarlyIntResolution":"complete","BRC49_OffsetSubtraction":"complete","BRC61_BitShiftMul10Void":"complete","BRC52_TempParsingBitSubtraction":"complete","BRC021_LooplessParsing":"complete","BRC042_ForkJoinPool":"complete","BRC079_RunWithoutByteBuffer":"complete","BRC072_ReadDirectNotViaBuffer":"complete","BRC066_Integer":"complete","BRC080_Set":"complete","BRC011_ParallelAfterMapping":"complete","FlexByteSkipMap":"complete","CreateOriginalMeasurementsJFR":"complete","BRC40i_SmallerSemicolonLoop":"complete","BRC51_TempParsingLessBranches":"complete","BRC63_Equals":"complete","BRC047_IntOnly":"complete","BRC025_MutateData":"complete","Baseline":"complete","BRC022_LooplessParsing2":"complete","BRC47_LeanerPut":"complete","BRC013_ParallelAll":"complete","BRC016_Compact":"complete","BRC081_LoopUnroll":"complete","BRC21_ManualMinMaxST":"complete","BRC070_Mutate":"complete","BRC40c_UnrollTempParsing":"complete","BRC05_ReplaceSplitST":"complete","PositionableByteReader":"complete","BRC67_StoreArrayLength":"complete","BRC45_DoubleTheSetSize":"complete","BRC072_Mutate_BetterReader":"complete","BRC40j_LessStateInSetEquals":"complete","BRC067_ParseDifferently":"complete","BRC00_Gemini":"complete","BRC000_Empty":"complete","BRC020_NoStream":"complete","BRC070_EqualsCity":"complete","Gemini01":"complete","Gemini02":"complete","BRC29c_ArrayCopyInMethod":"complete","BRC038_1_N_VThreadsAreTasks":"complete","ParseDouble":"complete","Gemini03":"complete","Gemini04":"complete","Gemini05":"complete","BRC016_JFR_NoExtraString":"complete","BRC66_HashCode":"complete","BRC56_MainLoopAsWhile":"complete","BRC23a_NoMulSplitST":"complete","PositionableReader2":"complete","BRC026_1_N_N_1_LargeBuffers":"complete","BRC02_NoGroupingST":"complete","BRC015_Parallel_NoCollector":"complete","BRC033_SimplerLambda":"complete","BRC00_Claude":"complete","BRC112_EqualsCityMismatch":"complete","BRC002_BaselineFileOnly":"complete","BRC078_CalculateEarlier":"complete","BRC045_MapperOnly":"complete","BRC41c_LargerBuffer":"complete","BRC40g_Put":"complete","BRC107_ParseTemp":"complete","BRC097_EqualsCity":"complete","BRC22_EarlyHashCodeST":"complete","BRC40e_NoReloadSub":"complete","BRC40_NoChannel":"complete","BRC036_1_N_ExecutorPool":"complete","BRC64_CombinePuts":"complete","BRC101_ParseFrom65_VOID":"complete","BRC065_OneLoopLess":"complete","BRC20_UseArrayNoBufferST":"complete","BRC10_MutateST":"complete","BRC121_UpdatedLoops":"complete","Benchmark":"complete","BRC048_VT_ChunkSize_10MB":"complete","BRC40f_DoWhile":"complete","FHS42b":"complete","BRC111_EqualsCitySplit_Reverse":"complete","BRC042_NoSplittedString":"complete","BRC29d_EqualsNotBoolean":"complete","BRC028_1_N_1":"complete","BRC03_NoStreamMT":"complete","BRC29f_LessDataForTempResolution":"complete","BRC096_ReadInt_VOID":"complete","CreateOriginalMeasurements":"complete","BRC123_121plus105_VOID":"complete","BRC25_SmallAddReordingST":"complete","BRC003_BaselineFileAndSplit":"complete","BRC044_ForkJoinPool_SelfSplitting":"complete","BRC064_NoExtraString":"complete","BRC01_BaselineMT":"complete","BRC015_ParseDoubleSimpler1":"complete","BRC120_OnlyHashing_From95":"complete","BRC13_HardcodedSetST":"complete","BRC075_LargeByteBuffer":"complete","BRC012_ParallelBoth":"complete","BRC061_RandomAccessFile":"complete","BRC100_DirectTempWrite":"complete","BRC014_NewParseDouble":"complete","BRC63b_Equals_MainLoop":"complete","BRC062_ParseDouble":"complete","BRC075_Bytes_ConcurrentRead":"complete","BRC68_RemoveNewLinePos":"complete","BRC017_ParseDoubleSimpler2":"complete","BRC14c_ReadBytesObjects":"complete","BRC70_RemovedPutReturn":"complete","BRC063_OneAddLess":"complete","BRC094_Reviewed91":"complete","BRC27_SmallPutST":"complete","BRC041_DirectUpdate":"complete","BRC092_ParseIntegerLessBranches_VOID":"complete","BRC40a_NoChannel":"complete","BRC040_ASetIsGoodEnough":"complete","BRC43_NoSubClass":"complete","PositionableByteReader2":"complete","BRC027_1_N_N_1_Batches":"complete","BRC093_ParseIntegerLessCode_VOID":"complete","BRC099_ArrayAccess":"complete","BasicWindowedBuffer":"complete","BRC045_KeepChars":"complete","BRC082_VectorSearchOnlyForLargeArray":"complete"};
+const baselineChecksums = {};
+
+function showDetails(key) {
+    const data = benchmarkData[key];
+    if (!data) {
+        alert("No data available for this run.");
+        return;
+    }
+
+    document.getElementById('matrix-view').style.display = 'none';
+    document.getElementById('details-view').style.display = 'block';
+    
+    document.getElementById('detail-title').innerText = 'Metrics: ' + key;
+
+    const parts = key.split(" | ");
+    const envDs = parts.slice(0, 6).join(" | ");
+    const cls = parts[6];
+    const status = classStatuses[cls] || "complete";
+    const baselineChecksum = baselineChecksums[envDs];
+
+    let checksumHtml = `<code style="background:#eee;padding:2px 4px;border-radius:3px;">${data.checksum}</code>`;
+    
+    if (status === "baseline") {
+        checksumHtml += ' <span style="color:#0056b3; font-weight:bold;">[Ground Truth]</span>';
+    } else if (status === "incomplete") {
+        checksumHtml += ' <span style="color:#6c757d; font-weight:bold;">[Skip: Known Incorrect]</span>';
+    } else if (status === "complete") {
+        if (baselineChecksum) {
+            if (data.checksum === baselineChecksum) {
+                checksumHtml += ' <span style="color:#28a745; font-weight:bold;">[Pass]</span>';
+            } else {
+                checksumHtml += ' <span style="color:#dc3545; font-weight:bold;">[Fail]</span>';
+            }
+        } else {
+             checksumHtml += ' <span style="color:#fd7e14; font-weight:bold;">[No Baseline to compare]</span>';
+        }
+    }
+
+    const tbody = document.getElementById('detail-body');
+    // Java String.hashCode() equivalent
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) {
+        hash = ((hash << 5) - hash) + key.charCodeAt(i);
+        hash |= 0;
+    }
+    if (hash < 0) hash = 0xFFFFFFFF + hash + 1;
+    const hashHex = hash.toString(16);
+
+    tbody.innerHTML = `
+        <tr><th>Median Runtime</th><td><strong>${data.medianRuntimeMs} ms</strong></td></tr>
+        <tr><th>Checksum</th><td>${checksumHtml}</td></tr>
+        <tr><th>Instructions Executed</th><td>${data.instructions.toLocaleString()}</td></tr>
+        <tr><th>CPU Cycles</th><td>${data.cycles.toLocaleString()}</td></tr>
+        <tr><th>Branches</th><td>${data.branches.toLocaleString()}</td></tr>
+        <tr><th>Branch Misses</th><td>${data.branchMisses.toLocaleString()}</td></tr>
+        <tr><th>Instructions Per Cycle (IPC)</th><td>${data.ipc}</td></tr>
+        <tr><th>GC Pause Time</th><td>${data.gcPauseMs} ms</td></tr>
+        <tr><th>Allocated Bytes</th><td>${data.allocatedBytes.toLocaleString()} bytes</td></tr>
+        <tr><th>JIT Compilation Time</th><td>${data.jitCompilationMs} ms</td></tr>
+        <tr><td colspan="2" style="text-align: center; padding-top: 20px;">
+            <a href="permutations/history-${hashHex}.html" class="btn" style="background: #28a745;">&#128200; View Historical Trend for this Test</a>
+        </td></tr>
+    `;
+    window.scrollTo(0, 0);
+}
+
+function hideDetails() {
+    document.getElementById('details-view').style.display = 'none';
+    document.getElementById('matrix-view').style.display = 'block';
+}
+</script>
+
+</body>
+</html>

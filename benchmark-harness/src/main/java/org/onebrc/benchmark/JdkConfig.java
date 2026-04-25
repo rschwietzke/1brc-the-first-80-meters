@@ -49,15 +49,18 @@ public class JdkConfig {
     /** True if this configuration relies on SDKMAN for dynamic installation and switching. */
     public final boolean isSdkman;
 
-    /**
-     * Constructs a new JdkConfig instance.
-     */
     public JdkConfig(String label, String pathOrSdkman) {
         this.label = label;
         this.pathOrSdkman = pathOrSdkman;
         this.isSdkman = pathOrSdkman.startsWith("sdkman:");
         this.majorVersion = detectMajorVersion();
     }
+
+    public String getLabel() { return label; }
+    public String getPathOrSdkman() { return pathOrSdkman; }
+    public int getMajorVersion() { return majorVersion; }
+    public boolean getIsSdkman() { return isSdkman; }
+
 
     /**
      * Helper method: detectMajorVersion.

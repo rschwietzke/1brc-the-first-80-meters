@@ -1,0 +1,5 @@
+Kernel: 6.17.0-14-generic
+OS: Ubuntu 24.04.4 LTS
+CPU: AMD Ryzen 7 PRO 4750U with Radeon Graphics
+CPU Cores: 16
+Memory: 30Gi
