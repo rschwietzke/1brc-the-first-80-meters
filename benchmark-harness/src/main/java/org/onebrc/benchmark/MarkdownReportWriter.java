@@ -25,6 +25,7 @@ import freemarker.template.TemplateExceptionHandler;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -37,9 +38,21 @@ import java.util.Set;
 public class MarkdownReportWriter {
 
     /**
-     * Helper method: write.
+     * Writes the Markdown report to the standard archive path only.
      */
     public static void write(String timestamp, ResultMatrix matrix) throws IOException {
+        write(timestamp, matrix, null);
+    }
+
+    /**
+     * Writes the Markdown report to the standard archive path and optionally
+     * to an additional convenience copy at the given path.
+     *
+     * @param timestamp The unique run identifier.
+     * @param matrix The parsed result matrix.
+     * @param additionalOutputPath Optional extra output path for --output-report. May be null.
+     */
+    public static void write(String timestamp, ResultMatrix matrix, Path additionalOutputPath) throws IOException {
         Path outPath = Paths.get("data", "benchmark-history", timestamp + ".md");
 
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_32);
@@ -81,6 +94,12 @@ public class MarkdownReportWriter {
             System.out.println("Generated Markdown report: " + outPath);
         } catch (Exception e) {
             throw new IOException("Failed to process Freemarker template", e);
+        }
+
+        // Write the optional convenience copy
+        if (additionalOutputPath != null) {
+            Files.copy(outPath, additionalOutputPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Copied Markdown report to: " + additionalOutputPath);
         }
     }
 }

@@ -277,5 +277,20 @@ public class ResultMatrix {
         }
         return set;
     }
+
+    /**
+     * Returns all keys present in this matrix. Used for cross-run comparison
+     * to enumerate the full set of permutations.
+     */
+    public Set<Key> getKeys() {
+        return matrix.keySet();
+    }
+
+    /**
+     * Returns the number of entries in the matrix.
+     */
+    public int size() {
+        return matrix.size();
+    }
 }
 

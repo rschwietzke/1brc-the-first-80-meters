@@ -12,7 +12,8 @@ source $HOME/.sdkman/bin/sdkman-init.sh 2>/dev/null || true
 
 echo "Capturing system information..."
 SYSINFO_FILE="data/benchmark-history/${timestamp}-sysinfo.txt"
-echo "Kernel: $(uname -r)" > $SYSINFO_FILE
+echo "Hostname: $(hostname)" > $SYSINFO_FILE
+echo "Kernel: $(uname -r)" >> $SYSINFO_FILE
 if [ -f /etc/os-release ]; then
     . /etc/os-release
     echo "OS: $PRETTY_NAME" >> $SYSINFO_FILE

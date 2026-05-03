@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +61,9 @@ public class MachineFingerprint {
         String hn = runCmd("hostname", "unknown_host");
         String kern = runCmd("uname -r", "unknown_kernel");
         String o = readOsRelease();
+        if ("unknown_os".equals(o)) {
+            o = System.getProperty("os.name", "unknown_os");
+        }
         
         String cModel = "unknown_cpu";
         int cCores = 0;
@@ -85,6 +89,10 @@ public class MachineFingerprint {
             System.err.println("Note: could not read /proc/cpuinfo");
         }
         
+        if (cCores == 0) {
+            cCores = Runtime.getRuntime().availableProcessors();
+        }
+        
         String mem = "unknown_mem";
         try {
             Path meminfo = Paths.get("/proc/meminfo");
@@ -101,6 +109,42 @@ public class MachineFingerprint {
         }
 
         return new MachineFingerprint(hn, kern, o, cModel, cCores, cMaxMhz, mem);
+    }
+
+    /**
+     * Reconstructs a MachineFingerprint from a parsed sysinfo.txt key-value map.
+     * Keys expected: "Hostname", "Kernel", "OS", "CPU", "CPU Cores", "Memory".
+     * Missing keys are replaced with "unknown" fallbacks.
+     */
+    public static MachineFingerprint fromSysInfo(final Map<String, String> sysInfo) {
+        final String hn = sysInfo.getOrDefault("Hostname", "unknown_host");
+        final String kern = sysInfo.getOrDefault("Kernel", "unknown_kernel");
+        final String os = sysInfo.getOrDefault("OS", "unknown_os");
+        final String cpu = sysInfo.getOrDefault("CPU", "unknown_cpu");
+        int cores = 0;
+        try {
+            cores = Integer.parseInt(sysInfo.getOrDefault("CPU Cores", "0"));
+        } catch (final NumberFormatException e) {
+            // ignore, default to 0
+        }
+        final String mem = sysInfo.getOrDefault("Memory", "unknown_mem");
+        return new MachineFingerprint(hn, kern, os, cpu, cores, "unknown_mhz", mem);
+    }
+
+    /**
+     * Reads a sysinfo.txt file and returns the parsed key-value map.
+     */
+    public static Map<String, String> parseSysInfoFile(final Path sysInfoFile) throws IOException {
+        final Map<String, String> sysInfo = new java.util.LinkedHashMap<>();
+        if (Files.exists(sysInfoFile)) {
+            for (final String line : Files.readAllLines(sysInfoFile)) {
+                final int idx = line.indexOf(":");
+                if (idx > 0) {
+                    sysInfo.put(line.substring(0, idx).trim(), line.substring(idx + 1).trim());
+                }
+            }
+        }
+        return sysInfo;
     }
 
     /**

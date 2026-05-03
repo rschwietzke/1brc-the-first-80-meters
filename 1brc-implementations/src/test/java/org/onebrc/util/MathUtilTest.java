@@ -13,11 +13,13 @@ public class MathUtilTest
         assertEquals("-1.0", String.valueOf(MathUtil.round(-1d)));
         assertEquals("1.0", String.valueOf(MathUtil.round(1.0d)));
         assertEquals("-1.0", String.valueOf(MathUtil.round(-1.0d)));
-        assertEquals("1.0", String.valueOf(MathUtil.round(1.02d)));
-        assertEquals("111.4", String.valueOf(MathUtil.round(111.42d)));
-        assertEquals("111.5", String.valueOf(MathUtil.round(111.46d)));
-        assertEquals("111.4", String.valueOf(MathUtil.round(111.449d)));
-        assertEquals("111.5", String.valueOf(MathUtil.round(111.451d)));
+        assertEquals("1.02", String.valueOf(MathUtil.round(1.02d)));
+        assertEquals("111.42", String.valueOf(MathUtil.round(111.42d)));
+        assertEquals("111.46", String.valueOf(MathUtil.round(111.46d)));
+        assertEquals("111.449", String.valueOf(MathUtil.round(111.449d)));
+        assertEquals("111.451", String.valueOf(MathUtil.round(111.451d)));
+        assertEquals("111.451", String.valueOf(MathUtil.round(111.4511d)));
+        assertEquals("111.452", String.valueOf(MathUtil.round(111.4516d)));
     }
 
     @Test

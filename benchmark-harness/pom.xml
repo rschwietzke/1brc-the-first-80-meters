@@ -11,6 +11,10 @@
     </parent>
 
     <artifactId>benchmark-harness</artifactId>
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+    </properties>
     <packaging>jar</packaging>
 
     <name>1BRC Benchmark Harness</name>

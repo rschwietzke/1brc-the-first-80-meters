@@ -61,7 +61,34 @@ th { background-color: #f2f2f2; }
             <#assign rd = matrix[k]!>
             <#if rd?has_content>
             <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('${k?js_string}')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
-                ${rd.medianRuntimeMs} ms<#if (rd.gcPauseMs > 0)><br><small style="color: #666;">GC: ${rd.gcPauseMs}ms</small></#if>
+                ${rd.medianRuntimeMs} ms
+                <#if baselineMatrix?? && baselineMatrix[k]??>
+                    <#assign baseMs = baselineMatrix[k].medianRuntimeMs>
+                    <#if (baseMs > 0)>
+                        <#assign deltaPct = ((rd.medianRuntimeMs - baseMs) * 100.0) / baseMs>
+                        <br>
+                        <small style="font-weight: bold;">
+                        <#if machineMatch?? && machineMatch == "SAME">
+                            <#if (deltaPct > 5.0)>
+                                <span style="color: #dc3545;">+${deltaPct?string("0.1")}% ⚠️</span>
+                            <#elseif (deltaPct < -5.0)>
+                                <span style="color: #28a745;">${deltaPct?string("0.1")}% ✅</span>
+                            <#else>
+                                <span style="color: #6c757d;">${deltaPct?string("0.1")}%</span>
+                            </#if>
+                        <#else>
+                            <#if (deltaPct > 5.0)>
+                                <span style="color: #dc3545;">+${deltaPct?string("0.1")}% 📈</span>
+                            <#elseif (deltaPct < -5.0)>
+                                <span style="color: #28a745;">${deltaPct?string("0.1")}% 📉</span>
+                            <#else>
+                                <span style="color: #6c757d;">${deltaPct?string("0.1")}%</span>
+                            </#if>
+                        </#if>
+                        </small>
+                    </#if>
+                </#if>
+                <#if (rd.gcPauseMs > 0)><br><small style="color: #666;">GC: ${rd.gcPauseMs}ms</small></#if>
             </td>
             <#else>
             <td style="text-align: center; color: #aaa;">-</td>

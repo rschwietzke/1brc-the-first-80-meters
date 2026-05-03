@@ -1,6 +1,10 @@
 #!/bin/bash
 # benchmark-matrix.sh
 
+if command -v java >/dev/null; then
+    export JAVA_HOME=$(dirname $(dirname $(readlink -f $(command -v java))))
+fi
+
 COMMAND=$1
 if [ -z "$COMMAND" ]; then
     echo "Usage: benchmark-matrix.sh <command> [args]"
@@ -14,10 +18,10 @@ fi
 
 shift # Remove command from arguments
 
-if [ "$COMMAND" = "analyze" ] || [ "$COMMAND" = "compare" ]; then
+if [ "$COMMAND" = "analyze" ] || [ "$COMMAND" = "compare" ] || [ "$COMMAND" = "compare-run" ]; then
     echo "==> Compiling benchmark harness..."
     mvn -q clean compile -pl benchmark-harness
-    mvn -q exec:java -pl benchmark-harness -Dexec.mainClass="org.onebrc.benchmark.BenchmarkMatrix" -Dexec.args="$COMMAND $*"
+    mvn -q exec:exec -pl benchmark-harness -Dexec.workingdir="$(pwd)" -Dexec.executable="java" -Dexec.args="-cp %classpath org.onebrc.benchmark.BenchmarkMatrix $COMMAND $*"
     exit $?
 fi
 
@@ -40,7 +44,7 @@ if [ "$COMMAND" = "run" ] || [ "$COMMAND" = "dry-run" ]; then
         ARGS="$ARGS $(printf "%q" "$arg")"
     done
 
-    OUTPUT=$(mvn -q exec:java -pl benchmark-harness -Dexec.mainClass="org.onebrc.benchmark.BenchmarkMatrix" -Dexec.args="$ARGS")
+    OUTPUT=$(mvn -q exec:exec -pl benchmark-harness -Dexec.workingdir="$(pwd)" -Dexec.executable="java" -Dexec.args="-cp %classpath org.onebrc.benchmark.BenchmarkMatrix $ARGS")
     RET=$?
 
     if [ $RET -ne 0 ]; then

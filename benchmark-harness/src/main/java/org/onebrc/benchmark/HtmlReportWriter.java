@@ -54,6 +54,14 @@ public class HtmlReportWriter {
      * @throws IOException If the FreeMarker template cannot be loaded or the output file cannot be written.
      */
     public static void write(final String timestamp, final ResultMatrix matrix) throws IOException {
+        write(timestamp, matrix, null, null);
+    }
+
+    /**
+     * Injects the parsed matrix data into the {@code report.html.ftl} template and writes it to disk.
+     * Optionally includes a baseline matrix for cross-run comparison.
+     */
+    public static void write(final String timestamp, final ResultMatrix matrix, final ResultMatrix baselineMatrix, final MachineMatch match) throws IOException {
         final Path outPath = Paths.get("data", "benchmark-history", timestamp + ".html");
 
         final Configuration cfg = new Configuration(Configuration.VERSION_2_3_32);
@@ -111,6 +119,25 @@ public class HtmlReportWriter {
             }
         }
         root.put("matrix", flatMatrix);
+
+        if (baselineMatrix != null && match != null) {
+            final Map<String, ResultMatrix.RowData> flatBaseline = new HashMap<>();
+            for (final String ds : datasets) {
+                for (final String cls : classes) {
+                    for (final String env : environments) {
+                        final String[] parts = env.split(" \\| ", -1);
+                        if (parts.length < 5) continue;
+                        final ResultMatrix.Key k = new ResultMatrix.Key(parts[0], parts[1], parts[2], parts[3], parts[4], ds, cls);
+                        final ResultMatrix.RowData rd = baselineMatrix.get(k);
+                        if (rd != null) {
+                            flatBaseline.put(env + " | " + ds + " | " + cls, rd);
+                        }
+                    }
+                }
+            }
+            root.put("baselineMatrix", flatBaseline);
+            root.put("machineMatch", match.name());
+        }
 
         // Reparse the source directory to extract the current status (baseline/incomplete/complete)
         // for each class so we can visually distinct them in the HTML report.
