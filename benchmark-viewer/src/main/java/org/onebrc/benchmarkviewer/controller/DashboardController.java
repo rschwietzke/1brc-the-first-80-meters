@@ -16,26 +16,42 @@
 
 package org.onebrc.benchmarkviewer.controller;
 
+import org.onebrc.benchmarkviewer.repository.TestRunRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 /**
  * Dashboard controller serving the main landing page.
- *
- * <p>Currently renders a placeholder page using the Thymeleaf layout.
- * Will be extended in later steps to display the list of imported test runs.</p>
  */
 @Controller
 public class DashboardController
 {
+    private final TestRunRepository testRunRepository;
+
+    public DashboardController(final TestRunRepository testRunRepository)
+    {
+        this.testRunRepository = testRunRepository;
+    }
+
     /**
      * Render the landing page (test run list or placeholder).
      *
      * @return the Thymeleaf view name for the index page
      */
     @GetMapping("/")
-    public String index()
+    public String index(final Model model,
+                        @RequestHeader(value = "HX-Request", required = false) final String hxRequest)
     {
+        model.addAttribute("testRuns", this.testRunRepository.findAll(Sort.by(Sort.Direction.DESC, "timestamp")));
+        
+        if ("true".equals(hxRequest))
+        {
+            return "fragments/run-list :: content";
+        }
+        
         return "index";
     }
 }

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Path;
 
@@ -46,6 +47,7 @@ public class StartupImporter implements CommandLineRunner
     }
 
     @Override
+    @Transactional
     public void run(final String... args) throws Exception
     {
         log.info("Starting initial benchmark data import from {}", this.dataDir);

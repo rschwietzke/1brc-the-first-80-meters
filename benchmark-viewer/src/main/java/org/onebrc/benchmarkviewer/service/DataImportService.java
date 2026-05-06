@@ -177,7 +177,7 @@ public class DataImportService
             final String ts = extractJsonStringValue(jsonContent, "timestamp");
             if (ts != null)
             {
-                run.setTimestamp(LocalDateTime.parse(ts, DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                run.setTimestamp(LocalDateTime.parse(ts, DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")));
             }
             final String runs = extractJsonNumberValue(jsonContent, "totalRuns");
             if (runs != null)

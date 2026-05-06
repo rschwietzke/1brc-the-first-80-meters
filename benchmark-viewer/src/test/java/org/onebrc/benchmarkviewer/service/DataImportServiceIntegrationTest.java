@@ -50,7 +50,7 @@ class DataImportServiceIntegrationTest
         // Create meta.json
         Files.writeString(tempDir.resolve(baseName + "-meta.json"), """
             {
-              "timestamp": "2026-05-05T17:54:02",
+              "timestamp": "20260505-175402",
               "totalRuns": 2,
               "comment": "Test run"
             }

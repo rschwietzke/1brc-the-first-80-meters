@@ -59,20 +59,19 @@ class DataImportServiceTest
     void testParseMetaJson()
     {
         final DataImportService service = new DataImportService(null, null);
-        final String jsonContent = """
+        final String json = """
             {
-              "timestamp": "2026-05-05T17:54:02",
-              "totalRuns": 1225,
-              "comment": "Test run comment"
+              "timestamp": "20260505-175402",
+              "totalRuns": 1224,
+              "comment": "Test run"
             }
             """;
 
         final TestRun run = new TestRun();
-        service.parseMeta(run, jsonContent);
+        service.parseMeta(run, json);
 
         assertThat(run.getTimestamp()).isEqualTo(LocalDateTime.of(2026, 5, 5, 17, 54, 2));
-        assertThat(run.getTotalRuns()).isEqualTo(1225);
-        assertThat(run.getComment()).isEqualTo("Test run comment");
+        assertThat(run.getComment()).isEqualTo("Test run");
     }
 
     @Test

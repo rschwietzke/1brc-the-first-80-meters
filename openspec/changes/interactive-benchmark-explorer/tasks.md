@@ -61,14 +61,14 @@ Each step ends with a manual verification gate — **STOP and wait for user OK**
 **Goal:** Landing page shows all imported test runs as clickable cards.
 
 ### Tests first:
-- [ ] 3.1 Write controller test: GET `/` returns 200, model contains `testRuns` list
-- [ ] 3.2 Write controller test: GET `/` with `HX-Request` header returns fragment (not full page)
+- [x] 3.1 Write controller test: GET `/` returns 200, model contains `testRuns` list
+- [x] 3.2 Write controller test: GET `/` with `HX-Request` header returns fragment (not full page)
 
 ### Implementation:
-- [ ] 3.3 Create `DashboardController` with `@GetMapping("/")` — loads all TestRuns, renders full page or HTMX fragment based on `HX-Request` header
-- [ ] 3.4 Create `fragments/run-list.html` — Bootstrap card list sorted newest-first: timestamp, hostname, CPU, memory, measurement count, dataset summary
-- [ ] 3.5 Wire card click: `hx-get="/runs/{timestamp}"` targeting `#main-content` with `hx-push-url`
-- [ ] 3.6 All tests pass
+- [x] 3.3 Create `DashboardController` with `@GetMapping("/")` — loads all TestRuns, renders full page or HTMX fragment based on `HX-Request` header
+- [x] 3.4 Create `fragments/run-list.html` — Bootstrap card list sorted newest-first: timestamp, hostname, CPU, memory, measurement count, dataset summary
+- [x] 3.5 Wire card click: `hx-get="/runs/{timestamp}"` targeting `#main-content` with `hx-push-url`
+- [x] 3.6 All tests pass
 
 **🛑 MANUAL VERIFY then STOP:**
 - `localhost:8080` shows card(s) for imported test runs

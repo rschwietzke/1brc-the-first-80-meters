@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content" id="main-content">
+    
+    <div class="mb-5 text-center">
+        <h1 class="display-5 fw-bold mb-3">
+            Welcome to <span class="text-gradient">Benchmark Explorer</span>
+        </h1>
+        <p class="lead text-muted mx-auto" style="max-width: 600px;">
+            Interactive performance analysis dashboard for 1BRC results. 
+            Drill down into JVM metrics, discover hardware bottlenecks, and spot regressions instantly.
+        </p>
+    </div>
+
+    <!-- Empty State if no runs -->
+    <div th:if="${#lists.isEmpty(testRuns)}" class="row justify-content-center mt-5">
+        <div class="col-md-10 col-lg-8">
+            <div class="tm-empty-state shadow-sm">
+                <i class="bi bi-magic tm-empty-icon"></i>
+                <h4 class="fw-bold mb-2">No Test Runs Loaded</h4>
+                <p class="text-muted mb-4">
+                    Benchmark data will magically appear here once the data import pipeline is configured.
+                </p>
+                <button class="btn btn-primary px-4 rounded-pill disabled">
+                    <i class="bi bi-cloud-arrow-down me-2"></i> Import Pending
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Runs Grid -->
+    <div th:unless="${#lists.isEmpty(testRuns)}" class="row g-4 mt-2">
+        <div class="col-md-6 col-xl-4" th:each="run : ${testRuns}">
+            <!-- Clickable Card targeting #main-content with HTMX -->
+            <div class="card h-100 shadow-sm border-0 tm-hover-card" style="cursor: pointer;"
+                 th:attr="hx-get=@{/runs/{timestamp}(timestamp=${#temporals.format(run.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})}"
+                 hx-target="#main-content"
+                 hx-push-url="true"
+                 hx-swap="outerHTML">
+                 
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-medium">
+                            <i class="bi bi-calendar-event me-1"></i> 
+                            <span th:text="${#temporals.format(run.timestamp, 'MMM dd, yyyy HH:mm')}">Date</span>
+                        </span>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </div>
+
+                    <h5 class="card-title fw-bold text-dark mb-3">
+                        <i class="bi bi-hdd-network text-secondary me-2"></i><span th:text="${run.hostname}">Hostname</span>
+                    </h5>
+
+                    <div class="text-secondary small mb-3">
+                        <div class="mb-1"><i class="bi bi-cpu me-2"></i> <span th:text="${run.cpu}">CPU</span> (<span th:text="${run.cpuCores}">0</span> Cores)</div>
+                        <div class="mb-1"><i class="bi bi-memory me-2"></i> <span th:text="${run.memory}">Memory</span></div>
+                        <div><i class="bi bi-ubuntu me-2"></i> <span th:text="${run.os}">OS</span> (<span th:text="${run.kernelVersion}">Kernel</span>)</div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            <span class="fw-semibold text-dark" th:text="${#numbers.formatInteger(run.totalRuns, 1, 'COMMA')}">0</span> measurements
+                        </div>
+                        <div class="text-muted small" th:if="${run.comment}">
+                            <i class="bi bi-chat-text me-1"></i> <span th:text="${run.comment}">Comment</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
