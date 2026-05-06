@@ -1,0 +1,6 @@
+#FileLock
+#Wed May 06 00:32:08 CEST 2026
+hostName=picard-rschwietzke
+id=19dfa45230511c4aa2effc1cda1b4ca2a92216ea0f2
+method=file
+server=127.0.1.1\:35735

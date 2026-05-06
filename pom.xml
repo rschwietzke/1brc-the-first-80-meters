@@ -15,7 +15,7 @@
     <modules>
         <module>1brc-implementations</module>
         <module>benchmark-harness</module>
-        <!-- <module>benchmark-viewer</module> -->
+        <module>benchmark-viewer</module>
     </modules>
 
     <properties>
