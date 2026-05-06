@@ -30,21 +30,21 @@ Each step ends with a manual verification gate — **STOP and wait for user OK**
 **Goal:** CSV and metadata files are parsed and persisted into H2 on startup.
 
 ### Tests first:
-- [ ] 2.1 Write unit tests for `TestRun` entity: field mapping, constraints
-- [ ] 2.2 Write unit tests for `Measurement` entity: field mapping, `error` flag derived from Checksum
-- [ ] 2.3 Write unit tests for CSV parsing logic: quoted fields with commas/spaces, ERROR rows set `error = true`, column fallback (TASKSET → BINDING for old-format CSVs), all 18 metric fields parsed correctly
-- [ ] 2.4 Write unit tests for sysinfo.txt parsing: `Key: Value` format, all 6 fields extracted
-- [ ] 2.5 Write unit tests for meta.json parsing: timestamp, totalRuns, comment
-- [ ] 2.6 Write integration test: import a test CSV fixture → verify row count, field values, ERROR flag
+- [x] 2.1 Write unit tests for `TestRun` entity: field mapping, constraints
+- [x] 2.2 Write unit tests for `Measurement` entity: field mapping, `error` flag derived from Checksum
+- [x] 2.3 Write unit tests for CSV parsing logic: quoted fields with commas/spaces, ERROR rows set `error = true`, column fallback (TASKSET → BINDING for old-format CSVs), all 18 metric fields parsed correctly
+- [x] 2.4 Write unit tests for sysinfo.txt parsing: `Key: Value` format, all 6 fields extracted
+- [x] 2.5 Write unit tests for meta.json parsing: timestamp, totalRuns, comment
+- [x] 2.6 Write integration test: import a test CSV fixture → verify row count, field values, ERROR flag
 
 ### Implementation:
-- [ ] 2.7 Create `TestRun` JPA entity: id, timestamp, totalRuns, comment, hostname, kernelVersion, os, cpu, cpuCores, memory
-- [ ] 2.8 Create `Measurement` JPA entity: id, `@ManyToOne` TestRun, runTimestamp (denormalized — pending Q2), 7 dimension fields, all 18 metric fields, `error` boolean
-- [ ] 2.9 Add Hibernate Search `@Indexed` on Measurement, `@KeywordField` on all 7 dimension fields
-- [ ] 2.10 Create `TestRunRepository` and `MeasurementRepository` (Spring Data JPA)
-- [ ] 2.11 Implement `DataImportService`: scan for `*-meta.json`, parse `*-sysinfo.txt`, parse `*.csv` with proper CSV parser. Set `error = true` when `Checksum = "ERROR"`. Skip already-imported timestamps.
-- [ ] 2.12 Create `StartupImporter` (`CommandLineRunner`) that runs `DataImportService`
-- [ ] 2.13 Trigger Hibernate Search mass indexer after import completes
+- [x] 2.7 Create `TestRun` JPA entity: id, timestamp, totalRuns, comment, hostname, kernelVersion, os, cpu, cpuCores, memory
+- [x] 2.8 Create `Measurement` JPA entity: id, `@ManyToOne` TestRun, runTimestamp (denormalized — pending Q2), 7 dimension fields, all 18 metric fields, `error` boolean
+- [x] 2.9 Add Hibernate Search `@Indexed` on Measurement, `@KeywordField` on all 7 dimension fields
+- [x] 2.10 Create `TestRunRepository` and `MeasurementRepository` (Spring Data JPA)
+- [x] 2.11 Implement `DataImportService`: scan for `*-meta.json`, parse `*-sysinfo.txt`, parse `*.csv` with proper CSV parser. Set `error = true` when `Checksum = "ERROR"`. Skip already-imported timestamps.
+- [x] 2.12 Create `StartupImporter` (`CommandLineRunner`) that runs `DataImportService`
+- [x] 2.13 Trigger Hibernate Search mass indexer after import completes
 - [ ] 2.14 All tests pass
 
 **🛑 MANUAL VERIFY then STOP:**
