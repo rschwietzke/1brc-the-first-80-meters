@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="content" id="main-content">
+<!-- Out of Band Breadcrumb Swap -->
+<ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
+    <li class="breadcrumb-item fs-6">
+        <a href="/" hx-get="/" hx-target="#main-content" hx-swap="outerHTML" hx-push-url="true" class="text-decoration-none">
+            <i class="bi bi-house-door"></i> Runs
+        </a>
+    </li>
+    <li class="breadcrumb-item active fs-6" aria-current="page" th:text="${#temporals.format(testRun.timestamp, 'yyyyMMdd-HHmmss')}">
+        Timestamp
+    </li>
+</ol>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h4 mb-0 fw-bold">
+            <i class="bi bi-grid-3x3-gap text-primary me-2"></i>Variation Matrix
+        </h2>
+        <div class="d-flex align-items-center gap-3">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="globalNormalizationSwitch" 
+                       onchange="document.body.classList.toggle('global-normalization', this.checked)">
+                <label class="form-check-label small text-muted" for="globalNormalizationSwitch">Global Normalization</label>
+            </div>
+            <div class="badge bg-light text-dark border">
+                <i class="bi bi-hdd-network me-1"></i> <span th:text="${testRun.hostname}">Host</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 tm-matrix-card">
+        <div class="card-body p-0 overflow-auto">
+            <table class="table table-bordered table-hover mb-0 tm-matrix-table" style="font-size: 0.85rem; white-space: nowrap;">
+                <thead class="table-light sticky-top">
+                    <tr>
+                        <th class="bg-light sticky-left z-2" style="min-width: 200px;">Environment / Class (Total: <span th:text="${classes.size()}"></span>)</th>
+                        <th th:each="cls : ${classes}" class="text-center align-middle" style="min-width: 80px;" th:title="${cls}">
+                            <div class="text-truncate" style="max-width: 120px;" th:text="${cls.substring(cls.lastIndexOf('.') + 1)}">Class</div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="entry : ${matrix}">
+                        <th class="bg-light sticky-left fw-medium align-middle" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
+                            <div th:text="|JDK ${entry.key.jdk}|" class="text-primary">JDK</div>
+                            <div class="text-muted text-truncate" style="max-width: 250px;" th:title="${entry.key.gcOpts + ' ' + entry.key.vmOpts}">
+                                <span th:if="${!#strings.isEmpty(entry.key.gcOpts)}" th:text="${entry.key.gcOpts}"></span> (Size: <span th:text="${entry.value.size()}"></span>)
+                            </div>
+                        </th>
+                        <td th:each="cls : ${classes}" class="text-center align-middle p-0 position-relative tm-matrix-cell"
+                            th:with="m=${entry.value.get(cls)}"
+                            th:style="${m != null && !m.error} ? '--bg-col: ' + ${T(org.onebrc.benchmarkviewer.util.HeatColorUtil).calculateColor(m.medianRuntimeMs, columnMin.get(cls), columnMax.get(cls))} + '; --bg-global: ' + ${T(org.onebrc.benchmarkviewer.util.HeatColorUtil).calculateColor(m.medianRuntimeMs, globalMin, globalMax)} + ';' : ''"
+                            th:classappend="${m != null && m.error} ? 'bg-danger bg-opacity-10' : ''">
+                            
+                            <div th:if="${m != null}" class="p-2 h-100 w-100 tm-cell-content"
+                                 style="cursor: pointer;"
+                                 th:attr="hx-get=@{/runs/{ts}/detail/{id}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m.id})}"
+                                 hx-target="#main-content"
+                                 hx-push-url="true">
+                                <div th:if="${m.error}" class="text-danger fw-bold"><i class="bi bi-x-circle"></i> ERR</div>
+                                <div th:unless="${m.error}" class="fw-medium font-monospace" th:text="${#numbers.formatDecimal(m.medianRuntimeMs, 1, 1)}">0.0</div>
+                            </div>
+                            <div th:unless="${m != null}" class="p-2 h-100 w-100 text-muted opacity-25">
+                                -
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

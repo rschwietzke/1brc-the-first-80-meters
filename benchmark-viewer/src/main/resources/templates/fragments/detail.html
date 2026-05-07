@@ -1,0 +1,185 @@
+<div th:fragment="detail-pane" id="main-content" class="container-fluid py-4 fade-in">
+
+<!-- Out of Band Breadcrumb Swap -->
+<ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
+    <li class="breadcrumb-item fs-6">
+        <a href="/" hx-get="/" hx-target="#main-content" hx-swap="outerHTML" hx-push-url="true" class="text-decoration-none">
+            <i class="bi bi-house-door"></i> Runs
+        </a>
+    </li>
+    <li class="breadcrumb-item fs-6">
+        <a th:href="@{/runs/{ts}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})}" 
+           class="text-decoration-none text-muted"
+           th:attr="hx-get=@{/runs/{ts}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})}"
+           hx-target="#main-content"
+           hx-swap="outerHTML"
+           hx-push-url="true">
+           <span th:text="${#temporals.format(testRun.timestamp, 'yyyyMMdd-HHmmss')}"></span>
+        </a>
+    </li>
+    <li class="breadcrumb-item active fs-6" aria-current="page" th:text="${measurement.className.substring(measurement.className.lastIndexOf('.') + 1)}"></li>
+</ol>
+
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h2 class="h3 mb-1" th:text="${measurement.className.substring(measurement.className.lastIndexOf('.') + 1)}">Class Name</h2>
+            <p class="text-muted mb-0">Measurement Details</p>
+        </div>
+        <div th:if="${measurement.error}" class="badge bg-danger rounded-pill px-3 py-2 fs-6">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> Execution Error
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Environment Context -->
+        <div class="col-12 col-xl-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-transparent border-bottom-0 pt-4 pb-0">
+                    <h5 class="card-title text-primary"><i class="bi bi-pc-display me-2"></i>Environment Context</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush text-secondary">
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light">
+                            <span class="text-muted small">JDK</span>
+                            <span class="font-monospace text-dark" th:text="${measurement.jdk}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light">
+                            <span class="text-muted small">GC Options</span>
+                            <span class="font-monospace text-dark text-end" style="word-break: break-all;" th:text="${measurement.gcOpts}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light">
+                            <span class="text-muted small">VM Options</span>
+                            <span class="font-monospace text-dark text-end" style="word-break: break-all;" th:text="${measurement.vmOpts}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light">
+                            <span class="text-muted small">Prog Options</span>
+                            <span class="font-monospace text-dark text-end" style="word-break: break-all;" th:text="${measurement.progOpts}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light">
+                            <span class="text-muted small">Binding</span>
+                            <span class="font-monospace text-dark text-end" style="word-break: break-all;" th:text="${measurement.binding}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light">
+                            <span class="text-muted small">Dataset Size</span>
+                            <span class="badge bg-light text-dark font-monospace" th:text="${measurement.dataset}"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Runtime Metrics -->
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-transparent border-bottom-0 pt-4 pb-0">
+                    <h5 class="card-title text-success"><i class="bi bi-stopwatch me-2"></i>Runtimes & System Time</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush text-secondary">
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light">
+                            <span class="text-muted small">Median Runtime</span>
+                            <span class="fw-bold text-dark"><span th:text="${measurement.medianRuntimeMs}"></span> ms</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light">
+                            <span class="text-muted small">Perf Runtime</span>
+                            <span class="fw-bold text-dark"><span th:text="${measurement.perfRuntimeMs}"></span> ms</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light">
+                            <span class="text-muted small">JFR Runtime</span>
+                            <span class="fw-bold text-dark"><span th:text="${measurement.jfrRuntimeMs}"></span> ms</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light mt-3">
+                            <span class="text-muted small">Elapsed Time</span>
+                            <span class="text-dark"><span th:text="${measurement.secElapsed}"></span> s</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light">
+                            <span class="text-muted small">User Time</span>
+                            <span class="text-dark"><span th:text="${measurement.secUser}"></span> s</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light border-bottom-0">
+                            <span class="text-muted small">Sys Time</span>
+                            <span class="text-dark"><span th:text="${measurement.secSys}"></span> s</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-light border-0 py-3" th:if="${hasJfrFile}">
+                    <a th:href="@{'/jfr/download/' + ${jfrFileName}}" class="btn btn-sm btn-outline-success w-100" title="Download associated Flight Recording">
+                        <i class="bi bi-download me-1"></i> Download JFR
+                    </a>
+                </div>
+                <div class="card-footer bg-light border-0 py-3 text-center text-muted small" th:unless="${hasJfrFile}">
+                    <i class="bi bi-x-circle me-1"></i> No JFR file recorded
+                </div>
+            </div>
+        </div>
+
+        <!-- Hardware Counters & Derived Metrics -->
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-transparent border-bottom-0 pt-4 pb-0">
+                    <h5 class="card-title text-info"><i class="bi bi-cpu me-2"></i>Hardware Counters</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${measurement.instructions == 0 and measurement.cycles == 0 and measurement.branches == 0}" class="text-center text-muted my-5 py-3">
+                        <i class="bi bi-slash-circle fs-1 d-block mb-3 text-light"></i>
+                        Counters were not recorded for this run.
+                    </div>
+                    
+                    <ul class="list-group list-group-flush text-secondary" th:unless="${measurement.instructions == 0 and measurement.cycles == 0 and measurement.branches == 0}">
+                        <!-- Raw Counters -->
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.instructions > 0}">
+                            <span class="text-muted small" title="Instructions executed">Instructions</span>
+                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.instructions, 0, 'COMMA')}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.cycles > 0}">
+                            <span class="text-muted small" title="CPU Cycles">Cycles</span>
+                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.cycles, 0, 'COMMA')}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.branches > 0}">
+                            <span class="text-muted small" title="Branches executed">Branches</span>
+                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.branches, 0, 'COMMA')}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.branchMisses > 0}">
+                            <span class="text-muted small" title="Branch Mispredictions">Branch Misses</span>
+                            <span class="font-monospace text-danger" th:text="${#numbers.formatInteger(measurement.branchMisses, 0, 'COMMA')}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.l1Misses > 0}">
+                            <span class="text-muted small" title="L1 Data Cache Load Misses">L1 D-Cache Misses</span>
+                            <span class="font-monospace text-danger" th:text="${#numbers.formatInteger(measurement.l1Misses, 0, 'COMMA')}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.llcMisses > 0}">
+                            <span class="text-muted small" title="Last Level Cache Misses">LLC Misses</span>
+                            <span class="font-monospace text-danger" th:text="${#numbers.formatInteger(measurement.llcMisses, 0, 'COMMA')}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.pageFaults > 0}">
+                            <span class="text-muted small" title="Page Faults">Page Faults</span>
+                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.pageFaults, 0, 'COMMA')}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.contextSwitches > 0}">
+                            <span class="text-muted small" title="Context Switches">Context Switches</span>
+                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.contextSwitches, 0, 'COMMA')}"></span>
+                        </li>
+
+                        <!-- Derived Metrics -->
+                        <div class="mt-4" th:if="${measurement.ipc != null or measurement.branchMissRate != null}">
+                            <h6 class="text-muted text-uppercase small fw-bold mb-3 border-bottom pb-2">Derived Metrics</h6>
+                            
+                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.ipc != null}">
+                                <span class="text-muted small" title="Instructions Per Cycle">IPC</span>
+                                <span class="font-monospace fw-bold text-primary" th:text="${#numbers.formatDecimal(measurement.ipc, 1, 3)}"></span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.cpi != null}">
+                                <span class="text-muted small" title="Cycles Per Instruction">CPI</span>
+                                <span class="font-monospace text-primary" th:text="${#numbers.formatDecimal(measurement.cpi, 1, 3)}"></span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light border-bottom-0" th:if="${measurement.branchMissRate != null}">
+                                <span class="text-muted small" title="Branch Miss Rate">Branch Miss Rate</span>
+                                <span class="font-monospace text-danger"><span th:text="${#numbers.formatDecimal(measurement.branchMissRate, 1, 2)}"></span>%</span>
+                            </li>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

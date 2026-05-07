@@ -315,3 +315,6 @@ h1, h2, h3, h4, h5, h6 {
         padding: 1.5rem;
     }
 }
+
+.tm-matrix-cell { background-color: var(--bg-col, transparent); transition: background-color 0.3s; }
+.global-normalization .tm-matrix-cell { background-color: var(--bg-global, transparent); }

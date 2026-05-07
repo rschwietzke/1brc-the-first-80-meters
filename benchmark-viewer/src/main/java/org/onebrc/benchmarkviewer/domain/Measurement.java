@@ -25,6 +25,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
@@ -47,25 +48,31 @@ public class Measurement
     @JoinColumn(name = "test_run_id", nullable = false)
     private TestRun testRun;
 
-    @KeywordField
+    @org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField(name = "testRunId")
+    @org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency(derivedFrom = @org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath(@org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue(propertyName = "testRun")))
+    public Long getTestRunId() {
+        return testRun != null ? testRun.getId() : null;
+    }
+
+    @KeywordField(aggregable = org.hibernate.search.engine.backend.types.Aggregable.YES)
     private String jdk;
 
-    @KeywordField
+    @KeywordField(aggregable = org.hibernate.search.engine.backend.types.Aggregable.YES)
     private String gcOpts;
 
-    @KeywordField
+    @KeywordField(aggregable = org.hibernate.search.engine.backend.types.Aggregable.YES)
     private String vmOpts;
 
-    @KeywordField
+    @KeywordField(aggregable = org.hibernate.search.engine.backend.types.Aggregable.YES)
     private String progOpts;
 
-    @KeywordField
+    @KeywordField(aggregable = org.hibernate.search.engine.backend.types.Aggregable.YES)
     private String binding;
 
-    @KeywordField
+    @KeywordField(aggregable = org.hibernate.search.engine.backend.types.Aggregable.YES)
     private String dataset;
 
-    @KeywordField
+    @KeywordField(aggregable = org.hibernate.search.engine.backend.types.Aggregable.YES)
     private String className;
 
     private String runTimestamp;
@@ -371,5 +378,25 @@ public class Measurement
     public void setSecSys(final double secSys)
     {
         this.secSys = secSys;
+    }
+
+    @Transient
+    public Double getCpi()
+    {
+        if (this.instructions > 0)
+        {
+            return (double) this.cycles / this.instructions;
+        }
+        return null;
+    }
+
+    @Transient
+    public Double getBranchMissRate()
+    {
+        if (this.branches > 0)
+        {
+            return ((double) this.branchMisses / this.branches) * 100.0;
+        }
+        return null;
     }
 }

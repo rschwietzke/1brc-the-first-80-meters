@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Run Detail</title>
+</head>
+<body>
+
+    <!-- Breadcrumb -->
+    <li layout:fragment="breadcrumb" class="breadcrumb-item active" aria-current="page">
+        <i class="bi bi-grid me-1"></i> Dashboard
+    </li>
+
+    <!-- Sidebar -->
+    <div layout:fragment="sidebar" class="px-3">
+        <div th:replace="~{fragments/sidebar :: content}"></div>
+    </div>
+
+    <!-- Main content -->
+    <div layout:fragment="content">
+        <div th:replace="~{fragments/variation-matrix :: content}"></div>
+    </div>
+
+    <!-- HTMX Response Block -->
+    <th:block th:fragment="htmx-response">
+        <div th:replace="~{fragments/variation-matrix :: content}"></div>
+        <div th:replace="~{fragments/sidebar :: content}"></div>
+    </th:block>
+
+</body>
+</html>

@@ -46,6 +46,13 @@ public class DataImportService
 
     private final TestRunRepository testRunRepository;
     private final MeasurementRepository measurementRepository;
+
+    /**
+     * Construct the data import service.
+     *
+     * @param testRunRepository     repository for persisting test runs
+     * @param measurementRepository repository for persisting measurements
+     */
     public DataImportService(final TestRunRepository testRunRepository, final MeasurementRepository measurementRepository)
     {
         this.testRunRepository = testRunRepository;
@@ -113,9 +120,9 @@ public class DataImportService
             parseSysinfo(run, Files.readString(sysinfoPath));
             
             // Save run first to get ID
-            this.testRunRepository.save(run);
+            final TestRun savedRun = this.testRunRepository.save(run);
 
-            final List<Measurement> measurements = parseCsv(run, Files.readString(csvPath));
+            final List<Measurement> measurements = parseCsv(savedRun, Files.readString(csvPath));
             this.measurementRepository.saveAll(measurements);
 
             log.info("Imported {} measurements for run {}", measurements.size(), run.getTimestamp());
@@ -200,11 +207,20 @@ public class DataImportService
     {
         final String search = "\"" + key + "\":";
         int idx = json.indexOf(search);
-        if (idx < 0) return null;
+        if (idx < 0)
+        {
+            return null;
+        }
         idx = json.indexOf("\"", idx + search.length());
-        if (idx < 0) return null;
+        if (idx < 0)
+        {
+            return null;
+        }
         final int endIdx = json.indexOf("\"", idx + 1);
-        if (endIdx < 0) return null;
+        if (endIdx < 0)
+        {
+            return null;
+        }
         return json.substring(idx + 1, endIdx);
     }
 
@@ -212,12 +228,24 @@ public class DataImportService
     {
         final String search = "\"" + key + "\":";
         final int idx = json.indexOf(search);
-        if (idx < 0) return null;
+        if (idx < 0)
+        {
+            return null;
+        }
         int startIdx = idx + search.length();
-        while (startIdx < json.length() && Character.isWhitespace(json.charAt(startIdx))) startIdx++;
+        while (startIdx < json.length() && Character.isWhitespace(json.charAt(startIdx)))
+        {
+            startIdx++;
+        }
         int endIdx = startIdx;
-        while (endIdx < json.length() && (Character.isDigit(json.charAt(endIdx)) || json.charAt(endIdx) == '.' || json.charAt(endIdx) == '-')) endIdx++;
-        if (startIdx == endIdx) return null;
+        while (endIdx < json.length() && (Character.isDigit(json.charAt(endIdx)) || json.charAt(endIdx) == '.' || json.charAt(endIdx) == '-'))
+        {
+            endIdx++;
+        }
+        if (startIdx == endIdx)
+        {
+            return null;
+        }
         return json.substring(startIdx, endIdx);
     }
 

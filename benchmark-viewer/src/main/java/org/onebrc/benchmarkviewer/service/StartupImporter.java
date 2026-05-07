@@ -39,7 +39,7 @@ public class StartupImporter implements CommandLineRunner
 
     public StartupImporter(final DataImportService dataImportService, 
                            final EntityManager entityManager,
-                           @Value("${benchmark.data.dir:data/benchmark-history}") final String dataDir)
+                           @Value("${benchmark.data.directory:data/benchmark-history}") final String dataDir)
     {
         this.dataImportService = dataImportService;
         this.entityManager = entityManager;

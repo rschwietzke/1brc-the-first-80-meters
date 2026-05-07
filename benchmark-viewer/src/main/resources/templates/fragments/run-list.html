@@ -2,7 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="content" id="main-content">
-    
+
+    <!-- Out of Band Breadcrumb Swap -->
+    <ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
+        <li class="breadcrumb-item active fs-6" aria-current="page">
+            <i class="bi bi-grid me-1"></i> Dashboard
+        </li>
+    </ol>
     <div class="mb-5 text-center">
         <h1 class="display-5 fw-bold mb-3">
             Welcome to <span class="text-gradient">Benchmark Explorer</span>

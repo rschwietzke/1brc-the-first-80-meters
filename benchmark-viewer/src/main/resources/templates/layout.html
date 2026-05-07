@@ -42,19 +42,34 @@
 
     <div class="app-layout">
         
-        <!-- Sidebar -->
+        <!-- Sidebar (Desktop) -->
         <aside class="tm-sidebar d-none d-lg-flex" id="sidebar">
             <a class="tm-brand" href="/"
                hx-get="/" hx-target="#main-content" hx-push-url="true">
                 <i class="bi bi-rocket-takeoff"></i>
                 Explorer
             </a>
-            <div layout:fragment="sidebar" class="px-3">
+            <div layout:fragment="sidebar" class="px-3" id="sidebar-content">
                 <div class="sidebar-placeholder p-3">
                     <i class="bi bi-funnel me-2"></i> Filters will appear here
                 </div>
             </div>
         </aside>
+
+        <!-- Sidebar (Mobile Offcanvas) -->
+        <div class="offcanvas offcanvas-start d-lg-none border-end-0 shadow" tabindex="-1" id="sidebar-offcanvas" aria-labelledby="sidebarOffcanvasLabel">
+            <div class="offcanvas-header pb-0">
+                <h5 class="offcanvas-title fw-bold" id="sidebarOffcanvasLabel">
+                    <i class="bi bi-rocket-takeoff text-primary me-2"></i>Explorer
+                </h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div layout:fragment="sidebar-mobile">
+                    <!-- HTMX will copy the desktop sidebar here or we can just swap both. Actually, if we use the same ID, HTMX won't duplicate. We can duplicate the fragment inside run-detail.html or use JS to move it. Let's just create a secondary target. -->
+                </div>
+            </div>
+        </div>
 
         <!-- Main Container -->
         <main class="tm-main" id="main-wrapper">
