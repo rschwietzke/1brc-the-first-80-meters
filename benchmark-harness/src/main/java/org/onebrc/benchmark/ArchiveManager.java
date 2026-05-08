@@ -62,24 +62,22 @@ public class ArchiveManager {
      * Helper method: listRuns.
      */
     public static List<RunArchive> listRuns() {
-        Path historyDir = Paths.get("data", "benchmark-history");
+        Path historyDir = BenchmarkDataLocator.ROOT;
         if (!Files.exists(historyDir)) return Collections.emptyList();
 
         try (Stream<Path> paths = Files.walk(historyDir, 1)) {
             List<String> timestamps = paths
-                    .filter(Files::isRegularFile)
+                    .filter(Files::isDirectory)
                     .map(p -> p.getFileName().toString())
-                    .filter(n -> n.endsWith("-run.sh"))
-                    .map(n -> n.replace("-run.sh", ""))
-                    .distinct()
+                    .filter(n -> n.matches("\\d{8}-\\d{6}"))
                     .collect(Collectors.toList());
 
             List<RunArchive> archives = new ArrayList<>();
             for (String ts : timestamps) {
-                boolean script = Files.exists(historyDir.resolve(ts + "-run.sh"));
-                boolean csv = Files.exists(historyDir.resolve(ts + ".csv"));
-                boolean html = Files.exists(historyDir.resolve(ts + ".html"));
-                boolean md = Files.exists(historyDir.resolve(ts + ".md"));
+                boolean script = Files.exists(BenchmarkDataLocator.getRunScriptFile(ts));
+                boolean csv = Files.exists(BenchmarkDataLocator.getCsvFile(ts));
+                boolean html = Files.exists(BenchmarkDataLocator.getHtmlReportFile(ts));
+                boolean md = Files.exists(BenchmarkDataLocator.getMdReportFile(ts));
                 archives.add(new RunArchive(ts, script, csv, html, md));
             }
             Collections.sort(archives);

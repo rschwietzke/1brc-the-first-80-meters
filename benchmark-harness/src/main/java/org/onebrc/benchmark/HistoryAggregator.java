@@ -106,20 +106,22 @@ public class HistoryAggregator {
         List<RunSummary> summaries = new ArrayList<>();
         Map<String, List<HistoricalDataPoint>> permutations = new java.util.HashMap<>();
         
-        Path historyDir = Paths.get("data", "benchmark-history");
+        Path historyDir = BenchmarkDataLocator.ROOT;
         if (!Files.exists(historyDir)) return new AggregateResult(summaries, permutations);
 
         Gson gson = new Gson();
 
         try (Stream<Path> paths = Files.list(historyDir)) {
-            List<Path> csvFiles = paths
-                .filter(p -> p.toString().endsWith(".csv") && !p.getFileName().toString().contains("-meta"))
+            List<Path> timestampDirs = paths
+                .filter(Files::isDirectory)
+                .filter(p -> p.getFileName().toString().matches("\\d{8}-\\d{6}"))
                 .collect(Collectors.toList());
 
-            for (Path csvFile : csvFiles) {
+            for (Path runDir : timestampDirs) {
                 try {
-                    String timestamp = csvFile.getFileName().toString().replace(".csv", "");
-                    Path metaFile = historyDir.resolve(timestamp + "-meta.json");
+                    String timestamp = runDir.getFileName().toString();
+                    Path csvFile = BenchmarkDataLocator.getCsvFile(timestamp);
+                    Path metaFile = BenchmarkDataLocator.getMetaFile(timestamp);
                     
                     String comment = "";
                     int totalRuns = 0;
@@ -136,7 +138,7 @@ public class HistoryAggregator {
                     }
 
                     Map<String, String> sysInfo = new LinkedHashMap<>();
-                    Path sysInfoFile = historyDir.resolve(timestamp + "-sysinfo.txt");
+                    Path sysInfoFile = BenchmarkDataLocator.getSysInfoFile(timestamp);
                     if (Files.exists(sysInfoFile)) {
                         try {
                             List<String> lines = Files.readAllLines(sysInfoFile);
@@ -186,7 +188,7 @@ public class HistoryAggregator {
                     summaries.add(new RunSummary(timestamp, comment, totalRuns, fastestClass, fastestMs, fastestIpc, sysInfo));
 
                 } catch (Exception e) {
-                    System.err.println("Error processing run summary for " + csvFile + ": " + e.getMessage());
+                    System.err.println("Error processing run summary for " + runDir + ": " + e.getMessage());
                 }
             }
         } catch (IOException e) {

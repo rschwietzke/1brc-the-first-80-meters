@@ -45,7 +45,7 @@ Each step ends with a manual verification gate — **STOP and wait for user OK**
 - [x] 2.11 Implement `DataImportService`: scan for `*-meta.json`, parse `*-sysinfo.txt`, parse `*.csv` with proper CSV parser. Set `error = true` when `Checksum = "ERROR"`. Skip already-imported timestamps.
 - [x] 2.12 Create `StartupImporter` (`CommandLineRunner`) that runs `DataImportService`
 - [x] 2.13 Trigger Hibernate Search mass indexer after import completes
-- [ ] 2.14 All tests pass
+- [x] 2.14 All tests pass
 
 **🛑 MANUAL VERIFY then STOP:**
 - Application starts, logs import of 1,224 measurements
@@ -82,20 +82,20 @@ Each step ends with a manual verification gate — **STOP and wait for user OK**
 **Goal:** Clicking a test run shows environment × class matrix with heat coloring and ERROR flagging.
 
 ### Tests first:
-- [ ] 4.1 Write controller test: GET `/runs/{timestamp}` returns 200, model contains grouped matrix data
-- [ ] 4.2 Write unit test for heat coloring logic: per-column normalization produces correct color values for min/max/mid
-- [ ] 4.3 Write unit test for heat coloring logic: global normalization uses single min/max across all cells
-- [ ] 4.4 Write unit test: ERROR measurements produce distinct display model (not normal `0 ms`)
+- [x] 4.1 Write controller test: GET `/runs/{timestamp}` returns 200, model contains grouped matrix data
+- [x] 4.2 Write unit test for heat coloring logic: per-column normalization produces correct color values for min/max/mid
+- [x] 4.3 Write unit test for heat coloring logic: global normalization uses single min/max across all cells
+- [x] 4.4 Write unit test: ERROR measurements produce distinct display model (not normal `0 ms`)
 
 ### Implementation:
-- [ ] 4.5 Create `RunDetailController` with `@GetMapping("/runs/{timestamp}")` — loads Measurements, groups into matrix (rows = environment combos, columns = classes)
-- [ ] 4.6 Create `fragments/variation-matrix.html` — Bootstrap table, environment rows (JDK + GC + heap), class columns, cells with formatted `MedianRuntimeMs`
-- [ ] 4.7 Implement heat coloring with two modes (per-column, global). Default: per-column.
-- [ ] 4.8 Add normalization toggle control (radio buttons or switch) above matrix
-- [ ] 4.9 Flag ERROR cells: greyed out / strikethrough / error badge
-- [ ] 4.10 Wire cell click: `hx-get="/runs/{timestamp}/detail/{measurementId}"` targeting `#main-content`
-- [ ] 4.11 Create `fragments/breadcrumb.html` — Runs → [timestamp], each segment is HTMX link
-- [ ] 4.12 All tests pass
+- [x] 4.5 Create `RunDetailController` with `@GetMapping("/runs/{timestamp}")` — loads Measurements, groups into matrix (rows = environment combos, columns = classes)
+- [x] 4.6 Create `fragments/variation-matrix.html` — Bootstrap table, environment rows (JDK + GC + heap), class columns, cells with formatted `MedianRuntimeMs`
+- [x] 4.7 Implement heat coloring with two modes (per-column, global). Default: per-column.
+- [x] 4.8 Add normalization toggle control (radio buttons or switch) above matrix
+- [x] 4.9 Flag ERROR cells: greyed out / strikethrough / error badge
+- [x] 4.10 Wire cell click: `hx-get="/runs/{timestamp}/detail/{measurementId}"` targeting `#main-content`
+- [x] 4.11 Create `fragments/breadcrumb.html` — Runs → [timestamp], each segment is HTMX link
+- [x] 4.12 All tests pass
 
 **🛑 MANUAL VERIFY then STOP:**
 - Click run card → matrix appears (18 env rows × 68 class columns)
@@ -111,23 +111,23 @@ Each step ends with a manual verification gate — **STOP and wait for user OK**
 **Goal:** Sidebar with dimension checkboxes and counts. Toggling filters updates the matrix.
 
 ### Tests first:
-- [ ] 5.1 Write unit test for `SearchService.getFacetCounts()`: returns correct counts for unfiltered state
-- [ ] 5.2 Write unit test for `SearchService.getFacetCounts()`: applying a JDK filter reduces counts in other dimensions
-- [ ] 5.3 Write unit test for `SearchService.searchMeasurements()`: returns only matching measurements
-- [ ] 5.4 Write controller test: GET `/sidebar` returns fragment with facet data
-- [ ] 5.5 Write controller test: GET `/sidebar?jdk=JDK_21_OPEN` returns updated counts
+- [x] 5.1 Write unit test for `SearchService.getFacetCounts()`: returns correct counts for unfiltered state
+- [x] 5.2 Write unit test for `SearchService.getFacetCounts()`: applying a JDK filter reduces counts in other dimensions
+- [x] 5.3 Write unit test for `SearchService.searchMeasurements()`: returns only matching measurements
+- [x] 5.4 Write controller test: GET `/sidebar` returns fragment with facet data
+- [x] 5.5 Write controller test: GET `/sidebar?jdk=JDK_21_OPEN` returns updated counts
 
 ### Implementation:
-- [ ] 5.6 Implement `SearchService` using Hibernate Search `SearchSession`
-- [ ] 5.7 Implement `getFacetCounts(activeFilters)` — `Map<String, Map<String, Long>>` via terms aggregation
-- [ ] 5.8 Implement `searchMeasurements(activeFilters)` — filtered Measurement list
-- [ ] 5.9 Create `FilterState` model class
-- [ ] 5.10 Create `fragments/sidebar.html` — collapsible accordion for each dimension, checkboxes + count badges
-- [ ] 5.11 Create `SidebarController` with `@GetMapping("/sidebar")`
-- [ ] 5.12 Wire filter changes: checkbox toggle → HTMX refresh of sidebar + main content
-- [ ] 5.13 Implement "Clear All" button
-- [ ] 5.14 Responsive sidebar: Bootstrap offcanvas for viewport < 768px
-- [ ] 5.15 All tests pass
+- [x] 5.6 Implement `SearchService` using Hibernate Search `SearchSession`
+- [x] 5.7 Implement `getFacetCounts(activeFilters)` — `Map<String, Map<String, Long>>` via terms aggregation
+- [x] 5.8 Implement `searchMeasurements(activeFilters)` — filtered Measurement list
+- [x] 5.9 Create `FilterState` model class
+- [x] 5.10 Create `fragments/sidebar.html` — collapsible accordion for each dimension, checkboxes + count badges
+- [x] 5.11 Create `SidebarController` with `@GetMapping("/sidebar")`
+- [x] 5.12 Wire filter changes: checkbox toggle → HTMX refresh of sidebar + main content
+- [x] 5.13 Implement "Clear All" button
+- [x] 5.14 Responsive sidebar: Bootstrap offcanvas for viewport < 768px
+- [x] 5.15 All tests pass
 
 **🛑 MANUAL VERIFY then STOP:**
 - Sidebar shows dimensions with counts (e.g. JDK_21_OPEN: 612, JDK_25_OPEN: 612)
@@ -143,23 +143,23 @@ Each step ends with a manual verification gate — **STOP and wait for user OK**
 **Goal:** Clicking a matrix cell shows full telemetry with raw and derived metrics.
 
 ### Tests first:
-- [ ] 6.1 Write controller test: GET `/runs/{timestamp}/detail/{id}` returns 200, model contains Measurement
-- [ ] 6.2 Write unit test for derived metrics: IPC, CPI, branch miss rate %, L1 miss rate — computed correctly from raw counters
-- [ ] 6.3 Write unit test for derived metrics: returns null/absent when underlying counters are zero
-- [ ] 6.4 Write unit test for JFR file detection: returns download path when `.jfr` exists, null when absent
+- [x] 6.1 Write controller test: GET `/runs/{timestamp}/detail/{id}` returns 200, model contains Measurement
+- [x] 6.2 Write unit test for derived metrics: IPC, CPI, branch miss rate %, L1 miss rate — computed correctly from raw counters
+- [x] 6.3 Write unit test for derived metrics: returns null/absent when underlying counters are zero
+- [x] 6.4 Write unit test for JFR file detection: returns download path when `.jfr` exists, null when absent
 
 ### Implementation:
-- [ ] 6.5 Create `DetailController` with `@GetMapping("/runs/{timestamp}/detail/{id}")`
-- [ ] 6.6 Create `fragments/detail.html` — card grid:
+- [x] 6.5 Create `DetailController` with `@GetMapping("/runs/{timestamp}/detail/{id}")`
+- [x] 6.6 Create `fragments/detail.html` — card grid:
   - Environment context (JDK, GC, VM opts, binding, dataset, full class name)
   - Runtime group (MedianRuntimeMs, PerfRuntimeMs, JfrRuntimeMs, SecElapsed, SecUser, SecSys)
   - Hardware counters (all raw values)
   - Derived metrics (conditional: IPC, CPI, branch miss rate, L1 miss rate)
   - Error indicator (badge + Checksum value when `error = true`)
-- [ ] 6.7 Hide entire metric groups when all underlying values are zero
-- [ ] 6.8 JFR download link if `.jfr` file exists for this configuration
-- [ ] 6.9 Update breadcrumb: Runs → [timestamp] → [className]
-- [ ] 6.10 All tests pass
+- [x] 6.7 Hide entire metric groups when all underlying values are zero
+- [x] 6.8 JFR download link if `.jfr` file exists for this configuration
+- [x] 6.9 Update breadcrumb: Runs → [timestamp] → [className]
+- [x] 6.10 All tests pass
 
 **🛑 MANUAL VERIFY then STOP:**
 - Click matrix cell → detail view with all metrics

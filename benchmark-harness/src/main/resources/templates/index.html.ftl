@@ -44,7 +44,7 @@ tr:hover { background-color: #f5f5f5; }
         <tbody>
             <#list summaries as run>
             <tr>
-                <td><strong><a href="${run.timestamp}.html">${run.timestamp}</a></strong></td>
+                <td><strong><a href="${run.timestamp}/reports/results.html">${run.timestamp}</a></strong></td>
                 <td class="comment"><#if run.comment?has_content>${run.comment}<#else>-</#if></td>
                 <td>
                     <#if run.sysInfo?has_content>

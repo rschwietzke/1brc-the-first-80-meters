@@ -67,7 +67,7 @@ public class PermutationWriter {
      * @throws IOException If FreeMarker templates cannot be loaded or files cannot be written to disk.
      */
     public static void write(HistoryAggregator.AggregateResult result) throws IOException {
-        Path permutationsDir = Paths.get("data", "benchmark-history", "permutations");
+        Path permutationsDir = BenchmarkDataLocator.getPermutationsDir();
         if (!Files.exists(permutationsDir)) {
             Files.createDirectories(permutationsDir);
         }

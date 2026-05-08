@@ -43,7 +43,7 @@ public class OverviewWriter {
      * Helper method: write.
      */
     public static void write() throws IOException {
-        Path outPath = Paths.get("data", "benchmark-history", "index.html");
+        Path outPath = BenchmarkDataLocator.getGlobalOverviewFile();
 
         HistoryAggregator.AggregateResult result = HistoryAggregator.aggregate();
 

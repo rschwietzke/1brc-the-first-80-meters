@@ -58,7 +58,7 @@ tr:hover { background-color: #f5f5f5; }
         <tbody>
             <#list history as entry>
             <tr>
-                <td><a href="../${entry.timestamp}.html">${entry.timestamp}</a></td>
+                <td><a href="../${entry.timestamp}/reports/results.html">${entry.timestamp}</a></td>
                 <td>${entry.data.medianRuntimeMs}</td>
                 <td>${entry.data.ipc}</td>
                 <td>${entry.data.instructions}</td>

@@ -62,7 +62,9 @@ public class HtmlReportWriter {
      * Optionally includes a baseline matrix for cross-run comparison.
      */
     public static void write(final String timestamp, final ResultMatrix matrix, final ResultMatrix baselineMatrix, final MachineMatch match) throws IOException {
-        final Path outPath = Paths.get("data", "benchmark-history", timestamp + ".html");
+        final Path reportsDir = BenchmarkDataLocator.getReportsDir(timestamp);
+        Files.createDirectories(reportsDir);
+        final Path outPath = BenchmarkDataLocator.getHtmlReportFile(timestamp);
 
         final Configuration cfg = new Configuration(Configuration.VERSION_2_3_32);
         cfg.setClassForTemplateLoading(HtmlReportWriter.class, "/templates");
@@ -74,7 +76,7 @@ public class HtmlReportWriter {
 
         // Initialize the sysinfo map and attempt to load hardware telemetry
         final Map<String, String> sysInfo = new LinkedHashMap<>();
-        final Path sysInfoFile = Paths.get("data", "benchmark-history", timestamp + "-sysinfo.txt");
+        final Path sysInfoFile = BenchmarkDataLocator.getSysInfoFile(timestamp);
         if (Files.exists(sysInfoFile)) {
             try {
                 final List<String> lines = Files.readAllLines(sysInfoFile);

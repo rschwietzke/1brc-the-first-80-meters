@@ -47,6 +47,8 @@ public class JfrConsumer {
             return metrics;
         }
 
+        java.util.Map<Long, Long> threadAllocs = new java.util.HashMap<>();
+
         try (RecordingFile recordingFile = new RecordingFile(jfrFile)) {
             while (recordingFile.hasMoreEvents()) {
                 RecordedEvent event = recordingFile.readEvent();
@@ -62,6 +64,12 @@ public class JfrConsumer {
                     if (event.hasField("allocationSize")) {
                         metrics.totalAllocatedBytes += event.getLong("allocationSize");
                     }
+                } else if ("jdk.ThreadAllocationStatistics".equals(eventName)) {
+                    if (event.hasField("thread") && event.hasField("allocated")) {
+                        long threadId = event.getThread("thread").getJavaThreadId();
+                        long allocated = event.getLong("allocated");
+                        threadAllocs.put(threadId, Math.max(threadAllocs.getOrDefault(threadId, 0L), allocated));
+                    }
                 } else if ("jdk.Compilation".equals(eventName)) {
                     Duration duration = event.getDuration();
                     if (duration != null) {
@@ -71,6 +79,10 @@ public class JfrConsumer {
             }
         } catch (IOException e) {
             System.err.println("Warning: Failed to parse JFR file " + jfrFile + " - " + e.getMessage());
+        }
+
+        for (long alloc : threadAllocs.values()) {
+            metrics.totalAllocatedBytes += alloc;
         }
 
         return metrics;

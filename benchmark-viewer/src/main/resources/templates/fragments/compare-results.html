@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="results" id="compare-results-container">
+
+    <div th:if="${results == null or results.isEmpty()}" class="alert alert-info border-0 shadow-sm">
+        <i class="bi bi-info-circle me-2"></i> No data to compare. Please ensure you have selected two different environments, or check your sidebar filters.
+    </div>
+
+    <div th:if="${results != null and !results.isEmpty()}" class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-borderless align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Class</th>
+                        <th class="text-end">Runtime A (ms)</th>
+                        <th class="text-end">Runtime B (ms)</th>
+                        <th class="text-end">Δ ms</th>
+                        <th class="text-end pe-4">Δ %</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${results}">
+                        <td class="ps-4 font-monospace small">
+                            <span th:text="${row.className.substring(row.className.lastIndexOf('.') + 1)}"></span>
+                            <small class="text-muted d-block opacity-50" th:text="${row.className.substring(0, row.className.lastIndexOf('.') > 0 ? row.className.lastIndexOf('.') : 0)}"></small>
+                        </td>
+                        
+                        <td class="text-end font-monospace">
+                            <span th:if="${row.runtimeA == 0.0}" class="text-muted">-</span>
+                            <span th:if="${row.runtimeA > 0.0}" th:text="${#numbers.formatDecimal(row.runtimeA, 1, 'COMMA', 2, 'POINT')}"></span>
+                        </td>
+                        
+                        <td class="text-end font-monospace">
+                            <span th:if="${row.runtimeB == 0.0}" class="text-muted">-</span>
+                            <span th:if="${row.runtimeB > 0.0}" th:text="${#numbers.formatDecimal(row.runtimeB, 1, 'COMMA', 2, 'POINT')}"></span>
+                        </td>
+                        
+                        <td class="text-end font-monospace" th:classappend="${row.deltaMs > 0 ? 'text-danger fw-bold' : (row.deltaMs < 0 ? 'text-success' : 'text-muted')}">
+                            <span th:if="${row.deltaMs > 0}">+</span><span th:text="${#numbers.formatDecimal(row.deltaMs, 1, 'COMMA', 2, 'POINT')}"></span>
+                        </td>
+                        
+                        <td class="text-end font-monospace pe-4" th:classappend="${row.deltaPct > 0 ? 'text-danger fw-bold' : (row.deltaPct < 0 ? 'text-success fw-bold' : 'text-muted')}">
+                            <span th:if="${row.newRegression}">NEW</span>
+                            <span th:if="${!row.newRegression}">
+                                <span th:if="${row.deltaPct > 0}">+</span><span th:text="${#numbers.formatDecimal(row.deltaPct, 1, 'COMMA', 2, 'POINT')}"></span>%
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -149,14 +149,15 @@ public class BenchmarkMatrix {
         if (timestamp == null) {
             // Mode A: No specific timestamp provided, trigger a full history rebuild
             System.out.println("No timestamp provided. Scanning history and regenerating all reports...");
-            Path historyDir = Paths.get("data", "benchmark-history");
+            Path historyDir = BenchmarkDataLocator.ROOT;
             if (Files.exists(historyDir)) {
-                // Find all raw CSV result files, excluding the metadata tracking files
+                // Find all timestamp directories
                 try (Stream<Path> paths = Files.list(historyDir)) {
-                    paths.filter(p -> p.toString().endsWith(".csv") && !p.getFileName().toString().contains("-meta"))
+                    paths.filter(Files::isDirectory)
+                         .filter(p -> p.getFileName().toString().matches("\\d{8}-\\d{6}"))
                          .forEach(p -> {
-                             // Extract the raw timestamp from the filename and process it
-                             String ts = p.getFileName().toString().replace(".csv", "");
+                             // Extract the raw timestamp from the directory name and process it
+                             String ts = p.getFileName().toString();
                              try {
                                  processSingleRun(ts, null);
                              } catch (IOException e) {
@@ -187,7 +188,7 @@ public class BenchmarkMatrix {
         CsvMerger.merge(timestamp);
         
         ResultMatrix matrix = new ResultMatrix();
-        matrix.loadCsv(Paths.get("data", "benchmark-history", timestamp + ".csv"));
+        matrix.loadCsv(BenchmarkDataLocator.getCsvFile(timestamp));
         
         HtmlReportWriter.write(timestamp, matrix);
         MarkdownReportWriter.write(timestamp, matrix, outputReportPath);
@@ -196,7 +197,7 @@ public class BenchmarkMatrix {
     /**
      * Handles the 'list-runs' command.
      * 
-     * Scans the `data/benchmark-history/` directory to identify all previous benchmark executions.
+     * Scans the `data/` directory to identify all previous benchmark executions.
      * Prints a formatted table indicating the presence of scripts, CSVs, HTML, and MD reports.
      * 
      * @param args Unused command-line arguments.
@@ -204,7 +205,7 @@ public class BenchmarkMatrix {
     private static void listRuns(List<String> args) {
         List<ArchiveManager.RunArchive> runs = ArchiveManager.listRuns();
         if (runs.isEmpty()) {
-            System.out.println("No benchmark runs found in data/benchmark-history/");
+            System.out.println("No benchmark runs found in data/");
             return;
         }
         System.out.println("Timestamp       | Script | CSV | HTML | MD ");
@@ -239,7 +240,7 @@ public class BenchmarkMatrix {
         }
 
         final String currentTs = args.get(0);
-        final Path historyDir = Paths.get("data", "benchmark-history");
+        final Path historyDir = BenchmarkDataLocator.ROOT;
 
         // Filter out flag arguments to find the baseline timestamp (if provided)
         String foundBaselineTs = null;
@@ -265,8 +266,8 @@ public class BenchmarkMatrix {
         Path outputReportPath = extractArgValue(args, "--output-report");
 
         // Validate that both CSVs exist
-        final Path currentCsv = historyDir.resolve(currentTs + ".csv");
-        final Path baselineCsv = historyDir.resolve(baselineTs + ".csv");
+        final Path currentCsv = BenchmarkDataLocator.getCsvFile(currentTs);
+        final Path baselineCsv = BenchmarkDataLocator.getCsvFile(baselineTs);
         if (!Files.exists(currentCsv)) {
             System.err.println("Error: Current run CSV not found: " + currentCsv);
             return;
@@ -285,8 +286,8 @@ public class BenchmarkMatrix {
             baselineMatrix.loadCsv(baselineCsv);
 
             // Load and compare machine fingerprints
-            final Path currentSysInfo = historyDir.resolve(currentTs + "-sysinfo.txt");
-            final Path baselineSysInfo = historyDir.resolve(baselineTs + "-sysinfo.txt");
+            final Path currentSysInfo = BenchmarkDataLocator.getSysInfoFile(currentTs);
+            final Path baselineSysInfo = BenchmarkDataLocator.getSysInfoFile(baselineTs);
 
             final MachineFingerprint currentFp = MachineFingerprint.fromSysInfo(
                     MachineFingerprint.parseSysInfoFile(currentSysInfo));

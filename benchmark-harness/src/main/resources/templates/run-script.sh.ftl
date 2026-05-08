@@ -11,7 +11,7 @@ export ITERATIONS=${iterations}
 source $HOME/.sdkman/bin/sdkman-init.sh 2>/dev/null || true
 
 echo "Capturing system information..."
-SYSINFO_FILE="data/benchmark-history/${timestamp}-sysinfo.txt"
+SYSINFO_FILE="data/${timestamp}/raw/sysinfo.txt"
 echo "Hostname: $(hostname)" > $SYSINFO_FILE
 echo "Kernel: $(uname -r)" >> $SYSINFO_FILE
 if [ -f /etc/os-release ]; then
@@ -22,7 +22,7 @@ echo "CPU: $(lscpu | grep 'Model name' | awk -F ':' '{print $2}' | xargs)" >> $S
 echo "CPU Cores: $(nproc)" >> $SYSINFO_FILE
 echo "Memory: $(free -h | awk '/^Mem:/ {print $2}')" >> $SYSINFO_FILE
 
-echo "JDK,GC_OPTS,VM_OPTS,PROG_OPTS,BINDING,DATA,RunTimestamp,Class,MedianRuntimeMs,Checksum,PerfRuntimeMs,JfrRuntimeMs,Instructions,Cycles,Branches,BranchMisses,L1Misses,LLCMisses,PageFaults,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys" > data/benchmark-history/${timestamp}.csv
+echo "JDK,GC_OPTS,VM_OPTS,PROG_OPTS,BINDING,DATA,RunTimestamp,Class,MedianRuntimeMs,Checksum,PerfRuntimeMs,JfrRuntimeMs,Instructions,Cycles,Branches,BranchMisses,L1Misses,LLCMisses,PageFaults,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys" > data/${timestamp}/raw/results.csv
 
 <#list jdkBlocks as block>
 echo "=================================================="
@@ -63,8 +63,8 @@ else
     echo "[$CURRENT_RUN/$TOTAL_RUNS] Running ${combo.simpleClassName} (Run: ${combo.runName}) - ETA: calculating..."
 fi
 
-echo -n "${combo.jdkLabel},\"${combo.gcOpts}\",\"${combo.vmOpts}\",\"${combo.progOpts}\",\"${combo.binding}\",${combo.dataLabel},${timestamp}," >> data/benchmark-history/${timestamp}.csv
-./execute-scenario.sh >> data/benchmark-history/${timestamp}.csv
+echo -n "${combo.jdkLabel},\"${combo.gcOpts}\",\"${combo.vmOpts}\",\"${combo.progOpts}\",\"${combo.binding}\",${combo.dataLabel},${timestamp}," >> data/${timestamp}/raw/results.csv
+./execute-scenario.sh >> data/${timestamp}/raw/results.csv
 
 </#list>
 </#list>

@@ -28,6 +28,7 @@ import org.onebrc.benchmarkviewer.domain.Measurement;
 import org.onebrc.benchmarkviewer.domain.TestRun;
 import org.onebrc.benchmarkviewer.repository.MeasurementRepository;
 import org.onebrc.benchmarkviewer.repository.TestRunRepository;
+import org.onebrc.benchmarkviewer.util.ViewerDataLocator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -198,10 +199,14 @@ public class DetailController
             return null;
         }
 
-        // The data directory is typically "data/benchmark-history".
-        // JFR files are stored in the sibling "data/benchmark-jfr" directory.
-        final Path baseDir = Paths.get(this.benchmarkDataDirectory).toAbsolutePath().getParent();
-        return baseDir.resolve("benchmark-jfr").resolve(fileName).normalize();
+        if (fileName == null || fileName.length() < 16)
+        {
+            return null;
+        }
+
+        final String timestamp = fileName.substring(0, 15);
+        final Path dataDir = Paths.get(this.benchmarkDataDirectory).toAbsolutePath();
+        return ViewerDataLocator.getJfrDir(dataDir, timestamp).resolve(fileName).normalize();
     }
 
     /**

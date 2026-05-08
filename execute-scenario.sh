@@ -10,7 +10,7 @@ fi
 ITERATIONS=${ITERATIONS:-3}
 CLASSPATH="1brc-implementations/target/classes"
 
-cmd=(java $JVM_OPTS -cp "$CLASSPATH" "$CLASS" "$DATA" $PROG_OPTS)
+cmd=(java $JVM_OPTS -cp "$CLASSPATH" "$CLASS" -f "$DATA" $PROG_OPTS)
 if [ -n "$BINDING" ]; then
     cmd=($BINDING "${cmd[@]}")
 fi
@@ -74,7 +74,7 @@ seconds_elapsed=""
 seconds_user=""
 seconds_sys=""
 if [ -f "$time_file" ]; then
-    time_out=$(cat "$time_file")
+    time_out=$(tail -n 1 "$time_file")
     seconds_elapsed=$(echo "$time_out" | cut -d, -f1)
     seconds_user=$(echo "$time_out" | cut -d, -f2)
     seconds_sys=$(echo "$time_out" | cut -d, -f3)
@@ -83,7 +83,7 @@ fi
 # 4. Dedicated JFR Run (Always On if JFR_FILE is set)
 jfr_runtime=0
 if [ -n "$JFR_FILE" ]; then
-    jfr_cmd=(java $JVM_OPTS "-XX:StartFlightRecording=filename=$JFR_FILE,settings=profile" -cp "$CLASSPATH" "$CLASS" "$DATA" $PROG_OPTS)
+    jfr_cmd=(java $JVM_OPTS "-XX:StartFlightRecording=filename=$JFR_FILE,settings=profile" -cp "$CLASSPATH" "$CLASS" -f "$DATA" $PROG_OPTS)
     if [ -n "$BINDING" ]; then
         jfr_cmd=($BINDING "${jfr_cmd[@]}")
     fi

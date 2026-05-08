@@ -53,7 +53,9 @@ public class MarkdownReportWriter {
      * @param additionalOutputPath Optional extra output path for --output-report. May be null.
      */
     public static void write(String timestamp, ResultMatrix matrix, Path additionalOutputPath) throws IOException {
-        Path outPath = Paths.get("data", "benchmark-history", timestamp + ".md");
+        Path reportsDir = BenchmarkDataLocator.getReportsDir(timestamp);
+        Files.createDirectories(reportsDir);
+        Path outPath = BenchmarkDataLocator.getMdReportFile(timestamp);
 
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_32);
         cfg.setClassForTemplateLoading(MarkdownReportWriter.class, "/templates");

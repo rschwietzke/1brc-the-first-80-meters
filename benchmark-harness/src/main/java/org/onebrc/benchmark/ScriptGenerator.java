@@ -333,14 +333,16 @@ public class ScriptGenerator {
         }
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
-        Path outPath = Paths.get("data", "benchmark-history", timestamp + "-run.sh");
+        Path outPath = BenchmarkDataLocator.getRunScriptFile(timestamp);
         Files.createDirectories(outPath.getParent());
         
         if (!dryRun) {
             String safeComment = comment == null ? "" : comment.replace("\"", "\\\"");
             String metaJson = String.format("{\n  \"timestamp\": \"%s\",\n  \"totalRuns\": %d,\n  \"comment\": \"%s\"\n}", 
                                            timestamp, validCombinations.size(), safeComment);
-            Files.writeString(Paths.get("data", "benchmark-history", timestamp + "-meta.json"), metaJson);
+            Path rawDir = BenchmarkDataLocator.getRawDir(timestamp);
+            Files.createDirectories(rawDir);
+            Files.writeString(BenchmarkDataLocator.getMetaFile(timestamp), metaJson);
         }
 
         Map<JdkConfig, List<RunCombination>> groupedByJdk = new LinkedHashMap<>();
@@ -366,7 +368,7 @@ public class ScriptGenerator {
 
             List<ComboView> comboViews = new ArrayList<>();
             for (RunCombination combo : combos) {
-                Path jfrDir = Paths.get("data", "benchmark-jfr");
+                Path jfrDir = BenchmarkDataLocator.getJfrDir(timestamp);
                 Files.createDirectories(jfrDir);
                 String sanitizedEnv = (combo.gcOpts + "_" + combo.vmOpts + "_" + combo.binding).replaceAll("[^a-zA-Z0-9.-]", "_");
                 String jfrFile = jfrDir.resolve(timestamp + "-" + combo.classConfig.className + "-" + combo.jdkLabel + "-" + sanitizedEnv + "-" + combo.dataLabel + ".jfr").toString();

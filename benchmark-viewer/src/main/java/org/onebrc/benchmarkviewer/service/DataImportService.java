@@ -23,6 +23,7 @@ import org.onebrc.benchmarkviewer.domain.Measurement;
 import org.onebrc.benchmarkviewer.domain.TestRun;
 import org.onebrc.benchmarkviewer.repository.MeasurementRepository;
 import org.onebrc.benchmarkviewer.repository.TestRunRepository;
+import org.onebrc.benchmarkviewer.util.ViewerDataLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -68,10 +69,10 @@ public class DataImportService
             return;
         }
 
-        try (final Stream<Path> paths = Files.walk(directory, 1))
+        try (final Stream<Path> paths = Files.walk(directory, 3))
         {
-            paths.filter(p -> p.toString().endsWith("-meta.json"))
-                 .forEach(this::importRun);
+            paths.filter(p -> p.getFileName().toString().equals("meta.json"))
+                 .forEach(p -> importRun(directory, p));
         }
         catch (final IOException e)
         {
@@ -79,17 +80,16 @@ public class DataImportService
         }
     }
 
-    private void importRun(final Path metaJsonPath)
+    private void importRun(final Path baseDir, final Path metaJsonPath)
     {
-        final String baseName = metaJsonPath.getFileName().toString().replace("-meta.json", "");
-        final Path dir = metaJsonPath.getParent();
+        final String timestamp = metaJsonPath.getParent().getParent().getFileName().toString();
         
-        final Path sysinfoPath = dir.resolve(baseName + "-sysinfo.txt");
-        final Path csvPath = dir.resolve(baseName + ".csv");
+        final Path sysinfoPath = ViewerDataLocator.getSysInfoFile(baseDir, timestamp);
+        final Path csvPath = ViewerDataLocator.getCsvFile(baseDir, timestamp);
 
         if (!Files.exists(sysinfoPath) || !Files.exists(csvPath))
         {
-            log.warn("Missing files for run {}", baseName);
+            log.warn("Missing files for run {}", timestamp);
             return;
         }
 
@@ -129,7 +129,7 @@ public class DataImportService
         }
         catch (final IOException e)
         {
-            log.error("Failed to import run {}", baseName, e);
+            log.error("Failed to import run {}", timestamp, e);
         }
     }
 

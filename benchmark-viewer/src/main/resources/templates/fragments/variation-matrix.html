@@ -19,7 +19,14 @@
             <i class="bi bi-grid-3x3-gap text-primary me-2"></i>Variation Matrix
         </h2>
         <div class="d-flex align-items-center gap-3">
-            <div class="form-check form-switch">
+            <a th:href="@{/compare}"
+               th:attr="hx-get=@{/compare}"
+               hx-target="#main-content"
+               hx-push-url="true"
+               class="btn btn-sm btn-outline-primary shadow-sm">
+                <i class="bi bi-arrow-left-right me-1"></i> Global Compare
+            </a>
+            <div class="form-check form-switch ms-2">
                 <input class="form-check-input" type="checkbox" role="switch" id="globalNormalizationSwitch" 
                        onchange="document.body.classList.toggle('global-normalization', this.checked)">
                 <label class="form-check-label small text-muted" for="globalNormalizationSwitch">Global Normalization</label>

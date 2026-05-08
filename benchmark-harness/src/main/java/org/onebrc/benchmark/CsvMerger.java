@@ -45,7 +45,7 @@ public class CsvMerger {
      * @throws IOException If the CSV or JFR files are missing, locked, or malformed.
      */
     public static void merge(String timestamp) throws IOException {
-        Path csvFile = Paths.get("data", "benchmark-history", timestamp + ".csv");
+        Path csvFile = BenchmarkDataLocator.getCsvFile(timestamp);
         if (!Files.exists(csvFile)) {
             System.err.println("Error: CSV file not found: " + csvFile);
             return;
@@ -55,12 +55,13 @@ public class CsvMerger {
         if (lines.isEmpty()) return;
 
         String header = lines.get(0);
-        if (!header.startsWith("JDK,GC_OPTS,VM_OPTS,PROG_OPTS,TASKSET,DATA,RunTimestamp,Class")) {
+        if (!header.startsWith("JDK,GC_OPTS,VM_OPTS,PROG_OPTS,BINDING,DATA,RunTimestamp,Class") && 
+            !header.startsWith("JDK,GC_OPTS,VM_OPTS,PROG_OPTS,TASKSET,DATA,RunTimestamp,Class")) {
             System.err.println("Warning: CSV header mismatch. Expected standard schema.");
             return;
         }
 
-        boolean hasJfr = Files.exists(Paths.get("data", "benchmark-jfr"));
+        boolean hasJfr = Files.exists(BenchmarkDataLocator.getJfrDir(timestamp));
         if (hasJfr) {
             header += ",GcPauseMs,AllocatedBytes,JitCompilationMs";
         }
@@ -93,7 +94,7 @@ public class CsvMerger {
                     }
 
                     String sanitizedEnv = (gcOpts + "_" + vmOpts + "_" + taskset).replaceAll("[^a-zA-Z0-9.-]", "_");
-                    Path jfrFile = Paths.get("data", "benchmark-jfr", ts + "-" + simpleClass + "-" + jdk + "-" + sanitizedEnv + "-" + data + ".jfr");
+                    Path jfrFile = BenchmarkDataLocator.getJfrDir(timestamp).resolve(ts + "-" + simpleClass + "-" + jdk + "-" + sanitizedEnv + "-" + data + ".jfr");
                     JfrConsumer.JfrMetrics metrics = JfrConsumer.consume(jfrFile);
 
                     line += "," + metrics.totalGcPauseMs + "," + metrics.totalAllocatedBytes + "," + metrics.totalJitCompilationMs;

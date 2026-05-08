@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="compare-pane">
+
+    <!-- OOB Breadcrumb Update -->
+    <ol id="breadcrumb-list" hx-swap-oob="true" class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="/" hx-get="/" hx-target="#main-content" hx-push-url="true"><i class="bi bi-house"></i> Runs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="bi bi-arrow-left-right me-1"></i> Global Compare
+        </li>
+    </ol>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body bg-light rounded-3 p-4">
+            <h5 class="card-title mb-4">
+                <i class="bi bi-arrow-left-right text-primary me-2"></i> Global Environment Comparison
+            </h5>
+
+            <form id="compareForm"
+                  th:attr="hx-get=@{/compare/results}"
+                  hx-target="#compare-results-container"
+                  hx-trigger="change"
+                  hx-include="#sidebarForm"
+                  class="row g-3 align-items-end">
+
+                <div class="col-md-5">
+                    <label for="envA" class="form-label fw-bold small text-muted">Baseline Environment (A)</label>
+                    <select class="form-select shadow-sm" id="envA" name="envA">
+                        <option value="" selected disabled>Select baseline...</option>
+                        <option th:each="env : ${environments}" th:value="${env}" th:text="${env}"></option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 text-center d-none d-md-block">
+                    <i class="bi bi-vs fs-3 text-secondary"></i>
+                </div>
+
+                <div class="col-md-5">
+                    <label for="envB" class="form-label fw-bold small text-muted">Target Environment (B)</label>
+                    <select class="form-select shadow-sm" id="envB" name="envB">
+                        <option value="" selected disabled>Select target...</option>
+                        <option th:each="env : ${environments}" th:value="${env}" th:text="${env}"></option>
+                    </select>
+                </div>
+                
+                <!-- Explicit trigger button for mobile / no-js fallback (handled by htmx submit) -->
+                <div class="col-12 text-end d-md-none mt-3">
+                    <button type="submit" class="btn btn-primary w-100">Compare</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div id="compare-results-container">
+        <!-- Results load here via HTMX -->
+        <div class="text-center text-muted py-5 my-5">
+            <i class="bi bi-arrow-up-circle opacity-50 display-1 mb-3 d-block"></i>
+            <h5>Select two environments above to view deltas</h5>
+            <p class="small text-muted">The table will load automatically when both selections are made.</p>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

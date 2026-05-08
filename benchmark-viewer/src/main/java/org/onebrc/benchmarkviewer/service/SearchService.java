@@ -75,7 +75,12 @@ public class SearchService
         return searchSession.search(Measurement.class)
             .where(f -> f.bool(b ->
             {
-                b.must(f.match().field("testRunId").matching(testRunId));
+                boolean hasConstraints = false;
+                if (testRunId != null)
+                {
+                    b.must(f.match().field("testRunId").matching(testRunId));
+                    hasConstraints = true;
+                }
 
                 if (state != null)
                 {
@@ -87,8 +92,14 @@ public class SearchService
                         if (values != null && !values.isEmpty())
                         {
                             b.must(f.terms().field(field).matchingAny(values));
+                            hasConstraints = true;
                         }
                     }
+                }
+                
+                if (!hasConstraints)
+                {
+                    b.must(f.matchAll());
                 }
             }))
             .fetchHits(MAX_HITS);
@@ -117,7 +128,12 @@ public class SearchService
             final SearchResult<Measurement> result = searchSession.search(Measurement.class)
                 .where(f -> f.bool(b ->
                 {
-                    b.must(f.match().field("testRunId").matching(testRunId));
+                    boolean hasConstraints = false;
+                    if (testRunId != null)
+                    {
+                        b.must(f.match().field("testRunId").matching(testRunId));
+                        hasConstraints = true;
+                    }
 
                     if (state != null)
                     {
@@ -130,8 +146,14 @@ public class SearchService
                             if (values != null && !values.isEmpty() && !filterField.equals(field))
                             {
                                 b.must(f.terms().field(filterField).matchingAny(values));
+                                hasConstraints = true;
                             }
                         }
+                    }
+                    
+                    if (!hasConstraints)
+                    {
+                        b.must(f.matchAll());
                     }
                 }))
                 .aggregation(facetKey, f -> f.terms().field(field, String.class).maxTermCount(100))
