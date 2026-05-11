@@ -75,6 +75,9 @@ public class ExecutionCompareController
         model.addAttribute("secElapsedDiff", m2.getSecElapsed() - m1.getSecElapsed());
         model.addAttribute("secUserDiff", m2.getSecUser() - m1.getSecUser());
         model.addAttribute("secSysDiff", m2.getSecSys() - m1.getSecSys());
+        model.addAttribute("gcPauseMsDiff", m2.getGcPauseMs() - m1.getGcPauseMs());
+        model.addAttribute("allocatedBytesDiff", m2.getAllocatedBytes() - m1.getAllocatedBytes());
+        model.addAttribute("jitCompilationMsDiff", m2.getJitCompilationMs() - m1.getJitCompilationMs());
 
         return "compare-executions";
     }

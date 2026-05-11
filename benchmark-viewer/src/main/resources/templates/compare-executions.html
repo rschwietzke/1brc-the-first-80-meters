@@ -254,6 +254,40 @@
                                         </span>
                                     </td>
                                 </tr>
+
+                                <tr class="table-secondary">
+                                    <td colspan="3" class="fw-bold">JFR Metrics</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">GC Pause (ms)</td>
+                                    <td class="font-monospace" th:text="${#numbers.formatDecimal(m1.gcPauseMs, 1, 1)}"></td>
+                                    <td class="font-monospace" th:classappend="${gcPauseMsDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${#numbers.formatDecimal(m2.gcPauseMs, 1, 1)}"></span>
+                                        <span class="small text-muted ms-2" th:if="${gcPauseMsDiff != 0}">
+                                            (<span th:text="${gcPauseMsDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatDecimal(gcPauseMsDiff, 1, 1)}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Allocated Bytes</td>
+                                    <td class="font-monospace" th:text="${m1.allocatedBytes > 0 ? #numbers.formatInteger(m1.allocatedBytes, 1, 'COMMA') : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${allocatedBytesDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.allocatedBytes > 0 ? #numbers.formatInteger(m2.allocatedBytes, 1, 'COMMA') : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.allocatedBytes > 0 and m2.allocatedBytes > 0 and allocatedBytesDiff != 0}">
+                                            (<span th:text="${allocatedBytesDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatInteger(allocatedBytesDiff, 1, 'COMMA')}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">JIT Compilation (ms)</td>
+                                    <td class="font-monospace" th:text="${#numbers.formatDecimal(m1.jitCompilationMs, 1, 1)}"></td>
+                                    <td class="font-monospace" th:classappend="${jitCompilationMsDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${#numbers.formatDecimal(m2.jitCompilationMs, 1, 1)}"></span>
+                                        <span class="small text-muted ms-2" th:if="${jitCompilationMsDiff != 0}">
+                                            (<span th:text="${jitCompilationMsDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatDecimal(jitCompilationMsDiff, 1, 1)}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

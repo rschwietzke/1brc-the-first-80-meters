@@ -58,6 +58,7 @@ class ExecutionCompareControllerTest
         final Measurement m1 = new Measurement();
         m1.setId(1L);
         m1.setTestRun(run1);
+        m1.setClassName("org.onebrc.again26.BRC100");
         m1.setMedianRuntimeMs(100.0);
 
         final TestRun run2 = new TestRun();
@@ -65,6 +66,7 @@ class ExecutionCompareControllerTest
         final Measurement m2 = new Measurement();
         m2.setId(2L);
         m2.setTestRun(run2);
+        m2.setClassName("org.onebrc.again26.BRC100");
         m2.setMedianRuntimeMs(120.0);
 
         when(this.measurementRepository.findById(1L)).thenReturn(Optional.of(m1));

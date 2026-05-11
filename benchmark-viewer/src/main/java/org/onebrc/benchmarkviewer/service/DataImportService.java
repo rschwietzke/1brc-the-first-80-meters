@@ -301,6 +301,20 @@ public class DataImportService
                 m.setSecUser(parseDouble(record.get("SecUser")));
                 m.setSecSys(parseDouble(record.get("SecSys")));
 
+                // JFR-derived metrics (may not exist in older CSV files)
+                if (record.isMapped("GcPauseMs"))
+                {
+                    m.setGcPauseMs(parseDouble(record.get("GcPauseMs")));
+                }
+                if (record.isMapped("AllocatedBytes"))
+                {
+                    m.setAllocatedBytes(parseLong(record.get("AllocatedBytes")));
+                }
+                if (record.isMapped("JitCompilationMs"))
+                {
+                    m.setJitCompilationMs(parseDouble(record.get("JitCompilationMs")));
+                }
+
                 measurements.add(m);
             }
         }

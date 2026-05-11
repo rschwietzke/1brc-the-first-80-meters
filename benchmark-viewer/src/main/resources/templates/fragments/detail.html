@@ -38,8 +38,14 @@
             </h2>
             <p class="text-muted mb-0">Measurement Details</p>
         </div>
-        <div th:if="${measurement.error}" class="badge bg-danger rounded-pill px-3 py-2 fs-6">
-            <i class="bi bi-exclamation-triangle-fill me-1"></i> Execution Error
+        <div class="d-flex align-items-center gap-2">
+            <a th:href="@{/testcase/{className}/trends(className=${measurement.className})}"
+               class="btn btn-sm btn-outline-primary" title="View trend charts for this test case">
+                <i class="bi bi-graph-up me-1"></i> Trends
+            </a>
+            <div th:if="${measurement.error}" class="badge bg-danger rounded-pill px-3 py-2 fs-6">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> Execution Error
+            </div>
         </div>
     </div>
 
@@ -112,6 +118,22 @@
                         <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light border-bottom-0">
                             <span class="text-muted small">Sys Time</span>
                             <span class="text-dark"><span th:text="${measurement.secSys}"></span> s</span>
+                        </li>
+                    </ul>
+                    <!-- JFR-derived metrics -->
+                    <h6 class="text-muted text-uppercase small fw-bold mt-3 mb-2 border-bottom pb-2">JFR Metrics</h6>
+                    <ul class="list-group list-group-flush text-secondary">
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light">
+                            <span class="text-muted small" title="Total GC Pause Time">GC Pause</span>
+                            <span class="fw-bold text-dark"><span th:text="${measurement.gcPauseMs}"></span> ms</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light">
+                            <span class="text-muted small" title="Total Allocated Bytes">Allocated Bytes</span>
+                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.allocatedBytes, 1, 'COMMA')}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light border-bottom-0">
+                            <span class="text-muted small" title="JIT Compilation Time">JIT Compilation</span>
+                            <span class="fw-bold text-dark"><span th:text="${measurement.jitCompilationMs}"></span> ms</span>
                         </li>
                     </ul>
                 </div>
@@ -213,6 +235,8 @@
                                     <th class="text-end">Median Runtime (ms)</th>
                                     <th class="text-end">Instructions</th>
                                     <th class="text-end">Cycles</th>
+                                    <th class="text-end">GC Pause (ms)</th>
+                                    <th class="text-end">Allocated Bytes</th>
                                     <th class="text-center">Status</th>
                                 </tr>
                             </thead>
@@ -232,6 +256,8 @@
                                     <td class="text-end font-monospace" th:text="${hist.medianRuntimeMs}"></td>
                                     <td class="text-end font-monospace" th:text="${hist.instructions > 0 ? #numbers.formatInteger(hist.instructions, 1, 'COMMA') : '-'}"></td>
                                     <td class="text-end font-monospace" th:text="${hist.cycles > 0 ? #numbers.formatInteger(hist.cycles, 1, 'COMMA') : '-'}"></td>
+                                    <td class="text-end font-monospace" th:text="${hist.gcPauseMs > 0 ? #numbers.formatDecimal(hist.gcPauseMs, 1, 1) : '-'}"></td>
+                                    <td class="text-end font-monospace" th:text="${hist.allocatedBytes > 0 ? #numbers.formatInteger(hist.allocatedBytes, 1, 'COMMA') : '-'}"></td>
                                     <td class="text-center">
                                         <i th:if="${hist.error}" class="bi bi-x-circle-fill text-danger" title="Error"></i>
                                         <i th:unless="${hist.error}" class="bi bi-check-circle-fill text-success" title="Success"></i>

@@ -80,9 +80,9 @@ class DataImportServiceTest
     {
         final DataImportService service = new DataImportService(null, null);
         final String csvContent = """
-            JDK,GC_OPTS,VM_OPTS,PROG_OPTS,BINDING,DATA,RunTimestamp,Class,MedianRuntimeMs,Checksum,PerfRuntimeMs,JfrRuntimeMs,Instructions,Cycles,Branches,BranchMisses,L1Misses,LLCMisses,PageFaults,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys
-            JDK_21_OPEN,"-XX:+UseZGC","-Xms1g -Xmx1g","-wc 0 -mc 1 -t 8","taskset -c 0-7",10k,20260505-175402,org.onebrc.again26.BRC100,10.5,OK,20.0,30.0,100,200,300,400,500,600,700,800,900,1000,1.5,1.1,1.2,1.3
-            JDK_21_OPEN,"-XX:+UseZGC","-Xms2g -Xmx2g","-wc 0 -mc 1 -t 8","taskset -c 0-7",10k,20260505-175402,org.onebrc.again26.BRC101,0,ERROR,0,0,10,20,30,40,50,60,70,80,90,100,0.5,0.1,0.2,0.3
+            JDK,GC_OPTS,VM_OPTS,PROG_OPTS,BINDING,DATA,RunTimestamp,Class,MedianRuntimeMs,Checksum,PerfRuntimeMs,JfrRuntimeMs,Instructions,Cycles,Branches,BranchMisses,L1Misses,LLCMisses,PageFaults,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys,GcPauseMs,AllocatedBytes,JitCompilationMs
+            JDK_21_OPEN,"-XX:+UseZGC","-Xms1g -Xmx1g","-wc 0 -mc 1 -t 8","taskset -c 0-7",10k,20260505-175402,org.onebrc.again26.BRC100,10.5,OK,20.0,30.0,100,200,300,400,500,600,700,800,900,1000,1.5,1.1,1.2,1.3,45.2,21879136,123.4
+            JDK_21_OPEN,"-XX:+UseZGC","-Xms2g -Xmx2g","-wc 0 -mc 1 -t 8","taskset -c 0-7",10k,20260505-175402,org.onebrc.again26.BRC101,0,ERROR,0,0,10,20,30,40,50,60,70,80,90,100,0.5,0.1,0.2,0.3,0,0,0
             """;
 
         final TestRun run = new TestRun();
@@ -104,11 +104,39 @@ class DataImportServiceTest
         assertThat(m1.getPerfRuntimeMs()).isEqualTo(20.0);
         assertThat(m1.getInstructions()).isEqualTo(100L);
         assertThat(m1.getSecSys()).isEqualTo(1.3);
+        assertThat(m1.getGcPauseMs()).isEqualTo(45.2);
+        assertThat(m1.getAllocatedBytes()).isEqualTo(21879136L);
+        assertThat(m1.getJitCompilationMs()).isEqualTo(123.4);
 
         final Measurement m2 = measurements.get(1);
         assertThat(m2.getClassName()).isEqualTo("org.onebrc.again26.BRC101");
         assertThat(m2.isError()).isTrue();
         assertThat(m2.getMedianRuntimeMs()).isEqualTo(0.0);
         assertThat(m2.getInstructions()).isEqualTo(10L);
+        assertThat(m2.getGcPauseMs()).isEqualTo(0.0);
+        assertThat(m2.getAllocatedBytes()).isEqualTo(0L);
+        assertThat(m2.getJitCompilationMs()).isEqualTo(0.0);
+    }
+
+    @Test
+    @DisplayName("Should parse CSV without JFR columns gracefully")
+    void testParseCsvWithoutJfrColumns()
+    {
+        final DataImportService service = new DataImportService(null, null);
+        final String csvContent = """
+            JDK,GC_OPTS,VM_OPTS,PROG_OPTS,BINDING,DATA,RunTimestamp,Class,MedianRuntimeMs,Checksum,PerfRuntimeMs,JfrRuntimeMs,Instructions,Cycles,Branches,BranchMisses,L1Misses,LLCMisses,PageFaults,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys
+            JDK_21_OPEN,"-XX:+UseZGC","-Xms1g -Xmx1g","-wc 0 -mc 1 -t 8","taskset -c 0-7",10k,20260505-175402,org.onebrc.again26.BRC100,10.5,OK,20.0,30.0,100,200,300,400,500,600,700,800,900,1000,1.5,1.1,1.2,1.3
+            """;
+
+        final TestRun run = new TestRun();
+        final List<Measurement> measurements = service.parseCsv(run, csvContent);
+
+        assertThat(measurements).hasSize(1);
+
+        final Measurement m = measurements.get(0);
+        assertThat(m.getMedianRuntimeMs()).isEqualTo(10.5);
+        assertThat(m.getGcPauseMs()).isEqualTo(0.0);
+        assertThat(m.getAllocatedBytes()).isEqualTo(0L);
+        assertThat(m.getJitCompilationMs()).isEqualTo(0.0);
     }
 }

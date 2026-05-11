@@ -32,4 +32,25 @@ class MeasurementTest {
         assertNull(m.getCpi());
         assertNull(m.getBranchMissRate());
     }
+
+    @Test
+    void testGcAndAllocationFields() {
+        Measurement m = new Measurement();
+        m.setGcPauseMs(45.2);
+        m.setAllocatedBytes(21879136L);
+        m.setJitCompilationMs(123.4);
+
+        assertEquals(45.2, m.getGcPauseMs());
+        assertEquals(21879136L, m.getAllocatedBytes());
+        assertEquals(123.4, m.getJitCompilationMs());
+    }
+
+    @Test
+    void testGcAndAllocationFieldsDefaultToZero() {
+        Measurement m = new Measurement();
+
+        assertEquals(0.0, m.getGcPauseMs());
+        assertEquals(0L, m.getAllocatedBytes());
+        assertEquals(0.0, m.getJitCompilationMs());
+    }
 }

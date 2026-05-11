@@ -47,7 +47,11 @@
                         </h2>
                         <p class="text-muted mb-0 font-monospace small" th:text="${className}">Full Class Name</p>
                     </div>
-                    <div>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/testcase/{className}/trends(className=${className})}"
+                           class="btn btn-outline-primary">
+                            <i class="bi bi-graph-up me-1"></i> Trends
+                        </a>
                         <button id="compareBtn" class="btn btn-primary" disabled onclick="compareSelected()">
                             <i class="bi bi-layout-split me-1"></i> Compare Selected (0/2)
                         </button>

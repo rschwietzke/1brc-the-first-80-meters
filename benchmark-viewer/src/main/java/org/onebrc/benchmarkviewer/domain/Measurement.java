@@ -98,6 +98,11 @@ public class Measurement
     private double secUser;
     private double secSys;
 
+    // JFR-derived metrics
+    private double gcPauseMs;
+    private long allocatedBytes;
+    private double jitCompilationMs;
+
     // Getters and Setters
 
     public Long getId()
@@ -378,6 +383,36 @@ public class Measurement
     public void setSecSys(final double secSys)
     {
         this.secSys = secSys;
+    }
+
+    public double getGcPauseMs()
+    {
+        return this.gcPauseMs;
+    }
+
+    public void setGcPauseMs(final double gcPauseMs)
+    {
+        this.gcPauseMs = gcPauseMs;
+    }
+
+    public long getAllocatedBytes()
+    {
+        return this.allocatedBytes;
+    }
+
+    public void setAllocatedBytes(final long allocatedBytes)
+    {
+        this.allocatedBytes = allocatedBytes;
+    }
+
+    public double getJitCompilationMs()
+    {
+        return this.jitCompilationMs;
+    }
+
+    public void setJitCompilationMs(final double jitCompilationMs)
+    {
+        this.jitCompilationMs = jitCompilationMs;
     }
 
     @Transient
