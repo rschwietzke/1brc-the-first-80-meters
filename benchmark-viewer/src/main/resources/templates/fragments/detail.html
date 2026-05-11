@@ -1,9 +1,9 @@
-<div th:fragment="detail-pane" id="main-content" class="container-fluid py-4 fade-in">
+<div th:fragment="detail-pane" class="container-fluid py-4 fade-in">
 
 <!-- Out of Band Breadcrumb Swap -->
 <ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
     <li class="breadcrumb-item fs-6">
-        <a href="/" hx-get="/" hx-target="#main-content" hx-swap="outerHTML" hx-push-url="true" class="text-decoration-none">
+        <a href="/" hx-get="/" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
             <i class="bi bi-house-door"></i> Runs
         </a>
     </li>
@@ -12,7 +12,7 @@
            class="text-decoration-none text-muted"
            th:attr="hx-get=@{/runs/{ts}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})}"
            hx-target="#main-content"
-           hx-swap="outerHTML"
+           hx-swap="innerHTML"
            hx-push-url="true">
            <span th:text="${#temporals.format(testRun.timestamp, 'yyyyMMdd-HHmmss')}"></span>
         </a>

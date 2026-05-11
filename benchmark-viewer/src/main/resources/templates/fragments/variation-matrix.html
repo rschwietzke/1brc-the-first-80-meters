@@ -2,11 +2,11 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<div th:fragment="content" id="main-content">
+<div th:fragment="content">
 <!-- Out of Band Breadcrumb Swap -->
 <ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
     <li class="breadcrumb-item fs-6">
-        <a href="/" hx-get="/" hx-target="#main-content" hx-swap="outerHTML" hx-push-url="true" class="text-decoration-none">
+        <a href="/" hx-get="/" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
             <i class="bi bi-house-door"></i> Runs
         </a>
     </li>
@@ -18,7 +18,7 @@
         <h2 class="h4 mb-0 fw-bold">
             <i class="bi bi-grid-3x3-gap text-primary me-2"></i>Variation Matrix
         </h2>
-        <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
             <a th:href="@{/compare}"
                th:attr="hx-get=@{/compare}"
                hx-target="#main-content"
@@ -26,12 +26,21 @@
                class="btn btn-sm btn-outline-primary shadow-sm">
                 <i class="bi bi-arrow-left-right me-1"></i> Global Compare
             </a>
+            
+            <div class="d-flex align-items-center border-start ps-3">
+                <label for="baselineSelect" class="form-label small fw-medium text-muted mb-0 me-2 text-nowrap">Baseline Environment:</label>
+                <select class="form-select form-select-sm shadow-sm" id="baselineSelect" onchange="updateDeltas()" style="width: auto; min-width: 150px;">
+                    <option value="-1">None (Raw Values)</option>
+                    <option th:each="entry, iterStat : ${matrix}" th:value="${iterStat.index}" th:text="|JDK ${entry.key.jdk} ${entry.key.gcOpts}|">JDK</option>
+                </select>
+            </div>
+
             <div class="form-check form-switch ms-2">
                 <input class="form-check-input" type="checkbox" role="switch" id="globalNormalizationSwitch" 
                        onchange="document.body.classList.toggle('global-normalization', this.checked)">
-                <label class="form-check-label small text-muted" for="globalNormalizationSwitch">Global Normalization</label>
+                <label class="form-check-label small fw-medium text-muted" for="globalNormalizationSwitch">Global Normalization</label>
             </div>
-            <div class="badge bg-light text-dark border">
+            <div class="badge bg-light text-dark border ms-auto">
                 <i class="bi bi-hdd-network me-1"></i> <span th:text="${testRun.hostname}">Host</span>
             </div>
         </div>
@@ -42,32 +51,35 @@
             <table class="table table-bordered table-hover mb-0 tm-matrix-table" style="font-size: 0.85rem; white-space: nowrap;">
                 <thead class="table-light sticky-top">
                     <tr>
-                        <th class="bg-light sticky-left z-2" style="min-width: 200px;">Environment / Class (Total: <span th:text="${classes.size()}"></span>)</th>
-                        <th th:each="cls : ${classes}" class="text-center align-middle" style="min-width: 80px;" th:title="${cls}">
-                            <div class="text-truncate" style="max-width: 120px;" th:text="${cls.substring(cls.lastIndexOf('.') + 1)}">Class</div>
+                        <th class="bg-light sticky-left z-2" style="min-width: 250px;">Class (Total: <span th:text="${classes.size()}"></span>)</th>
+                        <th th:each="entry, iterStat : ${matrix}" class="text-center align-middle" style="min-width: 140px;">
+                            <div th:text="|JDK ${entry.key.jdk}|" class="text-primary fw-bold">JDK</div>
+                            <div class="text-muted small text-truncate" style="max-width: 200px;" th:title="${entry.key.gcOpts + ' ' + entry.key.vmOpts}">
+                                <span th:if="${!#strings.isEmpty(entry.key.gcOpts)}" th:text="${entry.key.gcOpts}"></span>
+                            </div>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="entry : ${matrix}">
-                        <th class="bg-light sticky-left fw-medium align-middle" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
-                            <div th:text="|JDK ${entry.key.jdk}|" class="text-primary">JDK</div>
-                            <div class="text-muted text-truncate" style="max-width: 250px;" th:title="${entry.key.gcOpts + ' ' + entry.key.vmOpts}">
-                                <span th:if="${!#strings.isEmpty(entry.key.gcOpts)}" th:text="${entry.key.gcOpts}"></span> (Size: <span th:text="${entry.value.size()}"></span>)
-                            </div>
+                    <tr th:each="cls : ${classes}">
+                        <th class="bg-light sticky-left fw-medium align-middle" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;" th:title="${cls}">
+                            <div class="text-truncate" style="max-width: 300px;" th:text="${cls.substring(cls.lastIndexOf('.') + 1)}">Class</div>
                         </th>
-                        <td th:each="cls : ${classes}" class="text-center align-middle p-0 position-relative tm-matrix-cell"
+                        <td th:each="entry, iterStat : ${matrix}" class="text-center align-middle p-0 position-relative tm-matrix-cell"
                             th:with="m=${entry.value.get(cls)}"
                             th:style="${m != null && !m.error} ? '--bg-col: ' + ${T(org.onebrc.benchmarkviewer.util.HeatColorUtil).calculateColor(m.medianRuntimeMs, columnMin.get(cls), columnMax.get(cls))} + '; --bg-global: ' + ${T(org.onebrc.benchmarkviewer.util.HeatColorUtil).calculateColor(m.medianRuntimeMs, globalMin, globalMax)} + ';' : ''"
                             th:classappend="${m != null && m.error} ? 'bg-danger bg-opacity-10' : ''">
                             
                             <div th:if="${m != null}" class="p-2 h-100 w-100 tm-cell-content"
                                  style="cursor: pointer;"
-                                 th:attr="hx-get=@{/runs/{ts}/detail/{id}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m.id})}"
+                                 th:attr="data-col-index=${iterStat.index}, data-raw-value=${!m.error ? m.medianRuntimeMs : ''}, hx-get=@{/runs/{ts}/detail/{id}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m.id})}"
                                  hx-target="#main-content"
                                  hx-push-url="true">
                                 <div th:if="${m.error}" class="text-danger fw-bold"><i class="bi bi-x-circle"></i> ERR</div>
-                                <div th:unless="${m.error}" class="fw-medium font-monospace" th:text="${#numbers.formatDecimal(m.medianRuntimeMs, 1, 1)}">0.0</div>
+                                <div th:unless="${m.error}" class="d-flex flex-column align-items-center justify-content-center">
+                                    <div class="fw-medium font-monospace raw-value" th:text="${#numbers.formatDecimal(m.medianRuntimeMs, 1, 1)}">0.0</div>
+                                    <div class="delta-value" style="display: none;"></div>
+                                </div>
                             </div>
                             <div th:unless="${m != null}" class="p-2 h-100 w-100 text-muted opacity-25">
                                 -
@@ -78,6 +90,68 @@
             </table>
         </div>
     </div>
+
+    <script>
+        function updateDeltas() {
+            const baselineIdx = document.getElementById('baselineSelect').value;
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                let baselineVal = null;
+                if (baselineIdx !== "-1") {
+                    const baselineCell = row.querySelector(`[data-col-index="${baselineIdx}"]`);
+                    if (baselineCell && baselineCell.dataset.rawValue) {
+                        baselineVal = parseFloat(baselineCell.dataset.rawValue);
+                    }
+                }
+
+                const cells = row.querySelectorAll('.tm-cell-content');
+                cells.forEach(cell => {
+                    const rawDiv = cell.querySelector('.raw-value');
+                    const deltaDiv = cell.querySelector('.delta-value');
+                    if (!rawDiv || !deltaDiv || !cell.dataset.rawValue) return;
+
+                    const val = parseFloat(cell.dataset.rawValue);
+
+                    if (baselineIdx === "-1" || baselineVal === null) {
+                        // Revert to raw view
+                        rawDiv.style.fontSize = '';
+                        rawDiv.classList.remove('text-muted');
+                        deltaDiv.style.display = 'none';
+                    } else {
+                        if (cell.dataset.colIndex === baselineIdx) {
+                            // Baseline cell styling
+                            rawDiv.style.fontSize = '';
+                            rawDiv.classList.remove('text-muted');
+                            deltaDiv.style.display = 'block';
+                            deltaDiv.className = 'small fw-bold text-muted delta-value mt-1';
+                            deltaDiv.innerText = 'Baseline';
+                        } else {
+                            // Delta cell styling
+                            const delta = val - baselineVal;
+                            const pct = (delta / baselineVal) * 100;
+                            
+                            rawDiv.style.fontSize = '0.75rem';
+                            rawDiv.classList.add('text-muted');
+                            deltaDiv.style.display = 'block';
+                            
+                            let sign = delta > 0 ? '+' : '';
+                            let colorClass = delta > 0 ? 'text-danger' : (delta < 0 ? 'text-success' : 'text-muted');
+                            
+                            deltaDiv.className = `fw-bold ${colorClass} delta-value mt-1`;
+                            deltaDiv.style.fontSize = '0.85rem';
+                            deltaDiv.innerText = `${sign}${delta.toFixed(1)} (${sign}${pct.toFixed(1)}%)`;
+                        }
+                    }
+                });
+            });
+        }
+
+        // Initialize if value is cached on back/forward navigation
+        if (document.getElementById('baselineSelect')) {
+            updateDeltas();
+        }
+    </script>
 </div>
 
 </body>

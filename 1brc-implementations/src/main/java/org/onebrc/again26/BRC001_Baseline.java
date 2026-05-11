@@ -1,3 +1,4 @@
+// baseline
 /*
  *  Copyright 2023 The original authors
  *
@@ -24,6 +25,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.onebrc.Benchmark;
+import org.onebrc.util.MathUtil;
 
 /**
  * This is a baseline implementation using only Java standard library to perform the task.
@@ -61,7 +63,7 @@ public class BRC001_Baseline extends Benchmark
         {
             // that is also different from Gunnar's version, to ensure proper parsing
             // we make things more precise here and output with three decimal digit !!!
-            return Math.round(value * 1000.0d) / 1000.0d;
+            return MathUtil.round(value);
         }
     };
 

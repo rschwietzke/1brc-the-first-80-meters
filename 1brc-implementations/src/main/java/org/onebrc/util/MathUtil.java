@@ -2,13 +2,16 @@ package org.onebrc.util;
 
 public class MathUtil
 {
+    // three digits are 0.1 aka 10.0d
+    private static final double ROUND_FACTOR = 10.0d;
+    
     /**
      * A double adjusted to one decimal point (properly rounded)
      * @return a result as double with one decimal digit
      */
     public static double round(final double value)
     {
-        return Math.round(value * 1000.0d) / 1000.0d;
+        return Math.round(value * ROUND_FACTOR) / ROUND_FACTOR;
     }
 
     /**
@@ -19,7 +22,7 @@ public class MathUtil
      */
     public static double roundFromIntDouble(final double value)
     {
-        return Math.round(value) / 1000.0d;
+        return Math.round(value) / ROUND_FACTOR;
     }
 
     /**
@@ -30,7 +33,7 @@ public class MathUtil
      */
     public static double round(final int value)
     {
-        return value / 1000.0d;
+        return value / ROUND_FACTOR;
     }
 
     /**
@@ -41,7 +44,7 @@ public class MathUtil
      */
     public static double meanAndRound(final long total, final int count)
     {
-        return Math.round((double)total / (double)count) / 1000.0d;
+        return Math.round((double)total / (double)count) / ROUND_FACTOR;
     }
 
     /**

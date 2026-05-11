@@ -147,7 +147,7 @@ public class HtmlReportWriter {
         final List<ClassConfig> classConfigs = SourceAnnotationParser.parseDirectory(srcDir);
         final Map<String, String> classStatuses = new HashMap<>();
         for (final ClassConfig cc : classConfigs) {
-            classStatuses.put(cc.className, cc.status);
+            classStatuses.put(cc.fqcn, cc.status);
         }
         root.put("classStatuses", classStatuses);
 

@@ -1,4 +1,4 @@
-// JVM_OPTS: $HIGH_MEM
+// baseline
 /*
  *  Copyright 2023 The original authors
  *

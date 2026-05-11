@@ -9,7 +9,7 @@
         <form id="filter-form" 
               th:attr="hx-get=@{/runs/{ts}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})}"
               hx-target="#main-content" 
-              hx-swap="outerHTML"
+              hx-swap="innerHTML"
               hx-trigger="change">
             
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -40,7 +40,7 @@
                                        th:checked="${activeFilters.getActiveFilters().get(facetEntry.key) != null && activeFilters.getActiveFilters().get(facetEntry.key).contains(termEntry.key)}">
                                 <label class="form-check-label d-flex justify-content-between align-items-center w-100" 
                                        th:for="'filter-' + ${facetEntry.key} + '-' + ${termEntry.key}">
-                                    <span class="text-truncate me-2" th:title="${termEntry.key}" th:text="${#strings.isEmpty(termEntry.key) ? '(None)' : termEntry.key}">Value</span>
+                                    <span class="text-truncate me-2" style="min-width: 0;" th:title="${termEntry.key}" th:text="${#strings.isEmpty(termEntry.key) ? '(None)' : termEntry.key}">Value</span>
                                     <span class="badge bg-light text-dark border" th:text="${termEntry.value}">0</span>
                                 </label>
                             </div>
