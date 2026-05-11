@@ -47,8 +47,12 @@ class DataImportServiceIntegrationTest
     {
         final String baseName = "20260505-175402";
 
+        // Create files inside the 'raw' subdirectory as expected by ViewerDataLocator
+        final Path rawDir = tempDir.resolve(baseName).resolve("raw");
+        Files.createDirectories(rawDir);
+
         // Create meta.json
-        Files.writeString(tempDir.resolve(baseName + "-meta.json"), """
+        Files.writeString(rawDir.resolve("meta.json"), """
             {
               "timestamp": "20260505-175402",
               "totalRuns": 2,
@@ -57,7 +61,7 @@ class DataImportServiceIntegrationTest
             """);
 
         // Create sysinfo.txt
-        Files.writeString(tempDir.resolve(baseName + "-sysinfo.txt"), """
+        Files.writeString(rawDir.resolve("sysinfo.txt"), """
             Hostname: host1
             Kernel: Linux 6.8
             OS: Ubuntu
@@ -67,7 +71,7 @@ class DataImportServiceIntegrationTest
             """);
 
         // Create csv
-        Files.writeString(tempDir.resolve(baseName + ".csv"), """
+        Files.writeString(rawDir.resolve("results.csv"), """
             JDK,GC_OPTS,VM_OPTS,PROG_OPTS,BINDING,DATA,RunTimestamp,Class,MedianRuntimeMs,Checksum,PerfRuntimeMs,JfrRuntimeMs,Instructions,Cycles,Branches,BranchMisses,L1Misses,LLCMisses,PageFaults,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys
             JDK_21_OPEN,"-XX:+UseZGC","-Xms1g -Xmx1g","-wc 0 -mc 1 -t 8","taskset -c 0-7",10k,20260505-175402,org.onebrc.again26.BRC100,10.5,OK,20.0,30.0,100,200,300,400,500,600,700,800,900,1000,1.5,1.1,1.2,1.3
             JDK_21_OPEN,"-XX:+UseZGC","-Xms2g -Xmx2g","-wc 0 -mc 1 -t 8","taskset -c 0-7",10k,20260505-175402,org.onebrc.again26.BRC101,0,ERROR,0,0,10,20,30,40,50,60,70,80,90,100,0.5,0.1,0.2,0.3

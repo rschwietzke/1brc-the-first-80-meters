@@ -109,7 +109,7 @@ class DetailControllerTest
         this.mockMvc.perform(get("/runs/2026-05-05T17:54:02/detail/42")
                 .header("HX-Request", "true"))
             .andExpect(status().isOk())
-            .andExpect(view().name("fragments/detail :: detail-pane"))
+            .andExpect(view().name("fragments/detail :: htmx-response"))
             .andExpect(model().attributeExists("testRun"))
             .andExpect(model().attributeExists("measurement"))
             .andExpect(model().attributeExists("hasJfrFile"))

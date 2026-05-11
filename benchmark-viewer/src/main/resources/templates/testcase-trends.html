@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="'1BRC Benchmark - Trends: ' + ${simpleClassName}">1BRC Benchmark - Trends</title>
+</head>
+<body>
+
+    <!-- Breadcrumb -->
+    <th:block layout:fragment="breadcrumb">
+        <li class="breadcrumb-item fs-6">
+            <a href="/" hx-get="/" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
+                <i class="bi bi-house-door"></i> Runs
+            </a>
+        </li>
+        <li class="breadcrumb-item fs-6">
+            <a th:href="@{/testcase/{className}(className=${className})}"
+               th:attr="hx-get=@{/testcase/{className}(className=${className})}"
+               hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none"
+               th:text="${simpleClassName}">
+                Class
+            </a>
+        </li>
+        <li class="breadcrumb-item active fs-6" aria-current="page">Trends</li>
+    </th:block>
+
+    <!-- Main content -->
+    <div layout:fragment="content">
+        <div th:replace="~{testcase-trends :: page-content}"></div>
+    </div>
+
+    <!-- HTMX Response Block -->
+    <th:block th:fragment="htmx-response">
+        <div th:replace="~{testcase-trends :: page-content}"></div>
+    </th:block>
+
+    <!-- Page Content Fragment -->
+    <div th:fragment="page-content" class="fade-in" id="trends-main">
+        <!-- Breadcrumb swap (OOB) -->
+        <ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
+            <li class="breadcrumb-item fs-6">
+                <a href="/" hx-get="/" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
+                    <i class="bi bi-house-door"></i> Runs
+                </a>
+            </li>
+            <li class="breadcrumb-item fs-6">
+                <a th:href="@{/testcase/{className}(className=${className})}"
+                   th:attr="hx-get=@{/testcase/{className}(className=${className})}"
+                   hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none"
+                   th:text="${simpleClassName}">
+                    Class
+                </a>
+            </li>
+            <li class="breadcrumb-item active fs-6" aria-current="page">Trends</li>
+        </ol>
+
+        <div class="container-fluid py-4">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h3 mb-1">
+                        <i class="bi bi-graph-up text-primary me-2"></i>
+                        <span class="text-dark" th:text="${simpleClassName}">Class Name</span>
+                    </h2>
+                    <p class="text-muted mb-0 font-monospace small" th:text="${className}">Full Class Name</p>
+                </div>
+                <a th:href="@{/testcase/{className}(className=${className})}"
+                   class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Back to History
+                </a>
+            </div>
+
+            <!-- No Data -->
+            <div th:if="${environments.isEmpty()}" class="card shadow-sm border-0 p-5 text-center text-muted">
+                <i class="bi bi-slash-circle fs-1 d-block mb-3"></i>
+                <p>No measurement data found for this test case.</p>
+            </div>
+
+            <!-- Environment Selector + Charts -->
+            <div th:unless="${environments.isEmpty()}">
+                <!-- Environment Dropdown -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <label for="envSelector" class="form-label fw-bold mb-0">
+                                    <i class="bi bi-pc-display me-1"></i> Environment Configuration
+                                </label>
+                            </div>
+                            <div class="col">
+                                <select id="envSelector" class="form-select" onchange="switchEnvironment(this.value)">
+                                    <th:block th:each="entry : ${environments}">
+                                        <option th:value="${entry.key}"
+                                                th:text="${entry.value.jdk()} + ' | ' + ${entry.value.gcOpts()} + ' | ' + ${entry.value.vmOpts()} + ' | ' + ${entry.value.dataset()} + (${entry.value.binding().isBlank()} ? '' : ' | ' + ${entry.value.binding()})">
+                                        </option>
+                                    </th:block>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <span class="badge bg-secondary rounded-pill" id="envCount"
+                                      th:text="${environments.size()} + ' environment' + (${environments.size() > 1} ? 's' : '')">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Environment Detail Card (shows opts not in dropdown text) -->
+                <th:block th:each="entry : ${environments}">
+                    <div class="env-detail-card mb-3" th:id="'detail-' + ${entry.key}" style="display: none;">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body py-2">
+                                <div class="row small text-muted">
+                                    <div class="col-auto" th:if="${!entry.value.progOpts().isBlank()}">
+                                        <span class="fw-bold">Prog:</span>
+                                        <span class="font-monospace" th:text="${entry.value.progOpts()}"></span>
+                                    </div>
+                                    <div class="col-auto" th:if="${!entry.value.binding().isBlank()}">
+                                        <span class="fw-bold">Binding:</span>
+                                        <span class="font-monospace" th:text="${entry.value.binding()}"></span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <span class="fw-bold">Data Points:</span>
+                                        <span th:text="${trendDataMap.get(entry.key).timestamps().size()}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+
+                <!-- Chart Grid -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-runtime" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-ipc" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-instructions" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-cycles" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-branches" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-branchMisses" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-l1Misses" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-llcMisses" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-pageFaults" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-contextSwitches" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-gcPause" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-allocatedBytes" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2">
+                                <div id="chart-jitCompilation" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Raw Data Table (collapsible) -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-transparent border-bottom-0 pt-3">
+                        <a class="text-decoration-none text-secondary" data-bs-toggle="collapse" href="#rawDataCollapse">
+                            <i class="bi bi-table me-1"></i> Raw Execution History
+                            <i class="bi bi-chevron-down ms-1 small"></i>
+                        </a>
+                    </div>
+                    <div class="collapse" id="rawDataCollapse">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle bg-white mb-0 small" id="rawDataTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th class="text-end">Runtime (ms)</th>
+                                            <th class="text-end">IPC</th>
+                                            <th class="text-end">Instructions</th>
+                                            <th class="text-end">Cycles</th>
+                                            <th class="text-end">Branches</th>
+                                            <th class="text-end">Branch Misses</th>
+                                            <th class="text-end">GC Pause (ms)</th>
+                                            <th class="text-end">Allocated Bytes</th>
+                                            <th class="text-end">JIT (ms)</th>
+                                            <th class="text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rawDataBody">
+                                        <!-- Populated by JS when environment switches -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            // All trend data keyed by environment ID
+            const trendDataMap = /*[[${trendDataMap}]]*/ {};
+
+            // ECharts instances (lazy-initialized)
+            const charts = {};
+            const chartConfigs = [
+                { id: 'chart-runtime',         title: 'Median Runtime (ms)',       key: 'runtime',          color: '#5470c6' },
+                { id: 'chart-ipc',             title: 'Instructions Per Cycle',    key: 'ipc',              color: '#91cc75' },
+                { id: 'chart-instructions',    title: 'Instructions Executed',     key: 'instructions',     color: '#fac858' },
+                { id: 'chart-cycles',          title: 'CPU Cycles',               key: 'cycles',           color: '#ee6666' },
+                { id: 'chart-branches',        title: 'Branches Evaluated',       key: 'branches',         color: '#73c0de' },
+                { id: 'chart-branchMisses',    title: 'Branch Misses',            key: 'branchMisses',     color: '#fc8452' },
+                { id: 'chart-l1Misses',        title: 'L1 D-Cache Misses',        key: 'l1Misses',         color: '#9a60b4' },
+                { id: 'chart-llcMisses',       title: 'LLC Misses',               key: 'llcMisses',        color: '#ea7ccc' },
+                { id: 'chart-pageFaults',      title: 'Page Faults',              key: 'pageFaults',       color: '#3ba272' },
+                { id: 'chart-contextSwitches', title: 'Context Switches',         key: 'contextSwitches',  color: '#5470c6' },
+                { id: 'chart-gcPause',         title: 'GC Pause Time (ms)',       key: 'gcPauseMs',        color: '#ee6666' },
+                { id: 'chart-allocatedBytes',  title: 'Allocated Bytes',          key: 'allocatedBytes',   color: '#fac858' },
+                { id: 'chart-jitCompilation',  title: 'JIT Compilation (ms)',     key: 'jitCompilationMs', color: '#91cc75' }
+            ];
+
+            /**
+             * Format a number with comma separators for the raw data table.
+             */
+            function formatNumber(n) {
+                if (n === null || n === undefined) return '-';
+                return n.toLocaleString();
+            }
+
+            /**
+             * Initialize or update all charts for the given environment.
+             */
+            function switchEnvironment(envId) {
+                const data = trendDataMap[envId];
+                if (!data) return;
+
+                // Show/hide detail cards
+                document.querySelectorAll('.env-detail-card').forEach(el => el.style.display = 'none');
+                const detailCard = document.getElementById('detail-' + envId);
+                if (detailCard) detailCard.style.display = 'block';
+
+                // Update each chart
+                chartConfigs.forEach(cfg => {
+                    const dom = document.getElementById(cfg.id);
+                    if (!dom) return;
+
+                    if (!charts[cfg.id]) {
+                        charts[cfg.id] = echarts.init(dom);
+                    }
+
+                    const seriesData = data[cfg.key] || [];
+
+                    charts[cfg.id].setOption({
+                        title: {
+                            text: cfg.title,
+                            textStyle: { fontSize: 13, fontWeight: 500, color: '#555' }
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                            backgroundColor: 'rgba(255,255,255,0.95)',
+                            borderColor: '#ddd',
+                            textStyle: { color: '#333' }
+                        },
+                        grid: { left: 60, right: 20, top: 40, bottom: 30 },
+                        xAxis: {
+                            type: 'category',
+                            data: data.timestamps,
+                            axisLabel: { rotate: 30, fontSize: 10 }
+                        },
+                        yAxis: {
+                            type: 'value',
+                            min: 'dataMin',
+                            axisLabel: {
+                                formatter: function(val) {
+                                    if (Math.abs(val) >= 1e9) return (val / 1e9).toFixed(1) + 'B';
+                                    if (Math.abs(val) >= 1e6) return (val / 1e6).toFixed(1) + 'M';
+                                    if (Math.abs(val) >= 1e3) return (val / 1e3).toFixed(1) + 'K';
+                                    return val;
+                                }
+                            }
+                        },
+                        series: [{
+                            name: cfg.title,
+                            type: 'line',
+                            smooth: true,
+                            symbol: 'circle',
+                            symbolSize: 6,
+                            lineStyle: { width: 2.5 },
+                            areaStyle: { opacity: 0.08, color: cfg.color },
+                            itemStyle: { color: cfg.color },
+                            data: seriesData
+                        }]
+                    }, true);
+                });
+
+                // Update raw data table
+                updateRawDataTable(data);
+            }
+
+            /**
+             * Populate the raw data table body for the selected environment.
+             */
+            function updateRawDataTable(data) {
+                const tbody = document.getElementById('rawDataBody');
+                if (!tbody) return;
+
+                let html = '';
+                for (let i = 0; i < data.timestamps.length; i++) {
+                    const isError = data.errors[i];
+                    html += '<tr' + (isError ? ' class="table-danger"' : '') + '>';
+                    html += '<td>' + data.timestamps[i] + '</td>';
+                    html += '<td class="text-end font-monospace">' + data.runtime[i] + '</td>';
+                    html += '<td class="text-end font-monospace">' + (data.ipc[i] || '-') + '</td>';
+                    html += '<td class="text-end font-monospace">' + formatNumber(data.instructions[i]) + '</td>';
+                    html += '<td class="text-end font-monospace">' + formatNumber(data.cycles[i]) + '</td>';
+                    html += '<td class="text-end font-monospace">' + formatNumber(data.branches[i]) + '</td>';
+                    html += '<td class="text-end font-monospace">' + formatNumber(data.branchMisses[i]) + '</td>';
+                    html += '<td class="text-end font-monospace">' + data.gcPauseMs[i] + '</td>';
+                    html += '<td class="text-end font-monospace">' + formatNumber(data.allocatedBytes[i]) + '</td>';
+                    html += '<td class="text-end font-monospace">' + data.jitCompilationMs[i] + '</td>';
+                    html += '<td class="text-center">';
+                    html += isError
+                        ? '<i class="bi bi-x-circle-fill text-danger" title="Error"></i>'
+                        : '<i class="bi bi-check-circle-fill text-success" title="Success"></i>';
+                    html += '</td></tr>';
+                }
+                tbody.innerHTML = html;
+            }
+
+            // Handle window resize for responsive charts
+            window.addEventListener('resize', function() {
+                Object.values(charts).forEach(c => c.resize());
+            });
+
+            // Initialize with the first environment
+            document.addEventListener('DOMContentLoaded', function() {
+                const selector = document.getElementById('envSelector');
+                if (selector && selector.value) {
+                    switchEnvironment(selector.value);
+                }
+            });
+
+            // Also handle HTMX swaps (re-initialize after partial load)
+            document.addEventListener('htmx:afterSettle', function() {
+                const selector = document.getElementById('envSelector');
+                if (selector && selector.value) {
+                    // Clear cached chart instances since DOM was replaced
+                    Object.keys(charts).forEach(k => delete charts[k]);
+                    switchEnvironment(selector.value);
+                }
+            });
+        </script>
+    </div>
+
+</body>
+</html>
