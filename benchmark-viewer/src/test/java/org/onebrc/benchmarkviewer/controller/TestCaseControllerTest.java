@@ -12,17 +12,18 @@
  * limitations under the License.
  */
 
-// AI-generated file: Claude Opus 4.6 (Thinking)
+// AI-generated file: Antigravity
 
 package org.onebrc.benchmarkviewer.controller;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.onebrc.benchmarkviewer.domain.Measurement;
 import org.onebrc.benchmarkviewer.domain.TestRun;
-import org.onebrc.benchmarkviewer.repository.TestRunRepository;
 import org.onebrc.benchmarkviewer.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +32,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -38,11 +40,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 /**
- * Tests for {@link SidebarController}.
+ * Tests for {@link TestCaseController}.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-class SidebarControllerTest
+class TestCaseControllerTest
 {
     @Autowired
     private MockMvc mockMvc;
@@ -50,42 +52,53 @@ class SidebarControllerTest
     @MockitoBean
     private SearchService searchService;
 
-    @MockitoBean
-    private TestRunRepository testRunRepository;
-
     @Test
-    @DisplayName("5.4: GET /sidebar returns fragment with facet data")
-    void testGetSidebar() throws Exception
+    @DisplayName("GET /testcase/{className} returns 200 with testcase view")
+    void getTestCase() throws Exception
     {
         final TestRun run = new TestRun();
         run.setId(1L);
-        run.setTimestamp(java.time.LocalDateTime.now());
-        when(this.testRunRepository.findById(1L)).thenReturn(Optional.of(run));
-        when(this.searchService.getFacetCounts(any(), any(), any()))
-            .thenReturn(Map.of("jdk", Map.of("21", 10L, "25", 5L)));
+        run.setTimestamp(LocalDateTime.now());
 
-        this.mockMvc.perform(get("/sidebar?testRunId=1"))
+        final Measurement m = new Measurement();
+        m.setId(1L);
+        m.setTestRun(run);
+        m.setClassName("BRC01");
+
+        when(this.searchService.searchMeasurements(any(), eq(null), eq("BRC01")))
+            .thenReturn(new java.util.ArrayList<>(List.of(m)));
+        when(this.searchService.getFacetCounts(any(), eq(null), eq("BRC01")))
+            .thenReturn(Map.of());
+
+        this.mockMvc.perform(get("/testcase/BRC01"))
             .andExpect(status().isOk())
-            .andExpect(view().name("fragments/sidebar :: content"))
-            .andExpect(model().attributeExists("facets"))
-            .andExpect(model().attributeExists("activeFilters"));
+            .andExpect(view().name("testcase"))
+            .andExpect(model().attributeExists("measurements"))
+            .andExpect(model().attributeExists("className"))
+            .andExpect(model().attributeExists("facets"));
     }
 
     @Test
-    @DisplayName("5.5: GET /sidebar?jdk=21 returns updated counts")
-    void testGetSidebarFiltered() throws Exception
+    @DisplayName("GET /testcase/{className} via HTMX returns fragment")
+    void getTestCaseHtmx() throws Exception
     {
         final TestRun run = new TestRun();
         run.setId(1L);
-        run.setTimestamp(java.time.LocalDateTime.now());
-        when(this.testRunRepository.findById(1L)).thenReturn(Optional.of(run));
-        when(this.searchService.getFacetCounts(any(), any(), any()))
-            .thenReturn(Map.of("jdk", Map.of("21", 10L, "25", 5L)));
+        run.setTimestamp(LocalDateTime.now());
 
-        this.mockMvc.perform(get("/sidebar?testRunId=1&jdk=21"))
+        final Measurement m = new Measurement();
+        m.setId(1L);
+        m.setTestRun(run);
+        m.setClassName("BRC01");
+
+        when(this.searchService.searchMeasurements(any(), eq(null), eq("BRC01")))
+            .thenReturn(new java.util.ArrayList<>(List.of(m)));
+        when(this.searchService.getFacetCounts(any(), eq(null), eq("BRC01")))
+            .thenReturn(Map.of());
+
+        this.mockMvc.perform(get("/testcase/BRC01")
+                .header("HX-Request", "true"))
             .andExpect(status().isOk())
-            .andExpect(view().name("fragments/sidebar :: content"))
-            .andExpect(model().attributeExists("facets"))
-            .andExpect(model().attributeExists("activeFilters"));
+            .andExpect(view().name("testcase :: htmx-response"));
     }
 }

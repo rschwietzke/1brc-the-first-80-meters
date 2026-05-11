@@ -70,11 +70,13 @@ public class SidebarController
         final TestRun testRun = this.testRunRepository.findById(testRunId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Test run not found"));
 
-        final var facets = this.searchService.getFacetCounts(filterState, testRunId);
+        final var facets = this.searchService.getFacetCounts(filterState, testRunId, null);
 
         model.addAttribute("testRun", testRun);
         model.addAttribute("facets", facets);
         model.addAttribute("activeFilters", filterState);
+        // By default, just use the current test run for the action URL if sidebar is loaded standalone
+        model.addAttribute("filterActionUrl", "/runs/" + testRun.getTimestamp().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
         return "fragments/sidebar :: content";
     }

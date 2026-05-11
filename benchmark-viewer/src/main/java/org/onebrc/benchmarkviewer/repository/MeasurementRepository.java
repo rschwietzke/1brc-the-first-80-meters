@@ -27,4 +27,9 @@ import java.util.List;
 public interface MeasurementRepository extends JpaRepository<Measurement, Long>
 {
     List<Measurement> findByTestRun(TestRun testRun);
+
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"testRun"})
+    List<Measurement> findByClassNameAndJdkAndGcOptsAndVmOptsAndProgOptsAndBindingAndDatasetOrderByTestRunTimestampDesc(
+        String className, String jdk, String gcOpts, String vmOpts, String progOpts, String binding, String dataset
+    );
 }

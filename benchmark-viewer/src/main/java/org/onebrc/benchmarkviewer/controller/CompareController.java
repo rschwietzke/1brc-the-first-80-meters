@@ -62,9 +62,10 @@ public class CompareController
         model.addAttribute("environments", formattedCandidates);
 
         // Also add facets for OOB sidebar update if requested via HTMX
-        final var facets = this.searchService.getFacetCounts(filterState, null);
+        final var facets = this.searchService.getFacetCounts(filterState, null, null);
         model.addAttribute("facets", facets);
         model.addAttribute("activeFilters", filterState);
+        model.addAttribute("filterActionUrl", "/compare");
 
         if ("true".equals(hxRequest))
         {

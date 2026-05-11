@@ -7,7 +7,7 @@
         <h6 class="text-uppercase text-white-50 fw-bold mb-3 fs-7" style="letter-spacing: 0.5px;">Filters</h6>
         
         <form id="filter-form" 
-              th:attr="hx-get=@{/runs/{ts}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})}"
+              th:attr="hx-get=${filterActionUrl}"
               hx-target="#main-content" 
               hx-swap="innerHTML"
               hx-trigger="change">

@@ -63,7 +63,7 @@ class CompareControllerTest
 
         when(this.compareService.getAllComparisonCandidates(any())).thenReturn(Set.of(cand));
         when(this.compareService.formatCandidate(cand)).thenReturn("2026-05-05 17:54 | 21 | ZGC | 10k");
-        when(this.searchService.getFacetCounts(any(), any())).thenReturn(Map.of());
+        when(this.searchService.getFacetCounts(any(), any(), any())).thenReturn(Map.of());
 
         this.mockMvc.perform(get("/compare"))
             .andExpect(status().isOk())
@@ -75,7 +75,7 @@ class CompareControllerTest
     @DisplayName("7.3: GET /compare via HTMX returns fragment")
     void getComparePage_htmxFragment() throws Exception
     {
-        when(this.searchService.getFacetCounts(any(), any())).thenReturn(Map.of());
+        when(this.searchService.getFacetCounts(any(), any(), any())).thenReturn(Map.of());
 
         this.mockMvc.perform(get("/compare")
                 .header("HX-Request", "true"))

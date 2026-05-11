@@ -21,10 +21,10 @@
         <i class="bi bi-info-circle me-2"></i> No data to compare. Please ensure you have selected two different environments, or check your sidebar filters.
     </div>
 
-    <div th:if="${results != null and !results.isEmpty()}" class="card shadow-sm border-0">
+    <div th:if="${results != null and !results.isEmpty()}" class="card shadow-sm border-0 overflow-hidden">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-borderless align-middle mb-0">
+                <table class="table table-hover align-middle bg-white mb-0">
                     <thead class="table-light">
                     <tr>
                         <th class="ps-4">Class</th>

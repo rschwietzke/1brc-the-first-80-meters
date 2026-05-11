@@ -123,10 +123,10 @@ public class CompareService
      */
     public Set<ComparisonCandidate> getAllComparisonCandidates(final FilterState filterState)
     {
-        final List<Measurement> measurements = this.searchService.searchMeasurements(filterState, null);
+        final List<Measurement> allFiltered = this.searchService.searchMeasurements(filterState, null, null);
         final Set<ComparisonCandidate> candidates = new TreeSet<>();
         
-        for (final Measurement m : measurements)
+        for (final Measurement m : allFiltered)
         {
             final EnvironmentKey key = this.extractKey(m);
             
@@ -149,7 +149,7 @@ public class CompareService
         final ComparisonCandidate candB)
     {
         // Fetch all measurements matching the filter state, bypassing potential testRunId index matching issues
-        final List<Measurement> allMeasurements = this.searchService.searchMeasurements(filterState, null);
+        final List<Measurement> allMeasurements = this.searchService.searchMeasurements(filterState, null, null);
 
         final Map<String, Double> runtimesA = new TreeMap<>();
         final Map<String, Double> runtimesB = new TreeMap<>();

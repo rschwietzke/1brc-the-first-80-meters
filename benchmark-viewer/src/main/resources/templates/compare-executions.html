@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>1BRC Benchmark - Compare Executions</title>
+</head>
+<body>
+
+    <!-- Breadcrumb -->
+    <th:block layout:fragment="breadcrumb">
+        <li class="breadcrumb-item fs-6">
+            <a th:href="@{/testcase/{className}(className=${m1.className})}"
+               hx-get="@{/testcase/{className}(className=${m1.className})}"
+               hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none"
+               th:text="${m1.className.substring(m1.className.lastIndexOf('.') + 1)}">
+                Class
+            </a>
+        </li>
+        <li class="breadcrumb-item active fs-6" aria-current="page">Compare Executions</li>
+    </th:block>
+
+    <!-- Main content -->
+    <div layout:fragment="content" class="fade-in">
+
+        <div class="container-fluid py-4">
+            <h2 class="h3 mb-4">Execution Comparison</h2>
+
+            <div class="card shadow-sm border-0 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle bg-white mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 20%;" class="bg-light sticky-left">Metric</th>
+                                    <th style="width: 40%;">
+                                        <div class="fw-bold">Execution 1</div>
+                                        <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(m1.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m1.id})}"
+                                           class="small fw-normal text-decoration-none" 
+                                           th:text="${#temporals.format(m1.testRun.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></a>
+                                    </th>
+                                    <th style="width: 40%;">
+                                        <div class="fw-bold">Execution 2</div>
+                                        <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(m2.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m2.id})}"
+                                           class="small fw-normal text-decoration-none" 
+                                           th:text="${#temporals.format(m2.testRun.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="table-secondary">
+                                    <td colspan="3" class="fw-bold">Hardware</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Host</td>
+                                    <td th:text="${m1.testRun.hostname}"></td>
+                                    <td th:class="${m1.testRun.hostname != m2.testRun.hostname} ? 'bg-warning bg-opacity-10 fw-bold' : ''" th:text="${m2.testRun.hostname}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">OS</td>
+                                    <td th:text="${m1.testRun.os}"></td>
+                                    <td th:class="${m1.testRun.os != m2.testRun.os} ? 'bg-warning bg-opacity-10 fw-bold' : ''" th:text="${m2.testRun.os}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">CPU</td>
+                                    <td th:text="${m1.testRun.cpu} + ' (' + ${m1.testRun.cpuCores} + ' cores)'"></td>
+                                    <td th:class="${m1.testRun.cpu != m2.testRun.cpu || m1.testRun.cpuCores != m2.testRun.cpuCores} ? 'bg-warning bg-opacity-10 fw-bold' : ''" th:text="${m2.testRun.cpu} + ' (' + ${m2.testRun.cpuCores} + ' cores)'"></td>
+                                </tr>
+                                
+                                <tr class="table-secondary">
+                                    <td colspan="3" class="fw-bold">Environment Context</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">JDK</td>
+                                    <td th:text="${m1.jdk}"></td>
+                                    <td th:class="${m1.jdk != m2.jdk} ? 'bg-warning bg-opacity-10 fw-bold' : ''" th:text="${m2.jdk}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">GC Options</td>
+                                    <td th:text="${m1.gcOpts}"></td>
+                                    <td th:class="${m1.gcOpts != m2.gcOpts} ? 'bg-warning bg-opacity-10 fw-bold' : ''" th:text="${m2.gcOpts}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">VM Options</td>
+                                    <td th:text="${m1.vmOpts}"></td>
+                                    <td th:class="${m1.vmOpts != m2.vmOpts} ? 'bg-warning bg-opacity-10 fw-bold' : ''" th:text="${m2.vmOpts}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Dataset</td>
+                                    <td th:text="${m1.dataset}"></td>
+                                    <td th:class="${m1.dataset != m2.dataset} ? 'bg-warning bg-opacity-10 fw-bold' : ''" th:text="${m2.dataset}"></td>
+                                </tr>
+
+                                <tr class="table-secondary">
+                                    <td colspan="3" class="fw-bold">Runtime Metrics</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Median Runtime</td>
+                                    <td class="font-monospace" th:text="${m1.medianRuntimeMs} + ' ms'"></td>
+                                    <td class="font-monospace fw-bold" th:classappend="${runtimeDiff > 0 ? 'text-danger bg-danger bg-opacity-10' : (runtimeDiff < 0 ? 'text-success bg-success bg-opacity-10' : '')}">
+                                        <span th:text="${m2.medianRuntimeMs} + ' ms'"></span>
+                                        <span class="small ms-2" th:if="${runtimeDiff != 0}">
+                                            (<span th:text="${runtimeDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatDecimal(runtimeDiff, 1, 1)}"></span> ms,
+                                            <span th:text="${runtimePct > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatDecimal(runtimePct, 1, 1)}"></span>%)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Perf Runtime</td>
+                                    <td class="font-monospace" th:text="${m1.perfRuntimeMs} + ' ms'"></td>
+                                    <td class="font-monospace" th:text="${m2.perfRuntimeMs} + ' ms'"></td>
+                                </tr>
+
+                                <tr class="table-secondary">
+                                    <td colspan="3" class="fw-bold">Hardware Counters</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Instructions</td>
+                                    <td class="font-monospace" th:text="${m1.instructions > 0 ? #numbers.formatInteger(m1.instructions, 1, 'COMMA') : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${instrDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.instructions > 0 ? #numbers.formatInteger(m2.instructions, 1, 'COMMA') : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.instructions > 0 and m2.instructions > 0 and instrDiff != 0}">
+                                            (<span th:text="${instrDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatInteger(instrDiff, 1, 'COMMA')}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Cycles</td>
+                                    <td class="font-monospace" th:text="${m1.cycles > 0 ? #numbers.formatInteger(m1.cycles, 1, 'COMMA') : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${cyclesDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.cycles > 0 ? #numbers.formatInteger(m2.cycles, 1, 'COMMA') : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.cycles > 0 and m2.cycles > 0 and cyclesDiff != 0}">
+                                            (<span th:text="${cyclesDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatInteger(cyclesDiff, 1, 'COMMA')}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">IPC</td>
+                                    <td class="font-monospace" th:text="${m1.ipc != null ? #numbers.formatDecimal(m1.ipc, 1, 3) : '-'}"></td>
+                                    <td class="font-monospace" th:text="${m2.ipc != null ? #numbers.formatDecimal(m2.ipc, 1, 3) : '-'}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Branches</td>
+                                    <td class="font-monospace" th:text="${m1.branches > 0 ? #numbers.formatInteger(m1.branches, 1, 'COMMA') : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${branchesDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.branches > 0 ? #numbers.formatInteger(m2.branches, 1, 'COMMA') : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.branches > 0 and m2.branches > 0 and branchesDiff != 0}">
+                                            (<span th:text="${branchesDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatInteger(branchesDiff, 1, 'COMMA')}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Branch Misses</td>
+                                    <td class="font-monospace" th:text="${m1.branchMisses > 0 ? #numbers.formatInteger(m1.branchMisses, 1, 'COMMA') : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${branchMissesDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.branchMisses > 0 ? #numbers.formatInteger(m2.branchMisses, 1, 'COMMA') : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.branchMisses > 0 and m2.branchMisses > 0 and branchMissesDiff != 0}">
+                                            (<span th:text="${branchMissesDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatInteger(branchMissesDiff, 1, 'COMMA')}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">L1 Misses</td>
+                                    <td class="font-monospace" th:text="${m1.l1Misses > 0 ? #numbers.formatInteger(m1.l1Misses, 1, 'COMMA') : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${l1MissesDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.l1Misses > 0 ? #numbers.formatInteger(m2.l1Misses, 1, 'COMMA') : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.l1Misses > 0 and m2.l1Misses > 0 and l1MissesDiff != 0}">
+                                            (<span th:text="${l1MissesDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatInteger(l1MissesDiff, 1, 'COMMA')}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">LLC Misses</td>
+                                    <td class="font-monospace" th:text="${m1.llcMisses > 0 ? #numbers.formatInteger(m1.llcMisses, 1, 'COMMA') : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${llcMissesDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.llcMisses > 0 ? #numbers.formatInteger(m2.llcMisses, 1, 'COMMA') : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.llcMisses > 0 and m2.llcMisses > 0 and llcMissesDiff != 0}">
+                                            (<span th:text="${llcMissesDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatInteger(llcMissesDiff, 1, 'COMMA')}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Page Faults</td>
+                                    <td class="font-monospace" th:text="${m1.pageFaults > 0 ? #numbers.formatInteger(m1.pageFaults, 1, 'COMMA') : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${pageFaultsDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.pageFaults > 0 ? #numbers.formatInteger(m2.pageFaults, 1, 'COMMA') : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.pageFaults > 0 and m2.pageFaults > 0 and pageFaultsDiff != 0}">
+                                            (<span th:text="${pageFaultsDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatInteger(pageFaultsDiff, 1, 'COMMA')}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Task Clock</td>
+                                    <td class="font-monospace" th:text="${m1.taskClock > 0 ? #numbers.formatInteger(m1.taskClock, 1, 'COMMA') : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${taskClockDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.taskClock > 0 ? #numbers.formatInteger(m2.taskClock, 1, 'COMMA') : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.taskClock > 0 and m2.taskClock > 0 and taskClockDiff != 0}">
+                                            (<span th:text="${taskClockDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatInteger(taskClockDiff, 1, 'COMMA')}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Context Switches</td>
+                                    <td class="font-monospace" th:text="${m1.contextSwitches > 0 ? #numbers.formatInteger(m1.contextSwitches, 1, 'COMMA') : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${contextSwitchesDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.contextSwitches > 0 ? #numbers.formatInteger(m2.contextSwitches, 1, 'COMMA') : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.contextSwitches > 0 and m2.contextSwitches > 0 and contextSwitchesDiff != 0}">
+                                            (<span th:text="${contextSwitchesDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatInteger(contextSwitchesDiff, 1, 'COMMA')}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">CPU Migrations</td>
+                                    <td class="font-monospace" th:text="${m1.cpuMigrations > 0 ? #numbers.formatInteger(m1.cpuMigrations, 1, 'COMMA') : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${cpuMigrationsDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.cpuMigrations > 0 ? #numbers.formatInteger(m2.cpuMigrations, 1, 'COMMA') : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.cpuMigrations > 0 and m2.cpuMigrations > 0 and cpuMigrationsDiff != 0}">
+                                            (<span th:text="${cpuMigrationsDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatInteger(cpuMigrationsDiff, 1, 'COMMA')}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+        
+                                <tr class="table-secondary">
+                                    <td colspan="3" class="fw-bold">CPU Times</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">Elapsed Time (s)</td>
+                                    <td class="font-monospace" th:text="${m1.secElapsed > 0 ? #numbers.formatDecimal(m1.secElapsed, 1, 3) : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${secElapsedDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.secElapsed > 0 ? #numbers.formatDecimal(m2.secElapsed, 1, 3) : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.secElapsed > 0 and m2.secElapsed > 0 and secElapsedDiff != 0}">
+                                            (<span th:text="${secElapsedDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatDecimal(secElapsedDiff, 1, 3)}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">User Time (s)</td>
+                                    <td class="font-monospace" th:text="${m1.secUser > 0 ? #numbers.formatDecimal(m1.secUser, 1, 3) : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${secUserDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.secUser > 0 ? #numbers.formatDecimal(m2.secUser, 1, 3) : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.secUser > 0 and m2.secUser > 0 and secUserDiff != 0}">
+                                            (<span th:text="${secUserDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatDecimal(secUserDiff, 1, 3)}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light sticky-left text-muted fw-medium">System Time (s)</td>
+                                    <td class="font-monospace" th:text="${m1.secSys > 0 ? #numbers.formatDecimal(m1.secSys, 1, 3) : '-'}"></td>
+                                    <td class="font-monospace" th:classappend="${secSysDiff != 0} ? 'fw-bold' : ''">
+                                        <span th:text="${m2.secSys > 0 ? #numbers.formatDecimal(m2.secSys, 1, 3) : '-'}"></span>
+                                        <span class="small text-muted ms-2" th:if="${m1.secSys > 0 and m2.secSys > 0 and secSysDiff != 0}">
+                                            (<span th:text="${secSysDiff > 0 ? '+' : ''}"></span><span th:text="${#numbers.formatDecimal(secSysDiff, 1, 3)}"></span>)
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -114,7 +114,7 @@ class SearchServiceTest
     {
         final FilterState state = new FilterState();
         final Map<String, Map<String, Long>> counts =
-            this.searchService.getFacetCounts(state, this.testRun.getId());
+            this.searchService.getFacetCounts(state, this.testRun.getId(), null);
 
         assertThat(counts).containsKey("jdk");
         assertThat(counts.get("jdk")).containsEntry("21", 2L);
@@ -133,7 +133,7 @@ class SearchServiceTest
         state.setJdk(List.of("25")); // only m3 matches
 
         final Map<String, Map<String, Long>> counts =
-            this.searchService.getFacetCounts(state, this.testRun.getId());
+            this.searchService.getFacetCounts(state, this.testRun.getId(), null);
 
         // The facet for the *filtered* field (jdk) should still show all options
         // to allow selecting others, or at least the selection itself.
@@ -153,7 +153,7 @@ class SearchServiceTest
         state.setGcOpts(List.of("-XX:+UseZGC"));
 
         final List<Measurement> results =
-            this.searchService.searchMeasurements(state, this.testRun.getId());
+            this.searchService.searchMeasurements(state, this.testRun.getId(), null);
 
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getJdk()).isEqualTo("21");

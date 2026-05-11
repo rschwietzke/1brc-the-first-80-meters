@@ -65,10 +65,11 @@ public class SearchService
      * Search for measurements within a test run, applying any active filters.
      *
      * @param state     the current filter state from the UI (may be {@code null})
-     * @param testRunId the ID of the test run to scope the search to
+     * @param testRunId the ID of the test run to scope the search to (may be {@code null} for cross-run search)
+     * @param className the class name to scope the search to (may be {@code null})
      * @return a list of matching measurements, up to {@value #MAX_HITS}
      */
-    public List<Measurement> searchMeasurements(final FilterState state, final Long testRunId)
+    public List<Measurement> searchMeasurements(final FilterState state, final Long testRunId, final String className)
     {
         final SearchSession searchSession = Search.session(this.entityManager);
 
@@ -79,6 +80,12 @@ public class SearchService
                 if (testRunId != null)
                 {
                     b.must(f.match().field("testRunId").matching(testRunId));
+                    hasConstraints = true;
+                }
+
+                if (className != null && !className.isBlank())
+                {
+                    b.must(f.match().field("className").matching(className));
                     hasConstraints = true;
                 }
 
@@ -113,10 +120,11 @@ public class SearchService
      * accurate picture of available values within each facet group.</p>
      *
      * @param state     the current filter state from the UI (may be {@code null})
-     * @param testRunId the ID of the test run to scope the aggregation to
+     * @param testRunId the ID of the test run to scope the aggregation to (may be {@code null} for cross-run aggregation)
+     * @param className the class name to scope the aggregation to (may be {@code null})
      * @return a map from field name to (term → count) pairs
      */
-    public Map<String, Map<String, Long>> getFacetCounts(final FilterState state, final Long testRunId)
+    public Map<String, Map<String, Long>> getFacetCounts(final FilterState state, final Long testRunId, final String className)
     {
         final SearchSession searchSession = Search.session(this.entityManager);
         final Map<String, Map<String, Long>> allFacets = new HashMap<>();
@@ -132,6 +140,12 @@ public class SearchService
                     if (testRunId != null)
                     {
                         b.must(f.match().field("testRunId").matching(testRunId));
+                        hasConstraints = true;
+                    }
+
+                    if (className != null && !className.isBlank())
+                    {
+                        b.must(f.match().field("className").matching(className));
                         hasConstraints = true;
                     }
 

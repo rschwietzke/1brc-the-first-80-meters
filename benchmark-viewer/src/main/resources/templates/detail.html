@@ -22,9 +22,9 @@
 <body>
 
     <!-- Breadcrumb -->
-    <li layout:fragment="breadcrumb" class="breadcrumb-item active" aria-current="page">
-        <i class="bi bi-cpu me-1"></i> Detail
-    </li>
+    <th:block layout:fragment="breadcrumb">
+        <div th:replace="~{fragments/detail :: breadcrumb-content}"></div>
+    </th:block>
 
     <!-- Main content -->
     <div layout:fragment="content">

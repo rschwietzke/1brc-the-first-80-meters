@@ -1,7 +1,11 @@
-<div th:fragment="detail-pane" class="container-fluid py-4 fade-in">
+<th:block th:fragment="htmx-response">
+    <ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
+        <div th:replace="~{fragments/detail :: breadcrumb-content}"></div>
+    </ol>
+    <div th:replace="~{fragments/detail :: detail-pane}"></div>
+</th:block>
 
-<!-- Out of Band Breadcrumb Swap -->
-<ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
+<th:block th:fragment="breadcrumb-content">
     <li class="breadcrumb-item fs-6">
         <a href="/" hx-get="/" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
             <i class="bi bi-house-door"></i> Runs
@@ -18,11 +22,20 @@
         </a>
     </li>
     <li class="breadcrumb-item active fs-6" aria-current="page" th:text="${measurement.className.substring(measurement.className.lastIndexOf('.') + 1)}"></li>
-</ol>
+</th:block>
+
+<div th:fragment="detail-pane" class="container-fluid py-4 fade-in">
 
     <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
-            <h2 class="h3 mb-1" th:text="${measurement.className.substring(measurement.className.lastIndexOf('.') + 1)}">Class Name</h2>
+            <h2 class="h3 mb-1">
+                <a th:href="@{/testcase/{className}(className=${measurement.className})}" 
+                   class="text-decoration-none text-dark"
+                   th:text="${measurement.className.substring(measurement.className.lastIndexOf('.') + 1)}"
+                   title="View all executions of this test case">
+                    Class Name
+                </a>
+            </h2>
             <p class="text-muted mb-0">Measurement Details</p>
         </div>
         <div th:if="${measurement.error}" class="badge bg-danger rounded-pill px-3 py-2 fs-6">
@@ -129,35 +142,35 @@
                         <!-- Raw Counters -->
                         <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.instructions > 0}">
                             <span class="text-muted small" title="Instructions executed">Instructions</span>
-                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.instructions, 0, 'COMMA')}"></span>
+                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.instructions, 1, 'COMMA')}"></span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.cycles > 0}">
                             <span class="text-muted small" title="CPU Cycles">Cycles</span>
-                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.cycles, 0, 'COMMA')}"></span>
+                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.cycles, 1, 'COMMA')}"></span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.branches > 0}">
                             <span class="text-muted small" title="Branches executed">Branches</span>
-                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.branches, 0, 'COMMA')}"></span>
+                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.branches, 1, 'COMMA')}"></span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.branchMisses > 0}">
                             <span class="text-muted small" title="Branch Mispredictions">Branch Misses</span>
-                            <span class="font-monospace text-danger" th:text="${#numbers.formatInteger(measurement.branchMisses, 0, 'COMMA')}"></span>
+                            <span class="font-monospace text-danger" th:text="${#numbers.formatInteger(measurement.branchMisses, 1, 'COMMA')}"></span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.l1Misses > 0}">
                             <span class="text-muted small" title="L1 Data Cache Load Misses">L1 D-Cache Misses</span>
-                            <span class="font-monospace text-danger" th:text="${#numbers.formatInteger(measurement.l1Misses, 0, 'COMMA')}"></span>
+                            <span class="font-monospace text-danger" th:text="${#numbers.formatInteger(measurement.l1Misses, 1, 'COMMA')}"></span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.llcMisses > 0}">
                             <span class="text-muted small" title="Last Level Cache Misses">LLC Misses</span>
-                            <span class="font-monospace text-danger" th:text="${#numbers.formatInteger(measurement.llcMisses, 0, 'COMMA')}"></span>
+                            <span class="font-monospace text-danger" th:text="${#numbers.formatInteger(measurement.llcMisses, 1, 'COMMA')}"></span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.pageFaults > 0}">
                             <span class="text-muted small" title="Page Faults">Page Faults</span>
-                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.pageFaults, 0, 'COMMA')}"></span>
+                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.pageFaults, 1, 'COMMA')}"></span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between bg-transparent px-0 border-light" th:if="${measurement.contextSwitches > 0}">
                             <span class="text-muted small" title="Context Switches">Context Switches</span>
-                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.contextSwitches, 0, 'COMMA')}"></span>
+                            <span class="font-monospace text-dark" th:text="${#numbers.formatInteger(measurement.contextSwitches, 1, 'COMMA')}"></span>
                         </li>
 
                         <!-- Derived Metrics -->
@@ -178,6 +191,55 @@
                             </li>
                         </div>
                     </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History for this Environment Context -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 overflow-hidden">
+                <div class="card-header bg-transparent border-bottom-0 pt-4 pb-0">
+                    <h5 class="card-title text-secondary"><i class="bi bi-clock-history me-2"></i>History for this Environment Context</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div th:if="${history.isEmpty()}" class="p-4 text-muted small">No historical data available for this configuration.</div>
+                    <div class="table-responsive" th:unless="${history.isEmpty()}">
+                        <table class="table table-hover align-middle bg-white mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Run Timestamp</th>
+                                    <th class="text-end">Median Runtime (ms)</th>
+                                    <th class="text-end">Instructions</th>
+                                    <th class="text-end">Cycles</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="hist : ${history}" th:class="${hist.id == measurement.id} ? 'table-primary' : ''">
+                                    <td>
+                                        <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(hist.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${hist.id})}"
+                                           class="text-decoration-none"
+                                           th:attr="hx-get=@{/runs/{ts}/detail/{id}(ts=${#temporals.format(hist.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${hist.id})}"
+                                           hx-target="#main-content"
+                                           hx-swap="innerHTML"
+                                           hx-push-url="true">
+                                           <span th:text="${#temporals.format(hist.testRun.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                                        </a>
+                                        <span th:if="${hist.id == measurement.id}" class="badge bg-secondary ms-2">Current</span>
+                                    </td>
+                                    <td class="text-end font-monospace" th:text="${hist.medianRuntimeMs}"></td>
+                                    <td class="text-end font-monospace" th:text="${hist.instructions > 0 ? #numbers.formatInteger(hist.instructions, 1, 'COMMA') : '-'}"></td>
+                                    <td class="text-end font-monospace" th:text="${hist.cycles > 0 ? #numbers.formatInteger(hist.cycles, 1, 'COMMA') : '-'}"></td>
+                                    <td class="text-center">
+                                        <i th:if="${hist.error}" class="bi bi-x-circle-fill text-danger" title="Error"></i>
+                                        <i th:unless="${hist.error}" class="bi bi-check-circle-fill text-success" title="Success"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

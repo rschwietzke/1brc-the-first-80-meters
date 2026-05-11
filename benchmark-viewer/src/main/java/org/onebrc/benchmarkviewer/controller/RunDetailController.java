@@ -110,7 +110,7 @@ public class RunDetailController
         double globalMax = Double.MIN_VALUE;
 
         final List<Measurement> measurements =
-            this.searchService.searchMeasurements(filterState, testRun.getId());
+            this.searchService.searchMeasurements(filterState, testRun.getId(), null);
 
         for (final Measurement m : measurements)
         {
@@ -147,9 +147,10 @@ public class RunDetailController
         model.addAttribute("globalMax", globalMax == Double.MIN_VALUE ? 0.0 : globalMax);
 
         // Also add facets for OOB sidebar update
-        final var facets = this.searchService.getFacetCounts(filterState, testRun.getId());
+        final var facets = this.searchService.getFacetCounts(filterState, testRun.getId(), null);
         model.addAttribute("facets", facets);
         model.addAttribute("activeFilters", filterState);
+        model.addAttribute("filterActionUrl", "/runs/" + timestampStr);
 
         if ("true".equals(hxRequest))
         {

@@ -12,13 +12,11 @@
  * limitations under the License.
  */
 
-// AI-generated file: Claude Opus 4.6 (Thinking)
+// AI-generated file: Antigravity
 
 package org.onebrc.benchmarkviewer.controller;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -26,15 +24,12 @@ import org.junit.jupiter.api.Test;
 import org.onebrc.benchmarkviewer.domain.Measurement;
 import org.onebrc.benchmarkviewer.domain.TestRun;
 import org.onebrc.benchmarkviewer.repository.MeasurementRepository;
-import org.onebrc.benchmarkviewer.repository.TestRunRepository;
-import org.onebrc.benchmarkviewer.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -42,59 +37,46 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 /**
- * Tests for {@link RunDetailController}.
- *
- * <p>Verifies the variation matrix endpoint returns the correct view name,
- * populates the model with grouped matrix data, and responds correctly
- * to HTMX partial requests.</p>
+ * Tests for {@link ExecutionCompareController}.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-class RunDetailControllerTest
+class ExecutionCompareControllerTest
 {
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
-    private TestRunRepository testRunRepository;
-
-    @MockitoBean
     private MeasurementRepository measurementRepository;
 
-    @MockitoBean
-    private SearchService searchService;
-
     @Test
-    @DisplayName("4.1: GET /runs/{timestamp} returns 200, model contains grouped matrix data")
-    void getRunDetail_ShouldReturnMatrixView() throws Exception
+    @DisplayName("GET /compare-executions returns 200 with compare view")
+    void testCompareExecutions() throws Exception
     {
-        final LocalDateTime timestamp = LocalDateTime.of(2026, 5, 5, 17, 54, 2);
-        final TestRun run = new TestRun();
-        run.setId(1L);
-        run.setTimestamp(timestamp);
-
+        final TestRun run1 = new TestRun();
+        run1.setTimestamp(LocalDateTime.now());
         final Measurement m1 = new Measurement();
-        m1.setClassName("BRC01");
-        m1.setJdk("21");
+        m1.setId(1L);
+        m1.setTestRun(run1);
         m1.setMedianRuntimeMs(100.0);
-        m1.setError(false);
-        // Default empty string for other fields to prevent NPE in EnvironmentKey
-        m1.setGcOpts("");
-        m1.setVmOpts("");
-        m1.setProgOpts("");
-        m1.setBinding("");
-        m1.setDataset("");
 
-        when(this.testRunRepository.findByTimestamp(any())).thenReturn(Optional.of(run));
-        when(this.searchService.searchMeasurements(any(), any(), any())).thenReturn(List.of(m1));
-        when(this.searchService.getFacetCounts(any(), any(), any())).thenReturn(Map.of());
+        final TestRun run2 = new TestRun();
+        run2.setTimestamp(LocalDateTime.now());
+        final Measurement m2 = new Measurement();
+        m2.setId(2L);
+        m2.setTestRun(run2);
+        m2.setMedianRuntimeMs(120.0);
 
-        this.mockMvc.perform(get("/runs/2026-05-05T17:54:02")
-                .header("HX-Request", "true"))
+        when(this.measurementRepository.findById(1L)).thenReturn(Optional.of(m1));
+        when(this.measurementRepository.findById(2L)).thenReturn(Optional.of(m2));
+
+        this.mockMvc.perform(get("/compare-executions?m1=1&m2=2"))
             .andExpect(status().isOk())
-            .andExpect(view().name("run-detail :: htmx-response"))
-            .andExpect(model().attributeExists("testRun"))
-            .andExpect(model().attributeExists("classes"))
-            .andExpect(model().attributeExists("matrix"));
+            .andExpect(view().name("compare-executions"))
+            .andExpect(model().attributeExists("m1"))
+            .andExpect(model().attributeExists("m2"))
+            .andExpect(model().attributeExists("runtimeDiff"))
+            .andExpect(model().attributeExists("runtimePct"))
+            .andExpect(model().attribute("runtimeDiff", 20.0));
     }
 }

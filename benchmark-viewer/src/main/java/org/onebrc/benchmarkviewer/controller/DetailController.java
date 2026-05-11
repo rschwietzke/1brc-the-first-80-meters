@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 import org.onebrc.benchmarkviewer.domain.Measurement;
 import org.onebrc.benchmarkviewer.domain.TestRun;
@@ -36,6 +37,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,6 +52,7 @@ import org.springframework.web.server.ResponseStatusException;
  * that are associated with a given measurement.</p>
  */
 @Controller
+@Transactional(readOnly = true)
 public class DetailController
 {
     /** Formatter used to build the JFR file name from a timestamp. */
@@ -123,14 +126,20 @@ public class DetailController
         final boolean hasJfrFile = this.resolveJfrPath(jfrFileName) != null
             && Files.exists(this.resolveJfrPath(jfrFileName));
 
+        final List<Measurement> history = this.measurementRepository.findByClassNameAndJdkAndGcOptsAndVmOptsAndProgOptsAndBindingAndDatasetOrderByTestRunTimestampDesc(
+            measurement.getClassName(), measurement.getJdk(), measurement.getGcOpts(), measurement.getVmOpts(),
+            measurement.getProgOpts(), measurement.getBinding(), measurement.getDataset()
+        );
+
         model.addAttribute("testRun", testRun);
         model.addAttribute("measurement", measurement);
+        model.addAttribute("history", history);
         model.addAttribute("hasJfrFile", hasJfrFile);
         model.addAttribute("jfrFileName", jfrFileName);
 
         if ("true".equals(hxRequest))
         {
-            return "fragments/detail :: detail-pane";
+            return "fragments/detail :: htmx-response";
         }
 
         // Full-page fallback: render inside the layout by forwarding to a
