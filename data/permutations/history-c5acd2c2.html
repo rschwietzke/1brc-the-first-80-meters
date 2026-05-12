@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>History: org.onebrc.again26.BRC021_LooplessParsing</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+body { font-family: system-ui, sans-serif; margin: 20px; background: #f9f9f9; color: #333; }
+.card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px; }
+h1 { font-size: 1.5em; margin-bottom: 5px; }
+.config-key { font-family: monospace; background: #eef; padding: 10px; border-radius: 4px; display: inline-block; word-break: break-all; margin-bottom: 20px; border: 1px solid #ccd; }
+.chart-grid { display: flex; flex-wrap: wrap; gap: 20px; }
+.chart-container { flex: 1 1 45%; height: 350px; background: white; border: 1px solid #ddd; border-radius: 4px; padding: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
+th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: right; }
+th { background-color: #f2f2f2; text-align: left; }
+td:first-child { text-align: left; font-weight: bold; }
+tr:hover { background-color: #f5f5f5; }
+.btn { display: inline-block; padding: 8px 16px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; margin-bottom: 20px; }
+.btn:hover { background: #5a6268; }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="btn">&larr; Back to Permutations Index</a>
+
+<h1>Historical Analysis: org.onebrc.again26.BRC021_LooplessParsing</h1>
+<div class="config-key">JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC021_LooplessParsing</div>
+<p>Generated: 2026-05-11 11:16:53</p>
+
+<div class="card">
+    <h2>Performance Trend Charts</h2>
+    <div class="chart-grid">
+        <div id="chart-runtime" class="chart-container"></div>
+        <div id="chart-ipc" class="chart-container"></div>
+        <div id="chart-instructions" class="chart-container"></div>
+        <div id="chart-branches" class="chart-container"></div>
+        <div id="chart-gc" class="chart-container"></div>
+        <div id="chart-bytes" class="chart-container"></div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Raw Execution History</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Runtime (ms)</th>
+                <th>IPC</th>
+                <th>Instructions</th>
+                <th>Cycles</th>
+                <th>Branches</th>
+                <th>Branch Misses</th>
+                <th>GC Pause (ms)</th>
+                <th>Allocated Bytes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="../20260508-213732/reports/results.html">20260508-213732</a></td>
+                <td>42</td>
+                <td>0.98</td>
+                <td>850,003,600</td>
+                <td>871,592,250</td>
+                <td>166,033,897</td>
+                <td>8,881,726</td>
+                <td>0</td>
+                <td>16,660,448</td>
+            </tr>
+            <tr>
+                <td><a href="../20260508-215342/reports/results.html">20260508-215342</a></td>
+                <td>52</td>
+                <td>0.92</td>
+                <td>872,903,229</td>
+                <td>943,905,252</td>
+                <td>174,500,990</td>
+                <td>9,024,598</td>
+                <td>0</td>
+                <td>16,660,472</td>
+            </tr>
+            <tr>
+                <td><a href="../20260508-220316/reports/results.html">20260508-220316</a></td>
+                <td>41</td>
+                <td>0.87</td>
+                <td>867,322,827</td>
+                <td>993,333,912</td>
+                <td>170,295,055</td>
+                <td>8,971,160</td>
+                <td>0</td>
+                <td>16,656,736</td>
+            </tr>
+            <tr>
+                <td><a href="../20260509-152436/reports/results.html">20260509-152436</a></td>
+                <td>13,650</td>
+                <td>2.45</td>
+                <td>118,447,051,760</td>
+                <td>48,403,823,218</td>
+                <td>25,559,929,706</td>
+                <td>270,715,442</td>
+                <td>37</td>
+                <td>16,661,992</td>
+            </tr>
+            <tr>
+                <td><a href="../20260510-002939/reports/results.html">20260510-002939</a></td>
+                <td>16,063</td>
+                <td>2.38</td>
+                <td>118,894,244,644</td>
+                <td>50,024,017,988</td>
+                <td>25,602,406,582</td>
+                <td>277,247,340</td>
+                <td>38</td>
+                <td>16,658,424</td>
+            </tr>
+            <tr>
+                <td><a href="../20260511-111208/reports/results.html">20260511-111208</a></td>
+                <td>54</td>
+                <td>0.87</td>
+                <td>876,324,966</td>
+                <td>1,003,038,139</td>
+                <td>175,803,462</td>
+                <td>8,973,030</td>
+                <td>0</td>
+                <td>16,659,432</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const timestamps = [
+        '20260508-213732','20260508-215342','20260508-220316','20260509-152436','20260510-002939','20260511-111208',
+    ];
+    
+    function initChart(id, title, seriesName, data) {
+        var chartDom = document.getElementById(id);
+        var myChart = echarts.init(chartDom);
+        var option = {
+            title: { text: title, textStyle: { fontSize: 14 } },
+            tooltip: { trigger: 'axis' },
+            xAxis: { type: 'category', data: timestamps },
+            yAxis: { type: 'value', min: 'dataMin' },
+            series: [{
+                name: seriesName,
+                type: 'line',
+                smooth: true,
+                areaStyle: { opacity: 0.1 },
+                data: data
+            }]
+        };
+        myChart.setOption(option);
+    }
+
+    initChart('chart-runtime', 'Median Runtime (ms)', 'Runtime', [
+        42,52,41,13,650,16,063,54,
+    ]);
+    
+    initChart('chart-ipc', 'Instructions Per Cycle (IPC)', 'IPC', [
+        0.98,0.92,0.87,2.45,2.38,0.87,
+    ]);
+    
+    initChart('chart-instructions', 'Instructions Executed', 'Instructions', [
+        850,003,600,872,903,229,867,322,827,118,447,051,760,118,894,244,644,876,324,966,
+    ]);
+    
+    initChart('chart-branches', 'Branches Evaluated', 'Branches', [
+        166,033,897,174,500,990,170,295,055,25,559,929,706,25,602,406,582,175,803,462,
+    ]);
+    
+    initChart('chart-gc', 'Total GC Pause Time (ms)', 'GC', [
+        0,0,0,37,38,0,
+    ]);
+    
+    initChart('chart-bytes', 'Total Allocated Bytes', 'Bytes', [
+        16,660,448,16,660,472,16,656,736,16,661,992,16,658,424,16,659,432,
+    ]);
+</script>
+</body>
+</html>

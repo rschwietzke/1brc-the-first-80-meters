@@ -26,6 +26,11 @@
         <div th:replace="~{fragments/detail :: breadcrumb-content}"></div>
     </th:block>
 
+    <!-- Sidebar -->
+    <div layout:fragment="sidebar" class="px-3">
+        <div th:replace="~{fragments/sidebar :: content}"></div>
+    </div>
+
     <!-- Main content -->
     <div layout:fragment="content">
         <div th:replace="~{fragments/detail :: detail-pane}"></div>

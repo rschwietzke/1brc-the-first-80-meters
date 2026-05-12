@@ -25,10 +25,12 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
+import org.onebrc.benchmarkviewer.domain.FilterState;
 import org.onebrc.benchmarkviewer.domain.Measurement;
 import org.onebrc.benchmarkviewer.domain.TestRun;
 import org.onebrc.benchmarkviewer.repository.MeasurementRepository;
 import org.onebrc.benchmarkviewer.repository.TestRunRepository;
+import org.onebrc.benchmarkviewer.service.SearchService;
 import org.onebrc.benchmarkviewer.util.ViewerDataLocator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -61,6 +63,7 @@ public class DetailController
 
     private final TestRunRepository testRunRepository;
     private final MeasurementRepository measurementRepository;
+    private final SearchService searchService;
     private final String benchmarkDataDirectory;
 
     /**
@@ -72,10 +75,12 @@ public class DetailController
      */
     public DetailController(final TestRunRepository testRunRepository,
                             final MeasurementRepository measurementRepository,
+                            final SearchService searchService,
                             @Value("${benchmark.data.directory:}") final String benchmarkDataDirectory)
     {
         this.testRunRepository = testRunRepository;
         this.measurementRepository = measurementRepository;
+        this.searchService = searchService;
         this.benchmarkDataDirectory = benchmarkDataDirectory;
     }
 
@@ -98,6 +103,7 @@ public class DetailController
         @PathVariable("timestampStr") final String timestampStr,
         @PathVariable("id") final Long id,
         @RequestHeader(value = "HX-Request", required = false) final String hxRequest,
+        final FilterState filterState,
         final Model model)
     {
         final LocalDateTime timestamp;
@@ -136,6 +142,11 @@ public class DetailController
         model.addAttribute("history", history);
         model.addAttribute("hasJfrFile", hasJfrFile);
         model.addAttribute("jfrFileName", jfrFileName);
+
+        final var facets = this.searchService.getFacetCounts(filterState, testRun.getId(), null);
+        model.addAttribute("facets", facets);
+        model.addAttribute("activeFilters", filterState);
+        model.addAttribute("filterActionUrl", "/runs/" + timestampStr + "/detail/" + id);
 
         if ("true".equals(hxRequest))
         {

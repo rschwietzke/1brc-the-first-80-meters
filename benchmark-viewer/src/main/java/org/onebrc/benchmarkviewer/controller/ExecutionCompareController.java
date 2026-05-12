@@ -16,8 +16,10 @@
 
 package org.onebrc.benchmarkviewer.controller;
 
+import org.onebrc.benchmarkviewer.domain.FilterState;
 import org.onebrc.benchmarkviewer.domain.Measurement;
 import org.onebrc.benchmarkviewer.repository.MeasurementRepository;
+import org.onebrc.benchmarkviewer.service.SearchService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,16 +36,19 @@ import org.springframework.web.server.ResponseStatusException;
 public class ExecutionCompareController
 {
     private final MeasurementRepository measurementRepository;
+    private final SearchService searchService;
 
-    public ExecutionCompareController(final MeasurementRepository measurementRepository)
+    public ExecutionCompareController(final MeasurementRepository measurementRepository, final SearchService searchService)
     {
         this.measurementRepository = measurementRepository;
+        this.searchService = searchService;
     }
 
     @GetMapping("/compare-executions")
     public String compare(
         @RequestParam("m1") final Long m1Id,
         @RequestParam("m2") final Long m2Id,
+        final FilterState filterState,
         final Model model)
     {
         final Measurement m1 = this.measurementRepository.findById(m1Id)
@@ -57,6 +62,11 @@ public class ExecutionCompareController
 
         model.addAttribute("m1", m1);
         model.addAttribute("m2", m2);
+
+        final var facets = this.searchService.getFacetCounts(filterState, null, m1.getClassName());
+        model.addAttribute("facets", facets);
+        model.addAttribute("activeFilters", filterState);
+        model.addAttribute("filterActionUrl", "/compare-executions?m1=" + m1Id + "&m2=" + m2Id);
 
         // Calculate differences
         model.addAttribute("runtimeDiff", m2.getMedianRuntimeMs() - m1.getMedianRuntimeMs());

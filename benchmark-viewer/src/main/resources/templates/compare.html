@@ -26,6 +26,11 @@
         <i class="bi bi-arrow-left-right me-1"></i> Compare
     </li>
 
+    <!-- Sidebar -->
+    <div layout:fragment="sidebar" class="px-3">
+        <div th:replace="~{fragments/sidebar :: content}"></div>
+    </div>
+
     <!-- Main content -->
     <div layout:fragment="content">
         <div th:replace="~{fragments/compare :: compare-pane}"></div>

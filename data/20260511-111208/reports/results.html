@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>1BRC Benchmark Report - 20260511-111208</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+body { font-family: system-ui, sans-serif; margin: 20px; background: #f9f9f9; }
+table { border-collapse: collapse; width: 100%; margin-bottom: 30px; background: white; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #f2f2f2; }
+.dashboard { display: flex; gap: 20px; margin-bottom: 30px; }
+.card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex: 1; }
+.badge { font-size: 0.8em; padding: 2px 6px; border-radius: 10px; margin-left: 8px; }
+.badge-baseline { background: #ffd700; color: #000; }
+.badge-incomplete { background: #ffcccc; color: #900; }
+.rotate-th {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    padding: 10px 5px;
+    max-height: 150px;
+    text-align: left;
+}
+</style>
+</head>
+<body>
+<h1>1BRC Benchmark Report</h1>
+<p><strong>Run Timestamp:</strong> 20260511-111208</p>
+<div class="card" style="margin-bottom: 20px; background: #f0f8ff;">
+    <h3 style="margin-top: 0;">Machine Hardware Profile</h3>
+    <ul style="list-style-type: none; padding: 0; margin: 0; display: flex; gap: 20px; flex-wrap: wrap;">
+        <li><strong>Hostname:</strong> picard-rschwietzke</li>
+        <li><strong>Kernel:</strong> 6.17.0-14-generic</li>
+        <li><strong>OS:</strong> Ubuntu 24.04.4 LTS</li>
+        <li><strong>CPU:</strong> AMD Ryzen 7 PRO 4750U with Radeon Graphics</li>
+        <li><strong>CPU Cores:</strong> 16</li>
+        <li><strong>Memory:</strong> 30Gi</li>
+    </ul>
+</div>
+
+<div id="matrix-view">
+    <div class="dashboard">
+    <div class="card"><h3>Executive Anomaly Dashboard</h3><p><em>(Regression data placeholder)</em></p></div>
+    </div>
+
+    <h2>Dataset: 10k</h2>
+    <div style="overflow-x: auto;">
+        <table>
+        <tr>
+            <th>Environment (JDK | GC | VM Options | Taskset)</th>
+            <th class="rotate-th">org.onebrc.again26.BRC000_Empty</th>
+            <th class="rotate-th">org.onebrc.again26.BRC001_Baseline</th>
+            <th class="rotate-th">org.onebrc.again26.BRC010_NoStream</th>
+            <th class="rotate-th">org.onebrc.again26.BRC012_SplitRemoved</th>
+            <th class="rotate-th">org.onebrc.again26.BRC014_NewParseDouble</th>
+            <th class="rotate-th">org.onebrc.again26.BRC015_ParseDoubleSimpler1</th>
+            <th class="rotate-th">org.onebrc.again26.BRC016_NoExtraString</th>
+            <th class="rotate-th">org.onebrc.again26.BRC017_ParseDoubleSimpler2</th>
+            <th class="rotate-th">org.onebrc.again26.BRC020_IntegerValue</th>
+            <th class="rotate-th">org.onebrc.again26.BRC021_LooplessParsing</th>
+            <th class="rotate-th">org.onebrc.again26.BRC022_LooplessParsing2</th>
+            <th class="rotate-th">org.onebrc.again26.BRC025_MutateData</th>
+            <th class="rotate-th">org.onebrc.again26.BRC027_SizedMap</th>
+            <th class="rotate-th">org.onebrc.again26.BRC030_OpenMap</th>
+            <th class="rotate-th">org.onebrc.again26.BRC031_OpenMapLessCasting</th>
+            <th class="rotate-th">org.onebrc.again26.BRC033_SimplerLambda</th>
+            <th class="rotate-th">org.onebrc.again26.BRC035_NoLambda</th>
+            <th class="rotate-th">org.onebrc.again26.BRC036_TurnedIfs</th>
+            <th class="rotate-th">org.onebrc.again26.BRC037_LessNullChecks</th>
+            <th class="rotate-th">org.onebrc.again26.BRC040_ASetIsGoodEnough</th>
+            <th class="rotate-th">org.onebrc.again26.BRC041_DirectUpdate</th>
+            <th class="rotate-th">org.onebrc.again26.BRC042_NoSplittedString</th>
+            <th class="rotate-th">org.onebrc.again26.BRC045_KeepChars</th>
+            <th class="rotate-th">org.onebrc.again26.BRC047_IntOnly</th>
+            <th class="rotate-th">org.onebrc.again26.BRC048_ImprovedStringHandling</th>
+            <th class="rotate-th">org.onebrc.again26.BRC049_ManualMinMax</th>
+            <th class="rotate-th">org.onebrc.again26.BRC050_LargerSet</th>
+            <th class="rotate-th">org.onebrc.again26.BRC060_ReadingBytes</th>
+            <th class="rotate-th">org.onebrc.again26.BRC061_RandomAccessFile</th>
+            <th class="rotate-th">org.onebrc.again26.BRC063_OneAddLess</th>
+            <th class="rotate-th">org.onebrc.again26.BRC065_OneLoopLess</th>
+            <th class="rotate-th">org.onebrc.again26.BRC067_ParseDifferently</th>
+            <th class="rotate-th">org.onebrc.again26.BRC068_InlineParsing</th>
+            <th class="rotate-th">org.onebrc.again26.BRC069_InlineParsing_65</th>
+            <th class="rotate-th">org.onebrc.again26.BRC070_EqualsCity</th>
+            <th class="rotate-th">org.onebrc.again26.BRC072_ReadDirectNotViaBuffer</th>
+            <th class="rotate-th">org.onebrc.again26.BRC075_LargeByteBuffer</th>
+            <th class="rotate-th">org.onebrc.again26.BRC077_LessAdditions</th>
+            <th class="rotate-th">org.onebrc.again26.BRC078_CalculateEarlier</th>
+            <th class="rotate-th">org.onebrc.again26.BRC079_RunWithoutByteBuffer</th>
+            <th class="rotate-th">org.onebrc.again26.BRC080_JDKArrayUtils</th>
+            <th class="rotate-th">org.onebrc.again26.BRC081_LoopUnroll</th>
+            <th class="rotate-th">org.onebrc.again26.BRC082_VectorSearchOnlyForLargeArray</th>
+            <th class="rotate-th">org.onebrc.again26.BRC083_MainLoop</th>
+            <th class="rotate-th">org.onebrc.again26.BRC090_MemorySegment_VOID</th>
+            <th class="rotate-th">org.onebrc.again26.BRC091_Reviewed83</th>
+            <th class="rotate-th">org.onebrc.again26.BRC092_ParseIntegerLessBranches_VOID</th>
+            <th class="rotate-th">org.onebrc.again26.BRC093_ParseIntegerLessCode_VOID</th>
+            <th class="rotate-th">org.onebrc.again26.BRC094_Reviewed91</th>
+            <th class="rotate-th">org.onebrc.again26.BRC095_Hash</th>
+            <th class="rotate-th">org.onebrc.again26.BRC096_ReadInt_VOID</th>
+            <th class="rotate-th">org.onebrc.again26.BRC097_EqualsCity</th>
+            <th class="rotate-th">org.onebrc.again26.BRC098_ParseTemperature_VOID</th>
+            <th class="rotate-th">org.onebrc.again26.BRC099_ArrayAccess</th>
+            <th class="rotate-th">org.onebrc.again26.BRC100_DirectTempWrite</th>
+            <th class="rotate-th">org.onebrc.again26.BRC101_ParseFrom65_VOID</th>
+            <th class="rotate-th">org.onebrc.again26.BRC105_ParseTemp_95</th>
+            <th class="rotate-th">org.onebrc.again26.BRC106_ParseTemp_105</th>
+            <th class="rotate-th">org.onebrc.again26.BRC107_ParseTemp</th>
+            <th class="rotate-th">org.onebrc.again26.BRC110_EqualsCitySplit</th>
+            <th class="rotate-th">org.onebrc.again26.BRC111_EqualsCitySplit_Reverse</th>
+            <th class="rotate-th">org.onebrc.again26.BRC112_EqualsCityMismatch</th>
+            <th class="rotate-th">org.onebrc.again26.BRC113_EqualsCityMismatchSimple</th>
+            <th class="rotate-th">org.onebrc.again26.BRC120_OnlyHashing_From95</th>
+            <th class="rotate-th">org.onebrc.again26.BRC121_UpdatedLoops</th>
+            <th class="rotate-th">org.onebrc.again26.BRC123_121plus105_VOID</th>
+            <th class="rotate-th">org.onebrc.again26.BRC125_Refined_121</th>
+            <th class="rotate-th">org.onebrc.again26.BRC127_ParsingTempAI_VOID</th>
+        </tr>
+
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                122 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC010_NoStream')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                83 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC012_SplitRemoved')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                97 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC014_NewParseDouble')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                62 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC015_ParseDoubleSimpler1')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                83 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC016_NoExtraString')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                71 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC017_ParseDoubleSimpler2')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                62 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC020_IntegerValue')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                86 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC021_LooplessParsing')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                98 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC022_LooplessParsing2')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                76 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC025_MutateData')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC027_SizedMap')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                114 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC030_OpenMap')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                78 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC031_OpenMapLessCasting')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                97 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC033_SimplerLambda')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                89 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC035_NoLambda')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                94 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC036_TurnedIfs')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                65 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC037_LessNullChecks')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                63 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC040_ASetIsGoodEnough')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                58 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC041_DirectUpdate')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                76 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC042_NoSplittedString')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                78 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC045_KeepChars')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                59 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC047_IntOnly')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                58 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC048_ImprovedStringHandling')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                61 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC049_ManualMinMax')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                84 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC050_LargerSet')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                59 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC060_ReadingBytes')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                53 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC061_RandomAccessFile')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                46 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC063_OneAddLess')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                39 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC065_OneLoopLess')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                69 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC067_ParseDifferently')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                67 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC068_InlineParsing')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                43 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC069_InlineParsing_65')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                41 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC070_EqualsCity')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                42 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC072_ReadDirectNotViaBuffer')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                38 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC075_LargeByteBuffer')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                38 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC077_LessAdditions')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                39 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC078_CalculateEarlier')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                39 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC079_RunWithoutByteBuffer')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                70 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC080_JDKArrayUtils')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                52 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC081_LoopUnroll')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                46 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC082_VectorSearchOnlyForLargeArray')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                63 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC083_MainLoop')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                60 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC090_MemorySegment_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC091_Reviewed83')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                55 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC092_ParseIntegerLessBranches_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                44 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC093_ParseIntegerLessCode_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                51 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC094_Reviewed91')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                44 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC095_Hash')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                46 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC096_ReadInt_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                47 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC097_EqualsCity')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                50 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC098_ParseTemperature_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                45 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC099_ArrayAccess')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                47 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC100_DirectTempWrite')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                46 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC101_ParseFrom65_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                53 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC105_ParseTemp_95')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                67 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC106_ParseTemp_105')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                49 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC107_ParseTemp')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                45 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC110_EqualsCitySplit')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                43 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC111_EqualsCitySplit_Reverse')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                77 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC112_EqualsCityMismatch')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC113_EqualsCityMismatchSimple')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC120_OnlyHashing_From95')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                47 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC121_UpdatedLoops')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                43 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC123_121plus105_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                45 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC125_Refined_121')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                41 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC127_ParsingTempAI_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                51 ms
+                
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: monospace; white-space: nowrap;">JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7</td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                103 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC010_NoStream')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                91 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC012_SplitRemoved')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                95 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC014_NewParseDouble')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                53 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC015_ParseDoubleSimpler1')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                79 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC016_NoExtraString')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                86 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC017_ParseDoubleSimpler2')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                50 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC020_IntegerValue')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                45 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC021_LooplessParsing')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                54 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC022_LooplessParsing2')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                52 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC025_MutateData')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                54 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC027_SizedMap')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                49 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC030_OpenMap')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                48 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC031_OpenMapLessCasting')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                48 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC033_SimplerLambda')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                58 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC035_NoLambda')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                49 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC036_TurnedIfs')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                46 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC037_LessNullChecks')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                42 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC040_ASetIsGoodEnough')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                44 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC041_DirectUpdate')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                69 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC042_NoSplittedString')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                67 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC045_KeepChars')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                42 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC047_IntOnly')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                40 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC048_ImprovedStringHandling')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                40 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC049_ManualMinMax')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                67 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC050_LargerSet')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                70 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC060_ReadingBytes')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                35 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC061_RandomAccessFile')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                25 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC063_OneAddLess')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                26 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC065_OneLoopLess')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                25 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC067_ParseDifferently')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                31 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC068_InlineParsing')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                28 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC069_InlineParsing_65')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                45 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC070_EqualsCity')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                58 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC072_ReadDirectNotViaBuffer')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                26 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC075_LargeByteBuffer')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                24 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC077_LessAdditions')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                26 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC078_CalculateEarlier')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                29 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC079_RunWithoutByteBuffer')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                24 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC080_JDKArrayUtils')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                34 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC081_LoopUnroll')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                34 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC082_VectorSearchOnlyForLargeArray')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                27 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC083_MainLoop')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                33 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC090_MemorySegment_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                80 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC091_Reviewed83')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                27 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC092_ParseIntegerLessBranches_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                29 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC093_ParseIntegerLessCode_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                29 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC094_Reviewed91')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                46 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC095_Hash')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                27 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC096_ReadInt_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                32 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC097_EqualsCity')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                32 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC098_ParseTemperature_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                29 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC099_ArrayAccess')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                28 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC100_DirectTempWrite')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                32 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC101_ParseFrom65_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                30 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC105_ParseTemp_95')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                32 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC106_ParseTemp_105')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                32 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC107_ParseTemp')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                30 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC110_EqualsCitySplit')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                32 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC111_EqualsCitySplit_Reverse')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                31 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC112_EqualsCityMismatch')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC113_EqualsCityMismatchSimple')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                0 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC120_OnlyHashing_From95')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                26 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC121_UpdatedLoops')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                30 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC123_121plus105_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                38 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC125_Refined_121')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                27 ms
+                
+            </td>
+            <td style="cursor: pointer; background-color: #f8fbf8; white-space: nowrap; text-align: right;" onclick="showDetails('JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC127_ParsingTempAI_VOID')" onmouseover="this.style.backgroundColor='#e0ffe0'" onmouseout="this.style.backgroundColor='#f8fbf8'">
+                30 ms
+                
+            </td>
+        </tr>
+        </table>
+    </div>
+
+    <div id="chart-0" style="width: 100%; height: 400px; margin-bottom: 50px;"></div>
+    <script>
+    (function() {
+        var chartDom = document.getElementById('chart-0');
+        if (chartDom) {
+            var myChart = echarts.init(chartDom);
+            var option = { title: { text: '10k' }, tooltip: {}, xAxis: { data: [
+            'org.onebrc.again26.BRC000_Empty','org.onebrc.again26.BRC001_Baseline','org.onebrc.again26.BRC010_NoStream','org.onebrc.again26.BRC012_SplitRemoved','org.onebrc.again26.BRC014_NewParseDouble','org.onebrc.again26.BRC015_ParseDoubleSimpler1','org.onebrc.again26.BRC016_NoExtraString','org.onebrc.again26.BRC017_ParseDoubleSimpler2','org.onebrc.again26.BRC020_IntegerValue','org.onebrc.again26.BRC021_LooplessParsing','org.onebrc.again26.BRC022_LooplessParsing2','org.onebrc.again26.BRC025_MutateData','org.onebrc.again26.BRC027_SizedMap','org.onebrc.again26.BRC030_OpenMap','org.onebrc.again26.BRC031_OpenMapLessCasting','org.onebrc.again26.BRC033_SimplerLambda','org.onebrc.again26.BRC035_NoLambda','org.onebrc.again26.BRC036_TurnedIfs','org.onebrc.again26.BRC037_LessNullChecks','org.onebrc.again26.BRC040_ASetIsGoodEnough','org.onebrc.again26.BRC041_DirectUpdate','org.onebrc.again26.BRC042_NoSplittedString','org.onebrc.again26.BRC045_KeepChars','org.onebrc.again26.BRC047_IntOnly','org.onebrc.again26.BRC048_ImprovedStringHandling','org.onebrc.again26.BRC049_ManualMinMax','org.onebrc.again26.BRC050_LargerSet','org.onebrc.again26.BRC060_ReadingBytes','org.onebrc.again26.BRC061_RandomAccessFile','org.onebrc.again26.BRC063_OneAddLess','org.onebrc.again26.BRC065_OneLoopLess','org.onebrc.again26.BRC067_ParseDifferently','org.onebrc.again26.BRC068_InlineParsing','org.onebrc.again26.BRC069_InlineParsing_65','org.onebrc.again26.BRC070_EqualsCity','org.onebrc.again26.BRC072_ReadDirectNotViaBuffer','org.onebrc.again26.BRC075_LargeByteBuffer','org.onebrc.again26.BRC077_LessAdditions','org.onebrc.again26.BRC078_CalculateEarlier','org.onebrc.again26.BRC079_RunWithoutByteBuffer','org.onebrc.again26.BRC080_JDKArrayUtils','org.onebrc.again26.BRC081_LoopUnroll','org.onebrc.again26.BRC082_VectorSearchOnlyForLargeArray','org.onebrc.again26.BRC083_MainLoop','org.onebrc.again26.BRC090_MemorySegment_VOID','org.onebrc.again26.BRC091_Reviewed83','org.onebrc.again26.BRC092_ParseIntegerLessBranches_VOID','org.onebrc.again26.BRC093_ParseIntegerLessCode_VOID','org.onebrc.again26.BRC094_Reviewed91','org.onebrc.again26.BRC095_Hash','org.onebrc.again26.BRC096_ReadInt_VOID','org.onebrc.again26.BRC097_EqualsCity','org.onebrc.again26.BRC098_ParseTemperature_VOID','org.onebrc.again26.BRC099_ArrayAccess','org.onebrc.again26.BRC100_DirectTempWrite','org.onebrc.again26.BRC101_ParseFrom65_VOID','org.onebrc.again26.BRC105_ParseTemp_95','org.onebrc.again26.BRC106_ParseTemp_105','org.onebrc.again26.BRC107_ParseTemp','org.onebrc.again26.BRC110_EqualsCitySplit','org.onebrc.again26.BRC111_EqualsCitySplit_Reverse','org.onebrc.again26.BRC112_EqualsCityMismatch','org.onebrc.again26.BRC113_EqualsCityMismatchSimple','org.onebrc.again26.BRC120_OnlyHashing_From95','org.onebrc.again26.BRC121_UpdatedLoops','org.onebrc.again26.BRC123_121plus105_VOID','org.onebrc.again26.BRC125_Refined_121','org.onebrc.again26.BRC127_ParsingTempAI_VOID',
+            ] }, yAxis: {}, series: [
+            { name: 'JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7', type: 'bar', data: [
+            0,
+            122,
+            83,
+            97,
+            62,
+            83,
+            71,
+            62,
+            86,
+            98,
+            76,
+            0,
+            114,
+            78,
+            97,
+            89,
+            94,
+            65,
+            63,
+            58,
+            76,
+            78,
+            59,
+            58,
+            61,
+            84,
+            59,
+            53,
+            46,
+            39,
+            69,
+            67,
+            43,
+            41,
+            42,
+            38,
+            38,
+            39,
+            39,
+            70,
+            52,
+            46,
+            63,
+            60,
+            0,
+            55,
+            44,
+            51,
+            44,
+            46,
+            47,
+            50,
+            45,
+            47,
+            46,
+            53,
+            67,
+            49,
+            45,
+            43,
+            77,
+            0,
+            0,
+            47,
+            43,
+            45,
+            41,
+            51,
+            ] },
+            { name: 'JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7', type: 'bar', data: [
+            0,
+            103,
+            91,
+            95,
+            53,
+            79,
+            86,
+            50,
+            45,
+            54,
+            52,
+            54,
+            49,
+            48,
+            48,
+            58,
+            49,
+            46,
+            42,
+            44,
+            69,
+            67,
+            42,
+            40,
+            40,
+            67,
+            70,
+            35,
+            25,
+            26,
+            25,
+            31,
+            28,
+            45,
+            58,
+            26,
+            24,
+            26,
+            29,
+            24,
+            34,
+            34,
+            27,
+            33,
+            80,
+            27,
+            29,
+            29,
+            46,
+            27,
+            32,
+            32,
+            29,
+            28,
+            32,
+            30,
+            32,
+            32,
+            30,
+            32,
+            31,
+            0,
+            0,
+            26,
+            30,
+            38,
+            27,
+            30,
+            ] },
+            ] };
+            myChart.setOption(option);
+        }
+    })();
+    </script>
+</div>
+
+<div id="details-view" style="display: none;">
+    <button onclick="hideDetails()" style="padding: 10px 20px; cursor: pointer; margin-bottom: 20px; font-weight: bold;">&larr; Back to Matrix Overview</button>
+    <div class="card" style="margin-bottom: 30px;">
+        <h2 id="detail-title">Run Details</h2>
+        <table id="detail-table" style="width: 50%; max-width: 600px;">
+            <tbody id="detail-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const benchmarkData = {"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC063_OneAddLess":{"medianRuntimeMs":26,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":25,"jfrRuntimeMs":19,"instructions":740138410,"cycles":741545887,"branches":150474611,"branchMisses":7543240,"l1Misses":19375502,"llcMisses":15524419,"pageFaults":9233,"contextSwitches":536,"cpuMigrations":11,"ipc":1.0,"gcPauseMs":0,"allocatedBytes":16660224,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC069_InlineParsing_65":{"medianRuntimeMs":41,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":42,"jfrRuntimeMs":42,"instructions":934409080,"cycles":906829215,"branches":181655512,"branchMisses":8983659,"l1Misses":24032829,"llcMisses":18927114,"pageFaults":10161,"contextSwitches":591,"cpuMigrations":24,"ipc":1.03,"gcPauseMs":0,"allocatedBytes":21880512,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC042_NoSplittedString":{"medianRuntimeMs":78,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":76,"jfrRuntimeMs":64,"instructions":1104157865,"cycles":994977559,"branches":201450228,"branchMisses":9925485,"l1Misses":26876515,"llcMisses":20308521,"pageFaults":10142,"contextSwitches":797,"cpuMigrations":32,"ipc":1.11,"gcPauseMs":0,"allocatedBytes":21878040,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC092_ParseIntegerLessBranches_VOID":{"medianRuntimeMs":29,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":33,"jfrRuntimeMs":22,"instructions":747233097,"cycles":823647423,"branches":144957049,"branchMisses":7668782,"l1Misses":23141185,"llcMisses":16160080,"pageFaults":9309,"contextSwitches":497,"cpuMigrations":22,"ipc":0.91,"gcPauseMs":0,"allocatedBytes":16643912,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC045_KeepChars":{"medianRuntimeMs":42,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":56,"jfrRuntimeMs":46,"instructions":918143441,"cycles":956452835,"branches":181743594,"branchMisses":8733956,"l1Misses":26266283,"llcMisses":19409178,"pageFaults":9481,"contextSwitches":773,"cpuMigrations":21,"ipc":0.96,"gcPauseMs":0,"allocatedBytes":16643696,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC070_EqualsCity":{"medianRuntimeMs":58,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":58,"jfrRuntimeMs":24,"instructions":763426836,"cycles":833295472,"branches":150440992,"branchMisses":7962444,"l1Misses":25265062,"llcMisses":18531336,"pageFaults":9282,"contextSwitches":582,"cpuMigrations":15,"ipc":0.92,"gcPauseMs":0,"allocatedBytes":16660560,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC091_Reviewed83":{"medianRuntimeMs":55,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":47,"jfrRuntimeMs":59,"instructions":980157758,"cycles":945108927,"branches":174984914,"branchMisses":9074537,"l1Misses":25038372,"llcMisses":17997626,"pageFaults":9935,"contextSwitches":526,"cpuMigrations":26,"ipc":1.04,"gcPauseMs":0,"allocatedBytes":21876512,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC075_LargeByteBuffer":{"medianRuntimeMs":24,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":26,"jfrRuntimeMs":24,"instructions":726984704,"cycles":746027951,"branches":144318547,"branchMisses":7007188,"l1Misses":18640850,"llcMisses":15012262,"pageFaults":9411,"contextSwitches":528,"cpuMigrations":13,"ipc":0.97,"gcPauseMs":0,"allocatedBytes":16656472,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC041_DirectUpdate":{"medianRuntimeMs":76,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":75,"jfrRuntimeMs":69,"instructions":1115719196,"cycles":1154126572,"branches":208883656,"branchMisses":10471276,"l1Misses":32502950,"llcMisses":21644481,"pageFaults":10390,"contextSwitches":864,"cpuMigrations":44,"ipc":0.97,"gcPauseMs":0,"allocatedBytes":21880624,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC125_Refined_121":{"medianRuntimeMs":41,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":40,"jfrRuntimeMs":81,"instructions":882499099,"cycles":860326587,"branches":166482639,"branchMisses":8373810,"l1Misses":21295105,"llcMisses":17632965,"pageFaults":9656,"contextSwitches":596,"cpuMigrations":14,"ipc":1.03,"gcPauseMs":0,"allocatedBytes":21876848,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC107_ParseTemp":{"medianRuntimeMs":45,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":103,"jfrRuntimeMs":51,"instructions":960745615,"cycles":1171312589,"branches":182944394,"branchMisses":9939931,"l1Misses":27837578,"llcMisses":21067087,"pageFaults":10142,"contextSwitches":871,"cpuMigrations":123,"ipc":0.82,"gcPauseMs":0,"allocatedBytes":21880488,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC095_Hash":{"medianRuntimeMs":27,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":41,"jfrRuntimeMs":26,"instructions":738668554,"cycles":879595600,"branches":152932060,"branchMisses":7713023,"l1Misses":23729668,"llcMisses":17272347,"pageFaults":9345,"contextSwitches":546,"cpuMigrations":18,"ipc":0.84,"gcPauseMs":0,"allocatedBytes":16659232,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC060_ReadingBytes":{"medianRuntimeMs":53,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":55,"jfrRuntimeMs":67,"instructions":1112527824,"cycles":1047458736,"branches":205881315,"branchMisses":9983347,"l1Misses":28046394,"llcMisses":20709534,"pageFaults":10390,"contextSwitches":813,"cpuMigrations":26,"ipc":1.06,"gcPauseMs":0,"allocatedBytes":21876824,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC078_CalculateEarlier":{"medianRuntimeMs":39,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":38,"jfrRuntimeMs":60,"instructions":901575161,"cycles":890354822,"branches":168971716,"branchMisses":8603226,"l1Misses":23330609,"llcMisses":18483400,"pageFaults":9966,"contextSwitches":591,"cpuMigrations":17,"ipc":1.01,"gcPauseMs":0,"allocatedBytes":21880296,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC090_MemorySegment_VOID":{"medianRuntimeMs":0,"checksum":"ERROR","perfRuntimeMs":0,"jfrRuntimeMs":0,"instructions":265608012,"cycles":361243619,"branches":51969527,"branchMisses":3411209,"l1Misses":7892566,"llcMisses":5576788,"pageFaults":7981,"contextSwitches":254,"cpuMigrations":24,"ipc":0.74,"gcPauseMs":0,"allocatedBytes":22102912,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC031_OpenMapLessCasting":{"medianRuntimeMs":97,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":95,"jfrRuntimeMs":130,"instructions":1121547898,"cycles":1211358166,"branches":204815378,"branchMisses":10445288,"l1Misses":31707385,"llcMisses":21084622,"pageFaults":10473,"contextSwitches":844,"cpuMigrations":45,"ipc":0.93,"gcPauseMs":0,"allocatedBytes":21877792,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC033_SimplerLambda":{"medianRuntimeMs":89,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":154,"jfrRuntimeMs":100,"instructions":1156711228,"cycles":1270330964,"branches":218848916,"branchMisses":11495713,"l1Misses":37294559,"llcMisses":25525066,"pageFaults":10476,"contextSwitches":858,"cpuMigrations":86,"ipc":0.91,"gcPauseMs":0,"allocatedBytes":21856216,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC120_OnlyHashing_From95":{"medianRuntimeMs":47,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":40,"jfrRuntimeMs":44,"instructions":895565201,"cycles":835516338,"branches":164421487,"branchMisses":8162266,"l1Misses":20490714,"llcMisses":17051280,"pageFaults":9717,"contextSwitches":582,"cpuMigrations":18,"ipc":1.07,"gcPauseMs":0,"allocatedBytes":21856856,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC082_VectorSearchOnlyForLargeArray":{"medianRuntimeMs":27,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":25,"jfrRuntimeMs":20,"instructions":748887799,"cycles":760846688,"branches":144700570,"branchMisses":7256944,"l1Misses":20228199,"llcMisses":14798739,"pageFaults":9332,"contextSwitches":501,"cpuMigrations":13,"ipc":0.98,"gcPauseMs":0,"allocatedBytes":16655560,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC048_ImprovedStringHandling":{"medianRuntimeMs":40,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":40,"jfrRuntimeMs":49,"instructions":856885889,"cycles":846351224,"branches":163937000,"branchMisses":8679129,"l1Misses":22471685,"llcMisses":17013015,"pageFaults":8506,"contextSwitches":724,"cpuMigrations":18,"ipc":1.01,"gcPauseMs":0,"allocatedBytes":16660376,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC050_LargerSet":{"medianRuntimeMs":59,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":59,"jfrRuntimeMs":62,"instructions":1097721481,"cycles":1052813367,"branches":208280456,"branchMisses":9931447,"l1Misses":27118639,"llcMisses":20863282,"pageFaults":10317,"contextSwitches":823,"cpuMigrations":24,"ipc":1.04,"gcPauseMs":0,"allocatedBytes":21880608,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC100_DirectTempWrite":{"medianRuntimeMs":32,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":31,"jfrRuntimeMs":47,"instructions":781112319,"cycles":802850652,"branches":149683600,"branchMisses":7964611,"l1Misses":21977903,"llcMisses":16203691,"pageFaults":9347,"contextSwitches":496,"cpuMigrations":29,"ipc":0.97,"gcPauseMs":0,"allocatedBytes":16656832,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC048_ImprovedStringHandling":{"medianRuntimeMs":61,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":58,"jfrRuntimeMs":53,"instructions":1060785417,"cycles":1003449747,"branches":200485656,"branchMisses":9674310,"l1Misses":27460304,"llcMisses":19639307,"pageFaults":10157,"contextSwitches":784,"cpuMigrations":23,"ipc":1.06,"gcPauseMs":0,"allocatedBytes":21852904,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC070_EqualsCity":{"medianRuntimeMs":42,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":47,"jfrRuntimeMs":46,"instructions":977861721,"cycles":895641726,"branches":179913815,"branchMisses":8903967,"l1Misses":22529074,"llcMisses":17842064,"pageFaults":10241,"contextSwitches":614,"cpuMigrations":14,"ipc":1.09,"gcPauseMs":0,"allocatedBytes":21877632,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC125_Refined_121":{"medianRuntimeMs":27,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":27,"jfrRuntimeMs":28,"instructions":654632210,"cycles":665988804,"branches":135669854,"branchMisses":6807946,"l1Misses":17571558,"llcMisses":14576680,"pageFaults":9286,"contextSwitches":556,"cpuMigrations":10,"ipc":0.98,"gcPauseMs":0,"allocatedBytes":16656520,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC079_RunWithoutByteBuffer":{"medianRuntimeMs":70,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":68,"jfrRuntimeMs":72,"instructions":929806708,"cycles":833727268,"branches":166948775,"branchMisses":8694828,"l1Misses":20996707,"llcMisses":17722475,"pageFaults":10111,"contextSwitches":611,"cpuMigrations":14,"ipc":1.12,"gcPauseMs":0,"allocatedBytes":21880480,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC112_EqualsCityMismatch":{"medianRuntimeMs":0,"checksum":"ERROR","perfRuntimeMs":0,"jfrRuntimeMs":0,"instructions":229268146,"cycles":298033213,"branches":43394946,"branchMisses":3386232,"l1Misses":6383321,"llcMisses":5938692,"pageFaults":8062,"contextSwitches":145,"cpuMigrations":14,"ipc":0.77,"gcPauseMs":0,"allocatedBytes":21877648,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC123_121plus105_VOID":{"medianRuntimeMs":45,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":44,"jfrRuntimeMs":45,"instructions":900302531,"cycles":890617928,"branches":164396021,"branchMisses":8467890,"l1Misses":22543338,"llcMisses":18523308,"pageFaults":9724,"contextSwitches":632,"cpuMigrations":29,"ipc":1.01,"gcPauseMs":0,"allocatedBytes":21879296,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC075_LargeByteBuffer":{"medianRuntimeMs":38,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":38,"jfrRuntimeMs":49,"instructions":896412106,"cycles":844372440,"branches":167534724,"branchMisses":8345227,"l1Misses":21006886,"llcMisses":16973177,"pageFaults":9996,"contextSwitches":594,"cpuMigrations":14,"ipc":1.06,"gcPauseMs":0,"allocatedBytes":21876800,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"z4PhNX7vuL3xVChQ1m2AB9Yg5AULVxXcg/SpIdNs6c5H0NE8XYXysP+DGNKHfuwvY7kxvUdBeoGlODJ6+SfaPg\u003d\u003d","perfRuntimeMs":0,"jfrRuntimeMs":0,"instructions":587844687,"cycles":525868659,"branches":99703421,"branchMisses":5139981,"l1Misses":11203861,"llcMisses":10220221,"pageFaults":8690,"contextSwitches":262,"cpuMigrations":18,"ipc":1.12,"gcPauseMs":0,"allocatedBytes":21879480,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC065_OneLoopLess":{"medianRuntimeMs":25,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":26,"jfrRuntimeMs":26,"instructions":760387026,"cycles":751209609,"branches":150478241,"branchMisses":7473296,"l1Misses":20569472,"llcMisses":15552979,"pageFaults":9332,"contextSwitches":568,"cpuMigrations":8,"ipc":1.01,"gcPauseMs":0,"allocatedBytes":16660696,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC021_LooplessParsing":{"medianRuntimeMs":98,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":86,"jfrRuntimeMs":157,"instructions":1097607602,"cycles":1110641944,"branches":205431606,"branchMisses":10499254,"l1Misses":30368725,"llcMisses":21785613,"pageFaults":10544,"contextSwitches":787,"cpuMigrations":48,"ipc":0.99,"gcPauseMs":0,"allocatedBytes":21879560,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC040_ASetIsGoodEnough":{"medianRuntimeMs":44,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":42,"jfrRuntimeMs":63,"instructions":844858636,"cycles":844312672,"branches":163409808,"branchMisses":8417941,"l1Misses":21538879,"llcMisses":17148710,"pageFaults":8574,"contextSwitches":781,"cpuMigrations":17,"ipc":1.0,"gcPauseMs":0,"allocatedBytes":16656824,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC012_SplitRemoved":{"medianRuntimeMs":97,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":75,"jfrRuntimeMs":76,"instructions":1250388308,"cycles":1181705035,"branches":231011238,"branchMisses":11229318,"l1Misses":36557110,"llcMisses":21949995,"pageFaults":11018,"contextSwitches":780,"cpuMigrations":29,"ipc":1.06,"gcPauseMs":0,"allocatedBytes":21879376,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC077_LessAdditions":{"medianRuntimeMs":39,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":38,"jfrRuntimeMs":44,"instructions":911674309,"cycles":862214655,"branches":171102528,"branchMisses":8659488,"l1Misses":22150726,"llcMisses":17161679,"pageFaults":10148,"contextSwitches":590,"cpuMigrations":12,"ipc":1.06,"gcPauseMs":0,"allocatedBytes":21880600,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC121_UpdatedLoops":{"medianRuntimeMs":43,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":57,"jfrRuntimeMs":54,"instructions":882509305,"cycles":862926402,"branches":163253145,"branchMisses":8526795,"l1Misses":23189783,"llcMisses":18484534,"pageFaults":9843,"contextSwitches":627,"cpuMigrations":20,"ipc":1.02,"gcPauseMs":0,"allocatedBytes":21877672,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC111_EqualsCitySplit_Reverse":{"medianRuntimeMs":77,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":67,"jfrRuntimeMs":64,"instructions":961464827,"cycles":874593155,"branches":176293819,"branchMisses":9097191,"l1Misses":24491066,"llcMisses":18583648,"pageFaults":10087,"contextSwitches":569,"cpuMigrations":18,"ipc":1.1,"gcPauseMs":0,"allocatedBytes":21878112,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC000_Empty":{"medianRuntimeMs":0,"checksum":"z4PhNX7vuL3xVChQ1m2AB9Yg5AULVxXcg/SpIdNs6c5H0NE8XYXysP+DGNKHfuwvY7kxvUdBeoGlODJ6+SfaPg\u003d\u003d","perfRuntimeMs":0,"jfrRuntimeMs":0,"instructions":418729941,"cycles":465316862,"branches":81714286,"branchMisses":4796170,"l1Misses":10784076,"llcMisses":9911922,"pageFaults":7094,"contextSwitches":295,"cpuMigrations":20,"ipc":0.9,"gcPauseMs":0,"allocatedBytes":16656168,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC050_LargerSet":{"medianRuntimeMs":70,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":70,"jfrRuntimeMs":30,"instructions":866826394,"cycles":830909342,"branches":166554809,"branchMisses":8558613,"l1Misses":23125466,"llcMisses":18075900,"pageFaults":8546,"contextSwitches":716,"cpuMigrations":11,"ipc":1.04,"gcPauseMs":0,"allocatedBytes":16656768,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC098_ParseTemperature_VOID":{"medianRuntimeMs":45,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":55,"jfrRuntimeMs":64,"instructions":939053244,"cycles":980664100,"branches":178939193,"branchMisses":8989382,"l1Misses":25589825,"llcMisses":18979862,"pageFaults":9953,"contextSwitches":591,"cpuMigrations":24,"ipc":0.96,"gcPauseMs":0,"allocatedBytes":21876608,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC014_NewParseDouble":{"medianRuntimeMs":53,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":54,"jfrRuntimeMs":73,"instructions":908630749,"cycles":946869696,"branches":172840360,"branchMisses":9224011,"l1Misses":25779223,"llcMisses":18164125,"pageFaults":9089,"contextSwitches":794,"cpuMigrations":27,"ipc":0.96,"gcPauseMs":0,"allocatedBytes":16658560,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC072_ReadDirectNotViaBuffer":{"medianRuntimeMs":38,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":37,"jfrRuntimeMs":42,"instructions":917021996,"cycles":871471253,"branches":173340675,"branchMisses":8386006,"l1Misses":21793269,"llcMisses":17919906,"pageFaults":9558,"contextSwitches":599,"cpuMigrations":19,"ipc":1.05,"gcPauseMs":0,"allocatedBytes":21876704,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC127_ParsingTempAI_VOID":{"medianRuntimeMs":51,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":42,"jfrRuntimeMs":46,"instructions":880842842,"cycles":858462153,"branches":163693804,"branchMisses":8405220,"l1Misses":21061922,"llcMisses":17694355,"pageFaults":9721,"contextSwitches":625,"cpuMigrations":13,"ipc":1.03,"gcPauseMs":0,"allocatedBytes":21876600,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC097_EqualsCity":{"medianRuntimeMs":32,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":39,"jfrRuntimeMs":20,"instructions":743274948,"cycles":866908280,"branches":151378496,"branchMisses":7815641,"l1Misses":23792022,"llcMisses":16847749,"pageFaults":9293,"contextSwitches":502,"cpuMigrations":35,"ipc":0.86,"gcPauseMs":0,"allocatedBytes":16655856,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC021_LooplessParsing":{"medianRuntimeMs":54,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":59,"jfrRuntimeMs":44,"instructions":876324966,"cycles":1003038139,"branches":175803462,"branchMisses":8973030,"l1Misses":26407682,"llcMisses":19163375,"pageFaults":8861,"contextSwitches":841,"cpuMigrations":28,"ipc":0.87,"gcPauseMs":0,"allocatedBytes":16659432,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC100_DirectTempWrite":{"medianRuntimeMs":46,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":45,"jfrRuntimeMs":59,"instructions":973059678,"cycles":909110453,"branches":180610925,"branchMisses":8906893,"l1Misses":23555201,"llcMisses":17853529,"pageFaults":10052,"contextSwitches":554,"cpuMigrations":14,"ipc":1.07,"gcPauseMs":0,"allocatedBytes":21879416,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC082_VectorSearchOnlyForLargeArray":{"medianRuntimeMs":63,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":86,"jfrRuntimeMs":76,"instructions":939506115,"cycles":1160122802,"branches":176123075,"branchMisses":9434438,"l1Misses":20935412,"llcMisses":18629863,"pageFaults":10087,"contextSwitches":642,"cpuMigrations":58,"ipc":0.81,"gcPauseMs":0,"allocatedBytes":21876528,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC101_ParseFrom65_VOID":{"medianRuntimeMs":30,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":29,"jfrRuntimeMs":32,"instructions":755807070,"cycles":756464255,"branches":145585058,"branchMisses":7518556,"l1Misses":20693457,"llcMisses":15765739,"pageFaults":9300,"contextSwitches":517,"cpuMigrations":17,"ipc":1.0,"gcPauseMs":0,"allocatedBytes":16657112,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC014_NewParseDouble":{"medianRuntimeMs":62,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":63,"jfrRuntimeMs":64,"instructions":1140884996,"cycles":1068002646,"branches":212868193,"branchMisses":10342724,"l1Misses":29506857,"llcMisses":20932123,"pageFaults":10892,"contextSwitches":849,"cpuMigrations":14,"ipc":1.07,"gcPauseMs":0,"allocatedBytes":21876520,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC083_MainLoop":{"medianRuntimeMs":33,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":28,"jfrRuntimeMs":21,"instructions":677876833,"cycles":734205063,"branches":131810293,"branchMisses":7100309,"l1Misses":19594110,"llcMisses":15390365,"pageFaults":8003,"contextSwitches":546,"cpuMigrations":14,"ipc":0.92,"gcPauseMs":0,"allocatedBytes":16659984,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC065_OneLoopLess":{"medianRuntimeMs":69,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":66,"jfrRuntimeMs":55,"instructions":963630668,"cycles":841333105,"branches":177925886,"branchMisses":8954466,"l1Misses":22440199,"llcMisses":18585975,"pageFaults":10137,"contextSwitches":548,"cpuMigrations":11,"ipc":1.15,"gcPauseMs":0,"allocatedBytes":21876752,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC061_RandomAccessFile":{"medianRuntimeMs":25,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":39,"jfrRuntimeMs":20,"instructions":736911326,"cycles":916683575,"branches":151040183,"branchMisses":7814317,"l1Misses":26210591,"llcMisses":18290343,"pageFaults":9251,"contextSwitches":608,"cpuMigrations":25,"ipc":0.8,"gcPauseMs":0,"allocatedBytes":16660696,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC092_ParseIntegerLessBranches_VOID":{"medianRuntimeMs":44,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":58,"jfrRuntimeMs":55,"instructions":914748627,"cycles":1006669820,"branches":180102460,"branchMisses":9151442,"l1Misses":27109691,"llcMisses":20653165,"pageFaults":9989,"contextSwitches":618,"cpuMigrations":28,"ipc":0.91,"gcPauseMs":0,"allocatedBytes":21876672,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC072_ReadDirectNotViaBuffer":{"medianRuntimeMs":26,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":24,"jfrRuntimeMs":18,"instructions":717790165,"cycles":719029785,"branches":139372317,"branchMisses":7140746,"l1Misses":18610176,"llcMisses":15043867,"pageFaults":9126,"contextSwitches":541,"cpuMigrations":14,"ipc":1.0,"gcPauseMs":0,"allocatedBytes":16660400,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC020_IntegerValue":{"medianRuntimeMs":86,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":106,"jfrRuntimeMs":115,"instructions":1127524183,"cycles":1339814146,"branches":218481627,"branchMisses":11129366,"l1Misses":36884938,"llcMisses":23821416,"pageFaults":10606,"contextSwitches":888,"cpuMigrations":59,"ipc":0.84,"gcPauseMs":0,"allocatedBytes":21876608,"jitCompilationMs":145},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC091_Reviewed83":{"medianRuntimeMs":27,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":34,"jfrRuntimeMs":25,"instructions":772356827,"cycles":888649418,"branches":150352582,"branchMisses":7991415,"l1Misses":25413889,"llcMisses":18125943,"pageFaults":9399,"contextSwitches":542,"cpuMigrations":15,"ipc":0.87,"gcPauseMs":0,"allocatedBytes":16655680,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC123_121plus105_VOID":{"medianRuntimeMs":38,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":28,"jfrRuntimeMs":24,"instructions":664885166,"cycles":740050488,"branches":136433375,"branchMisses":6933658,"l1Misses":19358869,"llcMisses":15981783,"pageFaults":9276,"contextSwitches":535,"cpuMigrations":39,"ipc":0.9,"gcPauseMs":0,"allocatedBytes":16653864,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC068_InlineParsing":{"medianRuntimeMs":28,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":25,"jfrRuntimeMs":31,"instructions":733572766,"cycles":739925546,"branches":150051854,"branchMisses":7478666,"l1Misses":20040099,"llcMisses":15322134,"pageFaults":9407,"contextSwitches":522,"cpuMigrations":13,"ipc":0.99,"gcPauseMs":0,"allocatedBytes":16660512,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC033_SimplerLambda":{"medianRuntimeMs":58,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":60,"jfrRuntimeMs":55,"instructions":946287198,"cycles":956526958,"branches":186068182,"branchMisses":9352943,"l1Misses":25571758,"llcMisses":18098939,"pageFaults":9699,"contextSwitches":734,"cpuMigrations":14,"ipc":0.99,"gcPauseMs":0,"allocatedBytes":16660248,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC093_ParseIntegerLessCode_VOID":{"medianRuntimeMs":29,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":28,"jfrRuntimeMs":27,"instructions":659388156,"cycles":726490408,"branches":132777978,"branchMisses":7386154,"l1Misses":19862365,"llcMisses":15954732,"pageFaults":8093,"contextSwitches":555,"cpuMigrations":7,"ipc":0.91,"gcPauseMs":0,"allocatedBytes":16655840,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC105_ParseTemp_95":{"medianRuntimeMs":32,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":28,"jfrRuntimeMs":22,"instructions":749798617,"cycles":791043934,"branches":148867436,"branchMisses":7534012,"l1Misses":21597679,"llcMisses":15360389,"pageFaults":9325,"contextSwitches":490,"cpuMigrations":25,"ipc":0.95,"gcPauseMs":0,"allocatedBytes":16659640,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC049_ManualMinMax":{"medianRuntimeMs":67,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":68,"jfrRuntimeMs":58,"instructions":865649819,"cycles":824760584,"branches":164807264,"branchMisses":8606685,"l1Misses":22450287,"llcMisses":17660022,"pageFaults":8513,"contextSwitches":709,"cpuMigrations":17,"ipc":1.05,"gcPauseMs":0,"allocatedBytes":16660336,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC080_JDKArrayUtils":{"medianRuntimeMs":34,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":33,"jfrRuntimeMs":21,"instructions":746382675,"cycles":847244991,"branches":151690532,"branchMisses":7561966,"l1Misses":23047434,"llcMisses":16093088,"pageFaults":9475,"contextSwitches":817,"cpuMigrations":19,"ipc":0.88,"gcPauseMs":0,"allocatedBytes":16656608,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC035_NoLambda":{"medianRuntimeMs":94,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":93,"jfrRuntimeMs":90,"instructions":1100667748,"cycles":1232817931,"branches":203939227,"branchMisses":10934277,"l1Misses":34852144,"llcMisses":24525513,"pageFaults":10360,"contextSwitches":906,"cpuMigrations":80,"ipc":0.89,"gcPauseMs":0,"allocatedBytes":21877832,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC077_LessAdditions":{"medianRuntimeMs":26,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":24,"jfrRuntimeMs":22,"instructions":729553607,"cycles":737220323,"branches":139707924,"branchMisses":7118160,"l1Misses":18914733,"llcMisses":14638960,"pageFaults":9401,"contextSwitches":523,"cpuMigrations":9,"ipc":0.99,"gcPauseMs":0,"allocatedBytes":16656656,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC010_NoStream":{"medianRuntimeMs":91,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":74,"jfrRuntimeMs":68,"instructions":1130234378,"cycles":1112474338,"branches":214311596,"branchMisses":10986464,"l1Misses":35034209,"llcMisses":20971560,"pageFaults":9656,"contextSwitches":806,"cpuMigrations":30,"ipc":1.02,"gcPauseMs":0,"allocatedBytes":16643704,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC068_InlineParsing":{"medianRuntimeMs":43,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":41,"jfrRuntimeMs":51,"instructions":968975901,"cycles":968212587,"branches":180302738,"branchMisses":9209718,"l1Misses":25700144,"llcMisses":18837469,"pageFaults":10127,"contextSwitches":602,"cpuMigrations":38,"ipc":1.0,"gcPauseMs":0,"allocatedBytes":21876792,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC120_OnlyHashing_From95":{"medianRuntimeMs":26,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":25,"jfrRuntimeMs":21,"instructions":682907536,"cycles":712758418,"branches":132157416,"branchMisses":6860430,"l1Misses":17702508,"llcMisses":14822638,"pageFaults":9271,"contextSwitches":571,"cpuMigrations":19,"ipc":0.96,"gcPauseMs":0,"allocatedBytes":16656264,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC067_ParseDifferently":{"medianRuntimeMs":31,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":30,"jfrRuntimeMs":19,"instructions":782699789,"cycles":821883701,"branches":151316241,"branchMisses":7883769,"l1Misses":23442187,"llcMisses":16955459,"pageFaults":9636,"contextSwitches":765,"cpuMigrations":12,"ipc":0.95,"gcPauseMs":0,"allocatedBytes":16660168,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC042_NoSplittedString":{"medianRuntimeMs":67,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":67,"jfrRuntimeMs":44,"instructions":886990324,"cycles":824369228,"branches":170044044,"branchMisses":8674883,"l1Misses":22119126,"llcMisses":17991192,"pageFaults":8605,"contextSwitches":804,"cpuMigrations":10,"ipc":1.08,"gcPauseMs":0,"allocatedBytes":16660696,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC069_InlineParsing_65":{"medianRuntimeMs":45,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":51,"jfrRuntimeMs":29,"instructions":689824846,"cycles":711746732,"branches":136615009,"branchMisses":7467256,"l1Misses":19745951,"llcMisses":16613399,"pageFaults":8146,"contextSwitches":533,"cpuMigrations":14,"ipc":0.97,"gcPauseMs":0,"allocatedBytes":16658096,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC017_ParseDoubleSimpler2":{"medianRuntimeMs":62,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":72,"jfrRuntimeMs":99,"instructions":1105077082,"cycles":1133483963,"branches":213756680,"branchMisses":10532935,"l1Misses":31022263,"llcMisses":21275433,"pageFaults":10577,"contextSwitches":767,"cpuMigrations":13,"ipc":0.97,"gcPauseMs":0,"allocatedBytes":21876704,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC036_TurnedIfs":{"medianRuntimeMs":65,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":69,"jfrRuntimeMs":73,"instructions":1076824370,"cycles":1061319891,"branches":206455421,"branchMisses":9991235,"l1Misses":26964874,"llcMisses":20394385,"pageFaults":10439,"contextSwitches":839,"cpuMigrations":27,"ipc":1.01,"gcPauseMs":0,"allocatedBytes":21876376,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC098_ParseTemperature_VOID":{"medianRuntimeMs":29,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":25,"jfrRuntimeMs":27,"instructions":745917163,"cycles":742765021,"branches":149388765,"branchMisses":7222449,"l1Misses":19966700,"llcMisses":15144100,"pageFaults":9311,"contextSwitches":511,"cpuMigrations":12,"ipc":1.0,"gcPauseMs":0,"allocatedBytes":16660752,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC015_ParseDoubleSimpler1":{"medianRuntimeMs":79,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":90,"jfrRuntimeMs":57,"instructions":891702742,"cycles":938760045,"branches":175508196,"branchMisses":9426916,"l1Misses":27616781,"llcMisses":20674757,"pageFaults":9195,"contextSwitches":848,"cpuMigrations":31,"ipc":0.95,"gcPauseMs":0,"allocatedBytes":16660224,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC083_MainLoop":{"medianRuntimeMs":60,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":53,"jfrRuntimeMs":55,"instructions":940532779,"cycles":964791861,"branches":176833183,"branchMisses":9139886,"l1Misses":24799587,"llcMisses":18863509,"pageFaults":9918,"contextSwitches":603,"cpuMigrations":16,"ipc":0.97,"gcPauseMs":0,"allocatedBytes":21876704,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC121_UpdatedLoops":{"medianRuntimeMs":30,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":42,"jfrRuntimeMs":24,"instructions":621223913,"cycles":712971301,"branches":118932556,"branchMisses":6976667,"l1Misses":18128361,"llcMisses":15716544,"pageFaults":7863,"contextSwitches":632,"cpuMigrations":51,"ipc":0.87,"gcPauseMs":0,"allocatedBytes":16658264,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC012_SplitRemoved":{"medianRuntimeMs":95,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":67,"jfrRuntimeMs":58,"instructions":1030551882,"cycles":1056347720,"branches":200430039,"branchMisses":10263085,"l1Misses":32026587,"llcMisses":20541632,"pageFaults":9615,"contextSwitches":767,"cpuMigrations":19,"ipc":0.98,"gcPauseMs":0,"allocatedBytes":16652080,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC030_OpenMap":{"medianRuntimeMs":78,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":81,"jfrRuntimeMs":91,"instructions":1099539366,"cycles":1010667780,"branches":208980585,"branchMisses":9996341,"l1Misses":28565187,"llcMisses":20974335,"pageFaults":10406,"contextSwitches":834,"cpuMigrations":23,"ipc":1.09,"gcPauseMs":0,"allocatedBytes":21876576,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC035_NoLambda":{"medianRuntimeMs":49,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":51,"jfrRuntimeMs":49,"instructions":857907005,"cycles":875560884,"branches":168813249,"branchMisses":8735591,"l1Misses":23683328,"llcMisses":17771384,"pageFaults":8574,"contextSwitches":788,"cpuMigrations":23,"ipc":0.98,"gcPauseMs":0,"allocatedBytes":16643656,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC110_EqualsCitySplit":{"medianRuntimeMs":32,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":34,"jfrRuntimeMs":23,"instructions":739254107,"cycles":807710596,"branches":147593361,"branchMisses":7579409,"l1Misses":21022637,"llcMisses":16590594,"pageFaults":9381,"contextSwitches":583,"cpuMigrations":25,"ipc":0.92,"gcPauseMs":0,"allocatedBytes":16660408,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC106_ParseTemp_105":{"medianRuntimeMs":49,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":50,"jfrRuntimeMs":47,"instructions":968592849,"cycles":943965470,"branches":176597021,"branchMisses":9132764,"l1Misses":25171048,"llcMisses":18433129,"pageFaults":10038,"contextSwitches":553,"cpuMigrations":17,"ipc":1.03,"gcPauseMs":0,"allocatedBytes":21878056,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC040_ASetIsGoodEnough":{"medianRuntimeMs":58,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":60,"jfrRuntimeMs":62,"instructions":1131397656,"cycles":1036284959,"branches":205379016,"branchMisses":10122551,"l1Misses":28360513,"llcMisses":19916770,"pageFaults":10458,"contextSwitches":818,"cpuMigrations":10,"ipc":1.09,"gcPauseMs":0,"allocatedBytes":21877936,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC015_ParseDoubleSimpler1":{"medianRuntimeMs":83,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":68,"jfrRuntimeMs":77,"instructions":1127064550,"cycles":1106009533,"branches":212711285,"branchMisses":10564355,"l1Misses":31714222,"llcMisses":21331934,"pageFaults":10716,"contextSwitches":850,"cpuMigrations":73,"ipc":1.02,"gcPauseMs":0,"allocatedBytes":21876696,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC095_Hash":{"medianRuntimeMs":46,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":51,"jfrRuntimeMs":54,"instructions":964642809,"cycles":971377945,"branches":174318176,"branchMisses":9209780,"l1Misses":25729924,"llcMisses":18383670,"pageFaults":10086,"contextSwitches":579,"cpuMigrations":30,"ipc":0.99,"gcPauseMs":0,"allocatedBytes":21876480,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC111_EqualsCitySplit_Reverse":{"medianRuntimeMs":31,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":38,"jfrRuntimeMs":28,"instructions":742240156,"cycles":802185472,"branches":151797072,"branchMisses":7944962,"l1Misses":24094010,"llcMisses":17467970,"pageFaults":9340,"contextSwitches":507,"cpuMigrations":9,"ipc":0.93,"gcPauseMs":0,"allocatedBytes":16659808,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC080_JDKArrayUtils":{"medianRuntimeMs":52,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":94,"jfrRuntimeMs":37,"instructions":966104289,"cycles":1240300611,"branches":179213158,"branchMisses":9926455,"l1Misses":23567353,"llcMisses":19460663,"pageFaults":10464,"contextSwitches":926,"cpuMigrations":123,"ipc":0.78,"gcPauseMs":0,"allocatedBytes":21876544,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC099_ArrayAccess":{"medianRuntimeMs":47,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":47,"jfrRuntimeMs":45,"instructions":968941817,"cycles":962887297,"branches":177788178,"branchMisses":9166892,"l1Misses":25505363,"llcMisses":18900014,"pageFaults":10057,"contextSwitches":532,"cpuMigrations":17,"ipc":1.01,"gcPauseMs":0,"allocatedBytes":21880488,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC020_IntegerValue":{"medianRuntimeMs":45,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":52,"jfrRuntimeMs":39,"instructions":887936221,"cycles":975151832,"branches":170357122,"branchMisses":9021315,"l1Misses":24697806,"llcMisses":18256209,"pageFaults":8856,"contextSwitches":802,"cpuMigrations":45,"ipc":0.91,"gcPauseMs":0,"allocatedBytes":16657992,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC022_LooplessParsing2":{"medianRuntimeMs":52,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":50,"jfrRuntimeMs":44,"instructions":844350522,"cycles":889075223,"branches":160791419,"branchMisses":8663091,"l1Misses":23243428,"llcMisses":18017256,"pageFaults":8819,"contextSwitches":832,"cpuMigrations":20,"ipc":0.95,"gcPauseMs":0,"allocatedBytes":16656792,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC096_ReadInt_VOID":{"medianRuntimeMs":32,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":31,"jfrRuntimeMs":24,"instructions":780340864,"cycles":825072008,"branches":151915486,"branchMisses":7917320,"l1Misses":23524009,"llcMisses":16786571,"pageFaults":9433,"contextSwitches":695,"cpuMigrations":16,"ipc":0.95,"gcPauseMs":0,"allocatedBytes":16643432,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC097_EqualsCity":{"medianRuntimeMs":50,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":46,"jfrRuntimeMs":50,"instructions":930853917,"cycles":929929769,"branches":182271466,"branchMisses":8873500,"l1Misses":22906534,"llcMisses":18691236,"pageFaults":10041,"contextSwitches":540,"cpuMigrations":29,"ipc":1.0,"gcPauseMs":0,"allocatedBytes":21876512,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":103,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":101,"jfrRuntimeMs":111,"instructions":1365535549,"cycles":1313293701,"branches":274094003,"branchMisses":12873823,"l1Misses":44317137,"llcMisses":24772530,"pageFaults":11723,"contextSwitches":653,"cpuMigrations":21,"ipc":1.04,"gcPauseMs":0,"allocatedBytes":16660184,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC027_SizedMap":{"medianRuntimeMs":114,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":96,"jfrRuntimeMs":72,"instructions":1200092028,"cycles":1309556264,"branches":231390430,"branchMisses":11957938,"l1Misses":39122650,"llcMisses":25687784,"pageFaults":11142,"contextSwitches":825,"cpuMigrations":51,"ipc":0.92,"gcPauseMs":0,"allocatedBytes":21863224,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC016_NoExtraString":{"medianRuntimeMs":86,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":78,"jfrRuntimeMs":49,"instructions":886604696,"cycles":870632552,"branches":175438147,"branchMisses":9139232,"l1Misses":24967225,"llcMisses":19285630,"pageFaults":9005,"contextSwitches":850,"cpuMigrations":15,"ipc":1.02,"gcPauseMs":0,"allocatedBytes":16660408,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC017_ParseDoubleSimpler2":{"medianRuntimeMs":50,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":49,"jfrRuntimeMs":48,"instructions":895254642,"cycles":925749788,"branches":172525873,"branchMisses":9050395,"l1Misses":27145806,"llcMisses":19310312,"pageFaults":8920,"contextSwitches":856,"cpuMigrations":15,"ipc":0.97,"gcPauseMs":0,"allocatedBytes":16660352,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC099_ArrayAccess":{"medianRuntimeMs":28,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":30,"jfrRuntimeMs":26,"instructions":686370486,"cycles":754567156,"branches":135087733,"branchMisses":7464387,"l1Misses":19470357,"llcMisses":15737513,"pageFaults":8058,"contextSwitches":505,"cpuMigrations":18,"ipc":0.91,"gcPauseMs":0,"allocatedBytes":16660376,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC049_ManualMinMax":{"medianRuntimeMs":84,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":67,"jfrRuntimeMs":62,"instructions":1080921118,"cycles":1015773598,"branches":203750934,"branchMisses":9946626,"l1Misses":27139227,"llcMisses":21005689,"pageFaults":10344,"contextSwitches":830,"cpuMigrations":27,"ipc":1.06,"gcPauseMs":0,"allocatedBytes":21880512,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC022_LooplessParsing2":{"medianRuntimeMs":76,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":81,"jfrRuntimeMs":85,"instructions":1112742134,"cycles":1137897587,"branches":208112124,"branchMisses":10747191,"l1Misses":32500205,"llcMisses":22673195,"pageFaults":10525,"contextSwitches":773,"cpuMigrations":29,"ipc":0.98,"gcPauseMs":0,"allocatedBytes":21876640,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC025_MutateData":{"medianRuntimeMs":54,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":52,"jfrRuntimeMs":38,"instructions":874045179,"cycles":904088184,"branches":167743396,"branchMisses":8805692,"l1Misses":23803112,"llcMisses":18342305,"pageFaults":8569,"contextSwitches":812,"cpuMigrations":25,"ipc":0.97,"gcPauseMs":0,"allocatedBytes":16660464,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC037_LessNullChecks":{"medianRuntimeMs":63,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":60,"jfrRuntimeMs":64,"instructions":1100401770,"cycles":1056827894,"branches":205663128,"branchMisses":10096991,"l1Misses":29319637,"llcMisses":21308402,"pageFaults":10374,"contextSwitches":882,"cpuMigrations":20,"ipc":1.04,"gcPauseMs":0,"allocatedBytes":21880512,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC045_KeepChars":{"medianRuntimeMs":59,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":65,"jfrRuntimeMs":56,"instructions":1230999382,"cycles":1179940503,"branches":230279501,"branchMisses":11339032,"l1Misses":33597825,"llcMisses":22837356,"pageFaults":11982,"contextSwitches":695,"cpuMigrations":9,"ipc":1.04,"gcPauseMs":0,"allocatedBytes":21877472,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC094_Reviewed91":{"medianRuntimeMs":46,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":25,"jfrRuntimeMs":25,"instructions":768661265,"cycles":767565137,"branches":150326179,"branchMisses":7234895,"l1Misses":19332859,"llcMisses":15348544,"pageFaults":9308,"contextSwitches":485,"cpuMigrations":10,"ipc":1.0,"gcPauseMs":0,"allocatedBytes":16657008,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC060_ReadingBytes":{"medianRuntimeMs":35,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":42,"jfrRuntimeMs":20,"instructions":750042586,"cycles":896759039,"branches":148620304,"branchMisses":7619033,"l1Misses":24273167,"llcMisses":16491897,"pageFaults":9061,"contextSwitches":548,"cpuMigrations":29,"ipc":0.84,"gcPauseMs":0,"allocatedBytes":16660392,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC127_ParsingTempAI_VOID":{"medianRuntimeMs":30,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":37,"jfrRuntimeMs":24,"instructions":672522185,"cycles":764963254,"branches":136204288,"branchMisses":6996856,"l1Misses":19492697,"llcMisses":15746487,"pageFaults":9300,"contextSwitches":623,"cpuMigrations":26,"ipc":0.88,"gcPauseMs":0,"allocatedBytes":16658376,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC001_Baseline":{"medianRuntimeMs":122,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":193,"jfrRuntimeMs":127,"instructions":1662748808,"cycles":2038096742,"branches":323126809,"branchMisses":16256565,"l1Misses":58761828,"llcMisses":34843349,"pageFaults":14203,"contextSwitches":916,"cpuMigrations":99,"ipc":0.82,"gcPauseMs":0,"allocatedBytes":21876752,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC081_LoopUnroll":{"medianRuntimeMs":46,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":44,"jfrRuntimeMs":61,"instructions":980622370,"cycles":942518975,"branches":182772429,"branchMisses":9307360,"l1Misses":23875432,"llcMisses":18538180,"pageFaults":10102,"contextSwitches":806,"cpuMigrations":17,"ipc":1.04,"gcPauseMs":0,"allocatedBytes":21879792,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC010_NoStream":{"medianRuntimeMs":83,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":89,"jfrRuntimeMs":83,"instructions":1340298162,"cycles":1254988946,"branches":247308733,"branchMisses":12199814,"l1Misses":37947133,"llcMisses":23392354,"pageFaults":11595,"contextSwitches":807,"cpuMigrations":12,"ipc":1.07,"gcPauseMs":0,"allocatedBytes":21845184,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC041_DirectUpdate":{"medianRuntimeMs":69,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":71,"jfrRuntimeMs":61,"instructions":848928714,"cycles":827324796,"branches":163998314,"branchMisses":8793214,"l1Misses":23146041,"llcMisses":18315689,"pageFaults":8592,"contextSwitches":785,"cpuMigrations":15,"ipc":1.03,"gcPauseMs":0,"allocatedBytes":16656840,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC061_RandomAccessFile":{"medianRuntimeMs":46,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":40,"jfrRuntimeMs":48,"instructions":950597845,"cycles":890568039,"branches":185105834,"branchMisses":8762768,"l1Misses":21729118,"llcMisses":18266742,"pageFaults":9791,"contextSwitches":576,"cpuMigrations":14,"ipc":1.07,"gcPauseMs":0,"allocatedBytes":21876488,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC047_IntOnly":{"medianRuntimeMs":40,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":47,"jfrRuntimeMs":41,"instructions":877072820,"cycles":896579214,"branches":164849529,"branchMisses":8695685,"l1Misses":24037299,"llcMisses":17706932,"pageFaults":8466,"contextSwitches":769,"cpuMigrations":16,"ipc":0.98,"gcPauseMs":0,"allocatedBytes":16651744,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC093_ParseIntegerLessCode_VOID":{"medianRuntimeMs":51,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":59,"jfrRuntimeMs":45,"instructions":946562914,"cycles":951049609,"branches":178300285,"branchMisses":9100765,"l1Misses":24818618,"llcMisses":19149434,"pageFaults":10007,"contextSwitches":579,"cpuMigrations":37,"ipc":1.0,"gcPauseMs":0,"allocatedBytes":21872184,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC036_TurnedIfs":{"medianRuntimeMs":46,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":56,"jfrRuntimeMs":34,"instructions":912906581,"cycles":944924028,"branches":180741771,"branchMisses":8866784,"l1Misses":28864774,"llcMisses":19522856,"pageFaults":9569,"contextSwitches":797,"cpuMigrations":18,"ipc":0.97,"gcPauseMs":0,"allocatedBytes":16660536,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC090_MemorySegment_VOID":{"medianRuntimeMs":80,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":70,"jfrRuntimeMs":95,"instructions":1074597852,"cycles":1019954281,"branches":202286397,"branchMisses":9503884,"l1Misses":27715260,"llcMisses":21599818,"pageFaults":9278,"contextSwitches":583,"cpuMigrations":32,"ipc":1.05,"gcPauseMs":0,"allocatedBytes":16658344,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC110_EqualsCitySplit":{"medianRuntimeMs":43,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":42,"jfrRuntimeMs":70,"instructions":915129600,"cycles":888760839,"branches":178212056,"branchMisses":8877957,"l1Misses":22677981,"llcMisses":18311366,"pageFaults":10157,"contextSwitches":579,"cpuMigrations":20,"ipc":1.03,"gcPauseMs":0,"allocatedBytes":21877768,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC025_MutateData":{"medianRuntimeMs":0,"checksum":"ERROR","perfRuntimeMs":0,"jfrRuntimeMs":0,"instructions":259372389,"cycles":312061861,"branches":52107587,"branchMisses":3400050,"l1Misses":6106548,"llcMisses":5784881,"pageFaults":7969,"contextSwitches":165,"cpuMigrations":8,"ipc":0.83,"gcPauseMs":0,"allocatedBytes":22105696,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC078_CalculateEarlier":{"medianRuntimeMs":29,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":28,"jfrRuntimeMs":23,"instructions":721536704,"cycles":783353280,"branches":140199895,"branchMisses":7179428,"l1Misses":19287188,"llcMisses":14996355,"pageFaults":9420,"contextSwitches":562,"cpuMigrations":15,"ipc":0.92,"gcPauseMs":0,"allocatedBytes":16656712,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC101_ParseFrom65_VOID":{"medianRuntimeMs":53,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":43,"jfrRuntimeMs":55,"instructions":942463440,"cycles":903871642,"branches":179628491,"branchMisses":8937812,"l1Misses":23623487,"llcMisses":18352220,"pageFaults":10048,"contextSwitches":568,"cpuMigrations":17,"ipc":1.04,"gcPauseMs":0,"allocatedBytes":21877736,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC027_SizedMap":{"medianRuntimeMs":49,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":65,"jfrRuntimeMs":54,"instructions":960832278,"cycles":926768085,"branches":186681147,"branchMisses":9172600,"l1Misses":26151633,"llcMisses":17805177,"pageFaults":9625,"contextSwitches":747,"cpuMigrations":11,"ipc":1.04,"gcPauseMs":0,"allocatedBytes":16660360,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC107_ParseTemp":{"medianRuntimeMs":30,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":28,"jfrRuntimeMs":25,"instructions":755346095,"cycles":747772599,"branches":149650697,"branchMisses":7358817,"l1Misses":19447250,"llcMisses":15252080,"pageFaults":9318,"contextSwitches":501,"cpuMigrations":10,"ipc":1.01,"gcPauseMs":0,"allocatedBytes":16640816,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC113_EqualsCityMismatchSimple":{"medianRuntimeMs":0,"checksum":"ERROR","perfRuntimeMs":0,"jfrRuntimeMs":0,"instructions":220854529,"cycles":269522461,"branches":45104081,"branchMisses":3101376,"l1Misses":4910044,"llcMisses":4710814,"pageFaults":8045,"contextSwitches":146,"cpuMigrations":12,"ipc":0.82,"gcPauseMs":0,"allocatedBytes":21880384,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC030_OpenMap":{"medianRuntimeMs":48,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":51,"jfrRuntimeMs":47,"instructions":865302993,"cycles":885008071,"branches":168478719,"branchMisses":8701822,"l1Misses":23523564,"llcMisses":18056774,"pageFaults":8747,"contextSwitches":841,"cpuMigrations":10,"ipc":0.98,"gcPauseMs":0,"allocatedBytes":16658304,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC094_Reviewed91":{"medianRuntimeMs":44,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":53,"jfrRuntimeMs":61,"instructions":951005311,"cycles":1014894720,"branches":178810917,"branchMisses":9325648,"l1Misses":27997256,"llcMisses":20564472,"pageFaults":10120,"contextSwitches":830,"cpuMigrations":55,"ipc":0.94,"gcPauseMs":0,"allocatedBytes":21879592,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC079_RunWithoutByteBuffer":{"medianRuntimeMs":24,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":28,"jfrRuntimeMs":26,"instructions":729868996,"cycles":731382554,"branches":134439363,"branchMisses":7077768,"l1Misses":17663278,"llcMisses":14490142,"pageFaults":9428,"contextSwitches":535,"cpuMigrations":18,"ipc":1.0,"gcPauseMs":0,"allocatedBytes":16660160,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC047_IntOnly":{"medianRuntimeMs":58,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":83,"jfrRuntimeMs":57,"instructions":1141317730,"cycles":1261564127,"branches":218821070,"branchMisses":10755881,"l1Misses":34960734,"llcMisses":23658317,"pageFaults":10995,"contextSwitches":756,"cpuMigrations":67,"ipc":0.9,"gcPauseMs":0,"allocatedBytes":21876440,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC096_ReadInt_VOID":{"medianRuntimeMs":47,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":54,"jfrRuntimeMs":69,"instructions":977995413,"cycles":1022884741,"branches":183233686,"branchMisses":9518545,"l1Misses":28064719,"llcMisses":20787762,"pageFaults":10128,"contextSwitches":852,"cpuMigrations":51,"ipc":0.96,"gcPauseMs":0,"allocatedBytes":21880800,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC016_NoExtraString":{"medianRuntimeMs":71,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":72,"jfrRuntimeMs":56,"instructions":1135966898,"cycles":1113120032,"branches":209749630,"branchMisses":10552095,"l1Misses":31132321,"llcMisses":22130296,"pageFaults":10625,"contextSwitches":813,"cpuMigrations":19,"ipc":1.02,"gcPauseMs":0,"allocatedBytes":21876800,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC063_OneAddLess":{"medianRuntimeMs":39,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":40,"jfrRuntimeMs":64,"instructions":980062719,"cycles":869807780,"branches":169633287,"branchMisses":8800967,"l1Misses":22569925,"llcMisses":17000402,"pageFaults":9739,"contextSwitches":598,"cpuMigrations":9,"ipc":1.13,"gcPauseMs":0,"allocatedBytes":21879280,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC067_ParseDifferently":{"medianRuntimeMs":67,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":47,"jfrRuntimeMs":53,"instructions":989980853,"cycles":982655991,"branches":176060050,"branchMisses":9505467,"l1Misses":27738192,"llcMisses":20042088,"pageFaults":10345,"contextSwitches":857,"cpuMigrations":18,"ipc":1.01,"gcPauseMs":0,"allocatedBytes":21876456,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC106_ParseTemp_105":{"medianRuntimeMs":32,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":32,"jfrRuntimeMs":33,"instructions":752142997,"cycles":781508927,"branches":147411477,"branchMisses":7586509,"l1Misses":21265628,"llcMisses":15582011,"pageFaults":9324,"contextSwitches":502,"cpuMigrations":30,"ipc":0.96,"gcPauseMs":0,"allocatedBytes":16656040,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC081_LoopUnroll":{"medianRuntimeMs":34,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":28,"jfrRuntimeMs":18,"instructions":754617869,"cycles":832701723,"branches":148059696,"branchMisses":7815278,"l1Misses":22903977,"llcMisses":16923369,"pageFaults":9395,"contextSwitches":716,"cpuMigrations":32,"ipc":0.91,"gcPauseMs":0,"allocatedBytes":16656824,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC037_LessNullChecks":{"medianRuntimeMs":42,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":41,"jfrRuntimeMs":33,"instructions":842294792,"cycles":847335451,"branches":164119500,"branchMisses":8649623,"l1Misses":22050001,"llcMisses":17151670,"pageFaults":8665,"contextSwitches":792,"cpuMigrations":19,"ipc":0.99,"gcPauseMs":0,"allocatedBytes":16660600,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC031_OpenMapLessCasting":{"medianRuntimeMs":48,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":49,"jfrRuntimeMs":37,"instructions":868051296,"cycles":864543473,"branches":173616747,"branchMisses":8751475,"l1Misses":23340779,"llcMisses":17713164,"pageFaults":8753,"contextSwitches":793,"cpuMigrations":9,"ipc":1.0,"gcPauseMs":0,"allocatedBytes":16658352,"jitCompilationMs":0},"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC105_ParseTemp_95":{"medianRuntimeMs":67,"checksum":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","perfRuntimeMs":58,"jfrRuntimeMs":53,"instructions":925463045,"cycles":979615871,"branches":178632839,"branchMisses":9234553,"l1Misses":26700339,"llcMisses":20262728,"pageFaults":9858,"contextSwitches":622,"cpuMigrations":20,"ipc":0.94,"gcPauseMs":0,"allocatedBytes":21876752,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC113_EqualsCityMismatchSimple":{"medianRuntimeMs":0,"checksum":"ERROR","perfRuntimeMs":0,"jfrRuntimeMs":0,"instructions":203432993,"cycles":242689975,"branches":38465042,"branchMisses":2871177,"l1Misses":4984375,"llcMisses":4939047,"pageFaults":6462,"contextSwitches":161,"cpuMigrations":14,"ipc":0.84,"gcPauseMs":0,"allocatedBytes":16660544,"jitCompilationMs":0},"JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k | org.onebrc.again26.BRC112_EqualsCityMismatch":{"medianRuntimeMs":0,"checksum":"ERROR","perfRuntimeMs":0,"jfrRuntimeMs":0,"instructions":205047773,"cycles":279969335,"branches":38988243,"branchMisses":2932522,"l1Misses":5445511,"llcMisses":5012819,"pageFaults":6483,"contextSwitches":178,"cpuMigrations":28,"ipc":0.73,"gcPauseMs":0,"allocatedBytes":16660440,"jitCompilationMs":0}};
+const classStatuses = {"org.onebrc.devoxxpl24.BRC43_NoSubClass":"complete","dev.morling.onebrc.Baseline":"complete","org.onebrc.parallel.BRC072_Mutate_BetterReader":"complete","org.onebrc.parallel.BRC025_1_N_N_1":"complete","org.onebrc.jfr.BRC016_JFR_NoExtraString":"complete","org.onebrc.devoxxpl24.BRC11_SizedMapST":"complete","org.onebrc.parallel.BRC036_1_N_ExecutorPool":"complete","org.onebrc.devoxxpl24.BRC00_Empty":"complete","org.onebrc.again26.BRC125_Refined_121":"complete","org.onebrc.parallel.BRC075_Bytes_ConcurrentRead":"complete","org.onebrc.again26.BRC092_ParseIntegerLessBranches_VOID":"complete","org.onebrc.devoxxpl24.BRC29d_EqualsNotBoolean":"complete","org.onebrc.again26.BRC010_NoStream":"complete","org.onebrc.again26.BRC001_Baseline":"baseline","org.onebrc.parallel.BRC004_BaselineFileSplitMeasurements":"complete","org.onebrc.devoxxpl24.BRC03_NoStreamMT":"complete","org.onebrc.devoxxpl24.BRC08_GoIntST":"complete","dev.morling.onebrc.BaselineParallel":"complete","org.onebrc.devoxxpl24.BRC40h_ManualMismatch":"complete","org.onebrc.parallel.BRC030_1_N":"complete","org.onebrc.devoxxpl24.BRC14a_ReadBytesBroken":"complete","org.onebrc.devoxxpl24.BRC41c_LargerBuffer":"complete","org.onebrc.devoxxpl24.BRC71_EOFAsReturnValue":"complete","org.onebrc.parallel.BRC013_ParallelAll":"complete","org.onebrc.again26.BRC031_OpenMapLessCasting":"complete","org.onebrc.devoxxpl24.BRC20_UseArrayNoBufferST":"complete","org.onebrc.devoxxpl24.BRC66_HashCode":"complete","org.onebrc.devoxxpl24.BRC68_RemoveNewLinePos":"complete","org.onebrc.parallel.BRC000_Empty":"complete","org.onebrc.devoxxpl24.BRC46_TunedHashSet":"complete","org.onebrc.devoxxpl24.BRC12_NewMapST":"complete","org.onebrc.again26.BRC017_ParseDoubleSimpler2":"complete","org.onebrc.again26.BRC065_OneLoopLess":"complete","org.onebrc.again26.BRC098_ParseTemperature_VOID":"complete","org.onebrc.again26.BRC099_ArrayAccess":"complete","org.onebrc.devoxxpl24.BRC26_MoreMapSpaceST":"complete","org.onebrc.again26.BRC075_LargeByteBuffer":"complete","org.onebrc.parallel.BRC028_1_N_1":"complete","org.onebrc.again26.BRC060_ReadingBytes":"complete","org.onebrc.devoxxpl24.BRC29f_LessDataForTempResolution":"complete","org.onebrc.util.PositionableByteReader":"complete","org.onebrc.again26.BRC123_121plus105_VOID":"complete","org.onebrc.again26.BRC105_ParseTemp_95":"complete","org.onebrc.devoxxpl24.BRC40i_SmallerSemicolonLoop":"complete","dev.morling.onebrc.CreateOriginalMeasurementsJFR":"complete","org.onebrc.again26.BRC090_MemorySegment_VOID":"complete","org.onebrc.devoxxpl24.BRC65_OneMainLoopMethod":"complete","org.onebrc.again26.BRC106_ParseTemp_105":"complete","org.onebrc.devoxxpl24.BRC53_SetEqualsNoLocalAssignment":"complete","org.onebrc.again26.BRC096_ReadInt_VOID":"complete","org.onebrc.parallel.BRC016_Compact":"complete","org.onebrc.devoxxpl24.BRC14d_ReadBytesFixedImproved":"complete","org.onebrc.devoxxpl24.BRC60_FeedCPUUnrollSemicolonLoop":"complete","org.onebrc.again26.BRC015_ParseDoubleSimpler1":"complete","org.onebrc.again26.BRC030_OpenMap":"complete","org.onebrc.devoxxpl24.BRC09_NoMergeST":"complete","org.onebrc.again26.BRC091_Reviewed83":"complete","org.onebrc.util.bsm.RootByteSkipMap":"complete","org.onebrc.devoxxpl24.BRC40f_DoWhile":"complete","org.onebrc.parallel.BRC020_NoStream":"complete","org.onebrc.parallel.BRC021_NoStreamFileOnly":"complete","org.onebrc.Benchmark":"complete","org.onebrc.devoxxpl24.BRC69_RemovedExtraAdd":"complete","org.onebrc.parallel.BRC032_1_N_Batched":"complete","org.onebrc.devoxxpl24.BRC05_ReplaceSplitST":"complete","org.onebrc.devoxxpl24.BRC13_HardcodedSetST":"complete","org.onebrc.again26.BRC069_InlineParsing_65":"complete","org.onebrc.again26.BRC081_LoopUnroll":"complete","org.onebrc.parallel.BRC042_ForkJoinPool":"complete","org.onebrc.again26.BRC041_DirectUpdate":"complete","org.onebrc.again26.BRC014_NewParseDouble":"complete","org.onebrc.ai.Gemini01":"complete","org.onebrc.ai.Gemini02":"complete","org.onebrc.devoxxpl24.BRC50_Short":"complete","org.onebrc.jmh.FHS42bV2":"complete","org.onebrc.ai.Gemini03":"complete","org.onebrc.ai.Gemini04":"complete","org.onebrc.ai.Gemini05":"complete","org.onebrc.devoxxpl24.BRC55_SimplerPutCall":"complete","org.onebrc.again26.BRC016_NoExtraString":"complete","org.onebrc.devoxxpl24.BRC23a_NoMulSplitST":"complete","org.onebrc.devoxxpl24.BRC24_DifferentBranchInHashCodeST":"complete","org.onebrc.again26.BRC113_EqualsCityMismatchSimple":"complete","org.onebrc.devoxxpl24.BRC02_NoGroupingST":"complete","org.onebrc.util.MathUtil":"complete","org.onebrc.parallel.BRC002_BaselineFileOnly":"complete","org.onebrc.again26.BRC025_MutateData":"complete","org.onebrc.devoxxpl24.BRC06_NewDoubleParsingST":"complete","org.onebrc.devoxxpl24.BRC63_Equals":"complete","org.onebrc.devoxxpl24.BRC59_ByteBufferDirect":"complete","org.onebrc.again26.BRC080_JDKArrayUtils":"complete","org.onebrc.again26.BRC120_OnlyHashing_From95":"complete","org.onebrc.jmh.FHS42b":"complete","org.onebrc.again26.BRC121_UpdatedLoops":"complete","org.onebrc.util.bsm.FlexByteSkipMap":"complete","org.onebrc.devoxxpl24.BRC01_BaselineST":"baseline","org.onebrc.devoxxpl24.BRC30_DangerNoEqualsST":"complete","org.onebrc.devoxxpl24.BRC54_LoopVariableBackInLoop":"complete","org.onebrc.jmh.Basic_Benchmark":"complete","org.onebrc.util.PositionableReader2":"complete","org.onebrc.again26.BRC077_LessAdditions":"complete","org.onebrc.devoxxpl24.BRC42a_WhileTrue":"complete","org.onebrc.devoxxpl24.BRC40b_ReturnInstead":"complete","org.onebrc.devoxxpl24.BRC03_NoStreamST":"complete","org.onebrc.parallel.BRC044_ForkJoinPool_SelfSplitting":"complete","org.onebrc.again26.BRC045_KeepChars":"complete","org.onebrc.devoxxpl24.BRC42b_NoReturnBranch":"complete","org.onebrc.again26.BRC068_InlineParsing":"complete","org.onebrc.parallel.BRC080_Set":"complete","org.onebrc.parallel.BRC045_MapperOnly":"complete","org.onebrc.parallel.BRC062_ParseDouble":"complete","org.onebrc.devoxxpl24.BRC00_Claude":"complete","org.onebrc.parallel.BRC017_CompactUnordered":"complete","org.onebrc.devoxxpl24.BRC14c_ReadBytesObjects":"complete","org.onebrc.devoxxpl24.BRC15_ParseDoubleFixedST":"complete","org.onebrc.devoxxpl24.BRC67_StoreArrayLength":"complete","org.onebrc.parallel.BRC011_ParallelAfterMapping":"complete","org.onebrc.again26.BRC112_EqualsCityMismatch":"complete","org.onebrc.again26.BRC022_LooplessParsing2":"complete","org.onebrc.again26.BRC097_EqualsCity":"complete","org.onebrc.devoxxpl24.BRC64_CombinePuts":"complete","org.onebrc.parallel.BRC070_Mutate":"complete","org.onebrc.devoxxpl24.BRC41b_ReorderedLineFields":"complete","org.onebrc.util.BasicWindowedBuffer":"complete","org.onebrc.devoxxpl24.BRC40e_NoReloadSub":"complete","org.onebrc.devoxxpl24.BRC00_Gemini":"complete","org.onebrc.devoxxpl24.BRC57_SimplerHashing_VOID":"complete","org.onebrc.again26.BRC048_ImprovedStringHandling":"complete","org.onebrc.devoxxpl24.BRC40d_LongLoop":"complete","org.onebrc.util.ParseDouble":"complete","org.onebrc.parallel.BRC014_ParallelGrouping":"complete","org.onebrc.parallel.BRC043_ForkJoinPool_NoReducer":"complete","org.onebrc.util.PositionableReader":"complete","org.onebrc.devoxxpl24.BRC40j_LessStateInSetEquals":"complete","org.onebrc.devoxxpl24.BRC47_LeanerPut":"complete","org.onebrc.again26.BRC107_ParseTemp":"complete","org.onebrc.parallel.BRC046_MapperReduceEarly":"complete","org.onebrc.devoxxpl24.BRC10_MutateST":"complete","org.onebrc.again26.BRC110_EqualsCitySplit":"complete","org.onebrc.util.PositionableByteReader2":"complete","org.onebrc.devoxxpl24.BRC40g_Put":"complete","org.onebrc.devoxxpl24.BRC56_MainLoopAsWhile":"complete","dev.morling.onebrc.CreateOriginalMeasurements":"complete","org.onebrc.parallel.BRC012_ParallelBoth":"complete","org.onebrc.again26.BRC093_ParseIntegerLessCode_VOID":"complete","org.onebrc.devoxxpl24.BRC28_FineTuningST":"complete","org.onebrc.parallel.BRC064_NoExtraString":"complete","org.onebrc.again26.BRC067_ParseDifferently":"complete","org.onebrc.again26.BRC021_LooplessParsing":"complete","org.onebrc.again26.BRC079_RunWithoutByteBuffer":"complete","org.onebrc.devoxxpl24.BRC14b_ReadBytesFixed":"complete","org.onebrc.again26.BRC000_Empty":"incomplete","org.onebrc.parallel.BRC026_1_N_N_1_LargeBuffers":"complete","org.onebrc.again26.BRC027_SizedMap":"complete","org.onebrc.devoxxpl24.BRC29a_ParseDoubleTuningST":"complete","org.onebrc.parallel.BRC015_Parallel_NoCollector":"complete","org.onebrc.util.bsm.IByteSkipMap":"complete","org.onebrc.devoxxpl24.BRC23_NoMulST":"complete","org.onebrc.devoxxpl24.BRC40_NoChannel":"complete","org.onebrc.parallel.BRC001_Baseline":"baseline","org.onebrc.devoxxpl24.BRC29c_ArrayCopyInMethod":"complete","org.onebrc.devoxxpl24.BRC00_Claude2":"complete","org.onebrc.parallel.BRC068_ParsingWithoutALoop":"complete","org.onebrc.again26.BRC095_Hash":"complete","org.onebrc.again26.BRC049_ManualMinMax":"complete","org.onebrc.devoxxpl24.BRC51_TempParsingLessBranches":"complete","org.onebrc.parallel.BRC048_VT_ChunkSize_10MB":"complete","org.onebrc.devoxxpl24.BRC45_DoubleTheSetSize":"complete","org.onebrc.devoxxpl24.BRC48_FixedFactor":"complete","org.onebrc.again26.BRC063_OneAddLess":"complete","org.onebrc.devoxxpl24.BRC58_UnnoticedCharSkipping":"complete","org.onebrc.again26.BRC078_CalculateEarlier":"complete","org.onebrc.devoxxpl24.BRC62_IsEqualsWithADifferentBranchApproach":"complete","org.onebrc.devoxxpl24.BRC02_NoGroupingMT":"complete","org.onebrc.again26.BRC012_SplitRemoved":"complete","org.onebrc.parallel.BRC038_1_N_VThreadsAreTasks":"complete","org.onebrc.again26.BRC111_EqualsCitySplit_Reverse":"complete","org.onebrc.devoxxpl24.BRC49_OffsetSubtraction":"complete","org.onebrc.devoxxpl24.BRC63b_Equals_MainLoop":"complete","org.onebrc.again26.BRC036_TurnedIfs":"complete","org.onebrc.parallel.BRC034_1_N_Virtual":"complete","org.onebrc.parallel.BRC077_Bytes_ForkJoin_1Level":"complete","org.onebrc.again26.BRC042_NoSplittedString":"complete","org.onebrc.devoxxpl24.BRC01_BaselineMT":"complete","org.onebrc.parallel.BRC066_Integer":"complete","org.onebrc.again26.BRC047_IntOnly":"complete","org.onebrc.again26.BRC101_ParseFrom65_VOID":"complete","org.onebrc.devoxxpl24.BRC07_NoCopyForDoubleST":"complete","org.onebrc.devoxxpl24.BRC29e_EarlyIntResolution":"complete","org.onebrc.devoxxpl24.BRC41a_FixedFastHashSet":"complete","org.onebrc.parallel.BRC047_VirtualThreads":"complete","org.onebrc.devoxxpl24.BRC22_EarlyHashCodeST":"complete","org.onebrc.jmh.FastHashSet_Benchmark":"complete","org.onebrc.again26.BRC035_NoLambda":"complete","org.onebrc.again26.BRC100_DirectTempWrite":"complete","org.onebrc.parallel.BRC060_44_SplitTune":"complete","org.onebrc.again26.BRC070_EqualsCity":"complete","org.onebrc.devoxxpl24.BRC27_SmallPutST":"complete","org.onebrc.again26.BRC050_LargerSet":"complete","org.onebrc.again26.BRC082_VectorSearchOnlyForLargeArray":"complete","org.onebrc.devoxxpl24.BRC70_RemovedPutReturn":"complete","org.onebrc.parallel.BRC027_1_N_N_1_Batches":"complete","org.onebrc.devoxxpl24.BRC25_SmallAddReordingST":"complete","org.onebrc.devoxxpl24.BRC40c_UnrollTempParsing":"complete","org.onebrc.devoxxpl24.BRC52_TempParsingBitSubtraction":"complete","org.onebrc.again26.BRC061_RandomAccessFile":"complete","org.onebrc.again26.BRC037_LessNullChecks":"complete","org.onebrc.again26.BRC127_ParsingTempAI_VOID":"complete","org.onebrc.again26.BRC072_ReadDirectNotViaBuffer":"complete","org.onebrc.devoxxpl24.BRC29g_FixedIntParsing":"complete","org.onebrc.devoxxpl24.BRC40a_NoChannel":"complete","org.onebrc.parallel.BRC076_Bytes_ForkJoin_Full":"complete","org.onebrc.again26.BRC083_MainLoop":"complete","org.onebrc.devoxxpl24.BRC61_BitShiftMul10Void":"complete","org.onebrc.devoxxpl24.BRC06b_NewDoubleParsingST":"complete","org.onebrc.again26.BRC033_SimplerLambda":"complete","org.onebrc.again26.BRC020_IntegerValue":"complete","org.onebrc.parallel.BRC010_ParallelAfterRead":"complete","dev.morling.onebrc.CreateExtendedMeasurements":"complete","org.onebrc.parallel.BRC003_BaselineFileAndSplit":"complete","org.onebrc.parallel.BRC040_N_ConcurrentRead":"complete","org.onebrc.devoxxpl24.BRC21_ManualMinMaxST":"complete","org.onebrc.again26.BRC040_ASetIsGoodEnough":"complete","org.onebrc.again26.BRC094_Reviewed91":"complete"};
+const baselineChecksums = {"JDK_21_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d","JDK_25_OPEN | -XX:+UseG1GC | -Xms2g -Xmx2g | -wc 0 -mc 1 -t 8 | taskset -c 0-7 | 10k":"voBUT+lhssgXHcvCE+YPWG+wPNZQYAqMgRlIGp0sfdurdBLnnhxfTxhY/+TBwn1tHiyBEpGKTje339QcrDz9Lg\u003d\u003d"};
+
+function showDetails(key) {
+    const data = benchmarkData[key];
+    if (!data) {
+        alert("No data available for this run.");
+        return;
+    }
+
+    document.getElementById('matrix-view').style.display = 'none';
+    document.getElementById('details-view').style.display = 'block';
+    
+    document.getElementById('detail-title').innerText = 'Metrics: ' + key;
+
+    const parts = key.split(" | ");
+    const envDs = parts.slice(0, 6).join(" | ");
+    const cls = parts[6];
+    const status = classStatuses[cls] || "complete";
+    const baselineChecksum = baselineChecksums[envDs];
+
+    let checksumHtml = `<code style="background:#eee;padding:2px 4px;border-radius:3px;">${data.checksum}</code>`;
+    
+    if (status === "baseline") {
+        checksumHtml += ' <span style="color:#0056b3; font-weight:bold;">[Ground Truth]</span>';
+    } else if (status === "incomplete") {
+        checksumHtml += ' <span style="color:#6c757d; font-weight:bold;">[Skip: Known Incorrect]</span>';
+    } else if (status === "complete") {
+        if (baselineChecksum) {
+            if (data.checksum === baselineChecksum) {
+                checksumHtml += ' <span style="color:#28a745; font-weight:bold;">[Pass]</span>';
+            } else {
+                checksumHtml += ' <span style="color:#dc3545; font-weight:bold;">[Fail]</span>';
+            }
+        } else {
+             checksumHtml += ' <span style="color:#fd7e14; font-weight:bold;">[No Baseline to compare]</span>';
+        }
+    }
+
+    const tbody = document.getElementById('detail-body');
+    // Java String.hashCode() equivalent
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) {
+        hash = ((hash << 5) - hash) + key.charCodeAt(i);
+        hash |= 0;
+    }
+    if (hash < 0) hash = 0xFFFFFFFF + hash + 1;
+    const hashHex = hash.toString(16);
+
+    tbody.innerHTML = `
+        <tr><th colspan="2" style="background:#e9ecef;text-align:center;">Runtime Profiling (3 Stages)</th></tr>
+        <tr><th>Clean P50 Median Runtime</th><td><strong>${data.medianRuntimeMs} ms</strong></td></tr>
+        <tr><th>Perf Stat Overhead Run</th><td>${data.perfRuntimeMs} ms <small style="color:#666;">(+${data.perfRuntimeMs - data.medianRuntimeMs} ms)</small></td></tr>
+        <tr><th>JFR Agent Overhead Run</th><td>${data.jfrRuntimeMs} ms <small style="color:#666;">(+${data.jfrRuntimeMs - data.medianRuntimeMs} ms)</small></td></tr>
+        <tr><th>Checksum</th><td>${checksumHtml}</td></tr>
+        
+        <tr><th colspan="2" style="background:#e9ecef;text-align:center;">Hardware Telemetry (Perf Stat)</th></tr>
+        <tr><th>Instructions Executed</th><td>${data.instructions.toLocaleString()}</td></tr>
+        <tr><th>CPU Cycles</th><td>${data.cycles.toLocaleString()}</td></tr>
+        <tr><th>Instructions Per Cycle (IPC)</th><td>${data.ipc}</td></tr>
+        <tr><th>Branches</th><td>${data.branches.toLocaleString()}</td></tr>
+        <tr><th>Branch Misses</th><td>${data.branchMisses.toLocaleString()}</td></tr>
+        <tr><th>L1 Data Cache Misses</th><td>${data.l1Misses ? data.l1Misses.toLocaleString() : '0'}</td></tr>
+        <tr><th>Last Level Cache Misses</th><td>${data.llcMisses ? data.llcMisses.toLocaleString() : '0'}</td></tr>
+        <tr><th>Page Faults</th><td>${data.pageFaults ? data.pageFaults.toLocaleString() : '0'}</td></tr>
+        <tr><th>Context Switches</th><td>${data.contextSwitches ? data.contextSwitches.toLocaleString() : '0'}</td></tr>
+        <tr><th>CPU Migrations</th><td>${data.cpuMigrations ? data.cpuMigrations.toLocaleString() : '0'}</td></tr>
+        
+        <tr><th colspan="2" style="background:#e9ecef;text-align:center;">JVM Profiling (Java Flight Recorder)</th></tr>
+        <tr><th>GC Pause Time</th><td>${data.gcPauseMs} ms</td></tr>
+        <tr><th>Allocated Bytes</th><td>${data.allocatedBytes.toLocaleString()} bytes</td></tr>
+        <tr><th>JIT Compilation Time</th><td>${data.jitCompilationMs} ms</td></tr>
+        
+        <tr><td colspan="2" style="text-align: center; padding-top: 20px;">
+            <a href="permutations/history-${hashHex}.html" class="btn" style="background: #28a745;">&#128200; View Historical Trend for this Test</a>
+        </td></tr>
+    `;
+    window.scrollTo(0, 0);
+}
+
+function hideDetails() {
+    document.getElementById('details-view').style.display = 'none';
+    document.getElementById('matrix-view').style.display = 'block';
+}
+</script>
+
+</body>
+</html>

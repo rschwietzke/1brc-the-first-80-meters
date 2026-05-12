@@ -40,6 +40,8 @@ import java.util.List;
  * @param errors           whether each run was an error
  */
 public record TrendData(
+    List<Long> ids,
+    List<String> rawTimestamps,
     List<String> timestamps,
     List<Double> runtime,
     List<Double> ipc,

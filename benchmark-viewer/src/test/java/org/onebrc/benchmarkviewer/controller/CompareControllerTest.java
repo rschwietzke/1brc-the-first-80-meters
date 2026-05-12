@@ -80,7 +80,7 @@ class CompareControllerTest
         this.mockMvc.perform(get("/compare")
                 .header("HX-Request", "true"))
             .andExpect(status().isOk())
-            .andExpect(view().name("fragments/compare :: compare-pane"));
+            .andExpect(view().name("fragments/compare :: htmx-response"));
     }
 
     @Test

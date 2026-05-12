@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.onebrc.benchmarkviewer.domain.EnvironmentKey;
+import org.onebrc.benchmarkviewer.domain.FilterState;
 import org.onebrc.benchmarkviewer.domain.Measurement;
 import org.onebrc.benchmarkviewer.domain.TrendData;
 import org.onebrc.benchmarkviewer.service.SearchService;
@@ -78,11 +79,12 @@ public class TestCaseTrendController
     public String getTrends(
         @PathVariable("className") final String className,
         @RequestHeader(value = "HX-Request", required = false) final String hxRequest,
+        final FilterState filterState,
         final Model model)
     {
-        // Fetch all measurements for this class name across all runs
+        // Fetch all measurements for this class name across all runs, filtered by the current filter state
         final List<Measurement> allMeasurements =
-            this.searchService.searchMeasurements(null, null, className);
+            this.searchService.searchMeasurements(filterState, null, className);
 
         // Group by EnvironmentKey
         final Map<EnvironmentKey, List<Measurement>> grouped = new TreeMap<>();
@@ -122,6 +124,11 @@ public class TestCaseTrendController
         model.addAttribute("environments", environmentLabels);
         model.addAttribute("trendDataMap", trendDataMap);
 
+        final var facets = this.searchService.getFacetCounts(filterState, null, className);
+        model.addAttribute("facets", facets);
+        model.addAttribute("activeFilters", filterState);
+        model.addAttribute("filterActionUrl", "/testcase/" + className + "/trends");
+
         if ("true".equals(hxRequest))
         {
             return "testcase-trends :: htmx-response";
@@ -158,6 +165,9 @@ public class TestCaseTrendController
      */
     private TrendData buildTrendData(final List<Measurement> measurements)
     {
+        final DateTimeFormatter rawFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        final List<Long> ids = new ArrayList<>();
+        final List<String> rawTimestamps = new ArrayList<>();
         final List<String> timestamps = new ArrayList<>();
         final List<Double> runtime = new ArrayList<>();
         final List<Double> ipc = new ArrayList<>();
@@ -176,6 +186,8 @@ public class TestCaseTrendController
 
         for (final Measurement m : measurements)
         {
+            ids.add(m.getId());
+            rawTimestamps.add(m.getTestRun().getTimestamp().format(rawFormatter));
             timestamps.add(m.getTestRun().getTimestamp().format(CHART_TS_FORMATTER));
             runtime.add(m.getMedianRuntimeMs());
             ipc.add(m.getIpc());
@@ -194,7 +206,7 @@ public class TestCaseTrendController
         }
 
         return new TrendData(
-            timestamps, runtime, ipc, instructions, cycles,
+            ids, rawTimestamps, timestamps, runtime, ipc, instructions, cycles,
             branches, branchMisses, l1Misses, llcMisses,
             pageFaults, contextSwitches, gcPauseMs, allocatedBytes,
             jitCompilationMs, errors

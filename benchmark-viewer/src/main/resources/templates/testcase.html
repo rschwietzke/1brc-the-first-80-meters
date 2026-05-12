@@ -9,7 +9,14 @@
 <body>
 
     <!-- Breadcrumb -->
-    <li layout:fragment="breadcrumb" class="breadcrumb-item active" aria-current="page" th:text="${simpleClassName}"></li>
+    <th:block layout:fragment="breadcrumb">
+        <li class="breadcrumb-item fs-6">
+            <a th:href="@{/} + ${currentQueryString}" th:attr="hx-get=@{/} + ${currentQueryString}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
+                <i class="bi bi-house-door"></i> Runs
+            </a>
+        </li>
+        <li class="breadcrumb-item active fs-6" aria-current="page" th:text="${simpleClassName}"></li>
+    </th:block>
 
     <!-- Sidebar -->
     <div layout:fragment="sidebar" class="px-3">
@@ -25,21 +32,22 @@
     <th:block th:fragment="htmx-response">
         <div th:replace="~{fragments/sidebar :: content}"></div>
         <div th:replace="~{testcase :: page-content}"></div>
+        
+        <!-- Breadcrumb swap (OOB) -->
+        <ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
+            <li class="breadcrumb-item fs-6">
+                <a th:href="@{/} + ${currentQueryString}" th:attr="hx-get=@{/} + ${currentQueryString}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
+                    <i class="bi bi-house-door"></i> Runs
+                </a>
+            </li>
+            <li class="breadcrumb-item active fs-6" aria-current="page" th:text="${simpleClassName}"></li>
+        </ol>
     </th:block>
 
     <!-- Page Content Fragment -->
     <div th:fragment="page-content" class="fade-in" id="testcase-main">
-            <!-- Breadcrumb swap (OOB) -->
-            <ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
-                <li class="breadcrumb-item fs-6">
-                    <a href="/" hx-get="/" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
-                        <i class="bi bi-house-door"></i> Runs
-                    </a>
-                </li>
-                <li class="breadcrumb-item active fs-6" aria-current="page" th:text="${simpleClassName}"></li>
-            </ol>
 
-            <div class="container-fluid py-4">
+            <div class="container-fluid pb-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h2 class="h3 mb-1">
@@ -48,13 +56,13 @@
                         <p class="text-muted mb-0 font-monospace small" th:text="${className}">Full Class Name</p>
                     </div>
                     <div class="d-flex gap-2">
-                        <a th:href="@{/testcase/{className}/trends(className=${className})}"
-                           class="btn btn-outline-primary">
-                            <i class="bi bi-graph-up me-1"></i> Trends
-                        </a>
-                        <button id="compareBtn" class="btn btn-primary" disabled onclick="compareSelected()">
-                            <i class="bi bi-layout-split me-1"></i> Compare Selected (0/2)
-                        </button>
+                        <a th:href="@{/testcase/{className}/trends(className=${className})} + ${currentQueryString}"
+                           th:attr="hx-get=@{/testcase/{className}/trends(className=${className})} + ${currentQueryString}"
+                           class="btn btn-outline-primary"
+                           hx-target="#main-content"
+                           hx-swap="innerHTML"
+                           hx-push-url="true"><i class="bi bi-graph-up me-1"></i>Trends</a>
+                        <button id="compareBtn" class="btn btn-primary" disabled onclick="compareSelected()"><i class="bi bi-layout-split me-1"></i>Compare Selected (0/2)</button>
                     </div>
                 </div>
 
@@ -83,13 +91,13 @@
                                             <input class="form-check-input compare-cb" type="checkbox" th:value="${m.id}" onchange="updateCompareBtn()">
                                         </td>
                                         <td>
-                                            <a th:href="@{/runs/{ts}(ts=${#temporals.format(m.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})}"
-                                               class="text-decoration-none"
-                                               th:attr="hx-get=@{/runs/{ts}(ts=${#temporals.format(m.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})}"
+                                            <a th:href="@{/runs/{ts}(ts=${#temporals.format(m.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})} + ${currentQueryString}"
+                                               class="text-decoration-none text-dark"
+                                               th:attr="hx-get=@{/runs/{ts}(ts=${#temporals.format(m.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})} + ${currentQueryString}"
                                                hx-target="#main-content"
                                                hx-swap="innerHTML"
                                                hx-push-url="true">
-                                                <span th:text="${#temporals.format(m.testRun.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                                                <span th:text="${#temporals.format(m.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm''Z''')}"></span>
                                             </a>
                                         </td>
                                         <td th:text="${m.jdk}"></td>
@@ -105,7 +113,7 @@
                                             <i th:unless="${m.error}" class="bi bi-check-circle-fill text-success" title="Success"></i>
                                         </td>
                                         <td class="text-end pe-3">
-                                            <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(m.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m.id})}"
+                                            <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(m.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m.id})} + ${currentQueryString}"
                                                class="btn btn-sm btn-outline-secondary"
                                                title="View Details">
                                                 <i class="bi bi-info-circle"></i>
@@ -124,7 +132,7 @@
                     const checkboxes = document.querySelectorAll('.compare-cb:checked');
                     const btn = document.getElementById('compareBtn');
                     btn.disabled = checkboxes.length !== 2;
-                    btn.innerHTML = `<i class="bi bi-layout-split me-1"></i> Compare Selected (${checkboxes.length}/2)`;
+                    btn.innerHTML = `<i class="bi bi-layout-split me-1"></i>Compare Selected (${checkboxes.length}/2)`;
                     
                     // Disable unchecked checkboxes if 2 are already selected
                     document.querySelectorAll('.compare-cb:not(:checked)').forEach(cb => {
@@ -137,7 +145,7 @@
                     if (checkboxes.length === 2) {
                         const m1 = checkboxes[0].value;
                         const m2 = checkboxes[1].value;
-                        window.location.href = '/compare-executions?m1=' + m1 + '&m2=' + m2;
+                        window.location.href = '/compare-executions?m1=' + m1 + '&m2=' + m2 + (window.location.search ? '&' + window.location.search.substring(1) : '');
                     }
                 }
             </script>

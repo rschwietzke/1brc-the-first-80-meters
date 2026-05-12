@@ -6,11 +6,11 @@
 <!-- Out of Band Breadcrumb Swap -->
 <ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
     <li class="breadcrumb-item fs-6">
-        <a href="/" hx-get="/" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
+        <a th:href="@{/} + ${currentQueryString}" th:attr="hx-get=@{/} + ${currentQueryString}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
             <i class="bi bi-house-door"></i> Runs
         </a>
     </li>
-    <li class="breadcrumb-item active fs-6" aria-current="page" th:text="${#temporals.format(testRun.timestamp, 'yyyyMMdd-HHmmss')}">
+    <li class="breadcrumb-item active fs-6" aria-current="page" th:text="${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm''Z''')}">
         Timestamp
     </li>
 </ol>
@@ -19,8 +19,8 @@
             <i class="bi bi-grid-3x3-gap text-primary me-2"></i>Variation Matrix
         </h2>
         <div class="d-flex align-items-center gap-3 flex-wrap">
-            <a th:href="@{/compare}"
-               th:attr="hx-get=@{/compare}"
+            <a th:href="@{/compare} + ${currentQueryString}"
+               th:attr="hx-get=@{/compare} + ${currentQueryString}"
                hx-target="#main-content"
                hx-push-url="true"
                class="btn btn-sm btn-outline-primary shadow-sm">
@@ -64,7 +64,9 @@
                     <tr th:each="cls : ${classes}">
                         <th class="bg-light sticky-left fw-medium align-middle" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;" th:title="${cls}">
                             <div class="text-truncate" style="max-width: 300px;">
-                                <a th:href="@{/testcase/{className}(className=${cls})}" 
+                                <a th:href="@{/testcase/{className}(className=${cls})} + ${currentQueryString}" 
+                                   th:attr="hx-get=@{/testcase/{className}(className=${cls})} + ${currentQueryString}"
+                                   hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
                                    class="text-decoration-none text-dark"
                                    th:text="${cls.substring(cls.lastIndexOf('.') + 1)}">Class</a>
                             </div>
@@ -76,7 +78,7 @@
                             
                             <div th:if="${m != null}" class="p-2 h-100 w-100 tm-cell-content"
                                  style="cursor: pointer;"
-                                 th:attr="data-col-index=${iterStat.index}, data-raw-value=${!m.error ? m.medianRuntimeMs : ''}, hx-get=@{/runs/{ts}/detail/{id}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m.id})}"
+                                 th:attr="data-col-index=${iterStat.index}, data-raw-value=${!m.error ? m.medianRuntimeMs : ''}, hx-get=@{/runs/{ts}/detail/{id}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m.id})} + ${currentQueryString}"
                                  hx-target="#main-content"
                                  hx-push-url="true">
                                 <div th:if="${m.error}" class="text-danger fw-bold"><i class="bi bi-x-circle"></i> ERR</div>

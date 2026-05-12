@@ -11,8 +11,8 @@
     <!-- Breadcrumb -->
     <th:block layout:fragment="breadcrumb">
         <li class="breadcrumb-item fs-6">
-            <a th:href="@{/testcase/{className}(className=${m1.className})}"
-               hx-get="@{/testcase/{className}(className=${m1.className})}"
+            <a th:href="@{/testcase/{className}(className=${m1.className})} + ${currentQueryString}"
+               th:attr="hx-get=@{/testcase/{className}(className=${m1.className})} + ${currentQueryString}"
                hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none"
                th:text="${m1.className.substring(m1.className.lastIndexOf('.') + 1)}">
                 Class
@@ -21,10 +21,15 @@
         <li class="breadcrumb-item active fs-6" aria-current="page">Compare Executions</li>
     </th:block>
 
+    <!-- Sidebar -->
+    <div layout:fragment="sidebar" class="px-3">
+        <div th:replace="~{fragments/sidebar :: content}"></div>
+    </div>
+
     <!-- Main content -->
     <div layout:fragment="content" class="fade-in">
 
-        <div class="container-fluid py-4">
+        <div class="container-fluid pb-4">
             <h2 class="h3 mb-4">Execution Comparison</h2>
 
             <div class="card shadow-sm border-0 overflow-hidden">
@@ -36,15 +41,15 @@
                                     <th style="width: 20%;" class="bg-light sticky-left">Metric</th>
                                     <th style="width: 40%;">
                                         <div class="fw-bold">Execution 1</div>
-                                        <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(m1.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m1.id})}"
+                                        <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(m1.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m1.id})} + ${currentQueryString}"
                                            class="small fw-normal text-decoration-none" 
-                                           th:text="${#temporals.format(m1.testRun.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></a>
+                                           th:text="${#temporals.format(m1.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm''Z''')}"></a>
                                     </th>
                                     <th style="width: 40%;">
                                         <div class="fw-bold">Execution 2</div>
-                                        <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(m2.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m2.id})}"
+                                        <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(m2.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m2.id})} + ${currentQueryString}"
                                            class="small fw-normal text-decoration-none" 
-                                           th:text="${#temporals.format(m2.testRun.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></a>
+                                           th:text="${#temporals.format(m2.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm''Z''')}"></a>
                                     </th>
                                 </tr>
                             </thead>

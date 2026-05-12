@@ -69,7 +69,7 @@ public class CompareController
 
         if ("true".equals(hxRequest))
         {
-            return "fragments/compare :: compare-pane";
+            return "fragments/compare :: htmx-response";
         }
 
         return "compare";

@@ -33,6 +33,8 @@ class TrendDataTest
     void testTrendDataConstruction()
     {
         final TrendData data = new TrendData(
+            List.of(1L, 2L),
+            List.of("2026-05-08T21:37:00", "2026-05-09T15:24:00"),
             List.of("2026-05-08 21:37", "2026-05-09 15:24"),
             List.of(83.0, 57.0),
             List.of(0.9, 1.03),
@@ -67,7 +69,8 @@ class TrendDataTest
         final TrendData data = new TrendData(
             List.of(), List.of(), List.of(), List.of(), List.of(),
             List.of(), List.of(), List.of(), List.of(), List.of(),
-            List.of(), List.of(), List.of(), List.of(), List.of()
+            List.of(), List.of(), List.of(), List.of(), List.of(),
+            List.of(), List.of()
         );
 
         assertThat(data.timestamps()).isEmpty();

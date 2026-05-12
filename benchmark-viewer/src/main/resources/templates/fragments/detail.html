@@ -1,4 +1,5 @@
 <th:block th:fragment="htmx-response">
+    <div th:replace="~{fragments/sidebar :: content}"></div>
     <ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
         <div th:replace="~{fragments/detail :: breadcrumb-content}"></div>
     </ol>
@@ -7,29 +8,29 @@
 
 <th:block th:fragment="breadcrumb-content">
     <li class="breadcrumb-item fs-6">
-        <a href="/" hx-get="/" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
+        <a th:href="@{/} + ${currentQueryString}" th:attr="hx-get=@{/} + ${currentQueryString}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
             <i class="bi bi-house-door"></i> Runs
         </a>
     </li>
     <li class="breadcrumb-item fs-6">
-        <a th:href="@{/runs/{ts}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})}" 
+        <a th:href="@{/runs/{ts}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})} + ${currentQueryString}" 
            class="text-decoration-none text-muted"
-           th:attr="hx-get=@{/runs/{ts}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})}"
+           th:attr="hx-get=@{/runs/{ts}(ts=${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')})} + ${currentQueryString}"
            hx-target="#main-content"
            hx-swap="innerHTML"
            hx-push-url="true">
-           <span th:text="${#temporals.format(testRun.timestamp, 'yyyyMMdd-HHmmss')}"></span>
+           <span th:text="${#temporals.format(testRun.timestamp, 'yyyy-MM-dd''T''HH:mm''Z''')}"></span>
         </a>
     </li>
     <li class="breadcrumb-item active fs-6" aria-current="page" th:text="${measurement.className.substring(measurement.className.lastIndexOf('.') + 1)}"></li>
 </th:block>
 
-<div th:fragment="detail-pane" class="container-fluid py-4 fade-in">
+<div th:fragment="detail-pane" class="container-fluid pb-4 fade-in">
 
     <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
             <h2 class="h3 mb-1">
-                <a th:href="@{/testcase/{className}(className=${measurement.className})}" 
+                <a th:href="@{/testcase/{className}(className=${measurement.className})} + ${currentQueryString}" 
                    class="text-decoration-none text-dark"
                    th:text="${measurement.className.substring(measurement.className.lastIndexOf('.') + 1)}"
                    title="View all executions of this test case">
@@ -39,10 +40,8 @@
             <p class="text-muted mb-0">Measurement Details</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <a th:href="@{/testcase/{className}/trends(className=${measurement.className})}"
-               class="btn btn-sm btn-outline-primary" title="View trend charts for this test case">
-                <i class="bi bi-graph-up me-1"></i> Trends
-            </a>
+            <a th:href="@{/testcase/{className}/trends(className=${measurement.className})} + ${currentQueryString}"
+               class="btn btn-sm btn-outline-primary" title="View trend charts for this test case"><i class="bi bi-graph-up me-1"></i>Trends</a>
             <div th:if="${measurement.error}" class="badge bg-danger rounded-pill px-3 py-2 fs-6">
                 <i class="bi bi-exclamation-triangle-fill me-1"></i> Execution Error
             </div>
@@ -138,9 +137,7 @@
                     </ul>
                 </div>
                 <div class="card-footer bg-light border-0 py-3" th:if="${hasJfrFile}">
-                    <a th:href="@{'/jfr/download/' + ${jfrFileName}}" class="btn btn-sm btn-outline-success w-100" title="Download associated Flight Recording">
-                        <i class="bi bi-download me-1"></i> Download JFR
-                    </a>
+                    <a th:href="@{'/jfr/download/' + ${jfrFileName}}" class="btn btn-sm btn-outline-success w-100" title="Download associated Flight Recording"><i class="bi bi-download me-1"></i>Download JFR</a>
                 </div>
                 <div class="card-footer bg-light border-0 py-3 text-center text-muted small" th:unless="${hasJfrFile}">
                     <i class="bi bi-x-circle me-1"></i> No JFR file recorded
@@ -243,13 +240,13 @@
                             <tbody>
                                 <tr th:each="hist : ${history}" th:class="${hist.id == measurement.id} ? 'table-primary' : ''">
                                     <td>
-                                        <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(hist.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${hist.id})}"
+                                        <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(hist.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${hist.id})} + ${currentQueryString}"
                                            class="text-decoration-none"
-                                           th:attr="hx-get=@{/runs/{ts}/detail/{id}(ts=${#temporals.format(hist.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${hist.id})}"
+                                           th:attr="hx-get=@{/runs/{ts}/detail/{id}(ts=${#temporals.format(hist.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${hist.id})} + ${currentQueryString}"
                                            hx-target="#main-content"
                                            hx-swap="innerHTML"
                                            hx-push-url="true">
-                                           <span th:text="${#temporals.format(hist.testRun.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                                           <span th:text="${#temporals.format(hist.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm''Z''')}"></span>
                                         </a>
                                         <span th:if="${hist.id == measurement.id}" class="badge bg-secondary ms-2">Current</span>
                                     </td>

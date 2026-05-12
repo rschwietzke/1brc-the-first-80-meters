@@ -11,13 +11,13 @@
     <!-- Breadcrumb -->
     <th:block layout:fragment="breadcrumb">
         <li class="breadcrumb-item fs-6">
-            <a href="/" hx-get="/" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
+            <a th:href="@{/} + ${currentQueryString}" th:attr="hx-get=@{/} + ${currentQueryString}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
                 <i class="bi bi-house-door"></i> Runs
             </a>
         </li>
         <li class="breadcrumb-item fs-6">
-            <a th:href="@{/testcase/{className}(className=${className})}"
-               th:attr="hx-get=@{/testcase/{className}(className=${className})}"
+            <a th:href="@{/testcase/{className}(className=${className})} + ${currentQueryString}"
+               th:attr="hx-get=@{/testcase/{className}(className=${className})} + ${currentQueryString}"
                hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none"
                th:text="${simpleClassName}">
                 Class
@@ -26,6 +26,11 @@
         <li class="breadcrumb-item active fs-6" aria-current="page">Trends</li>
     </th:block>
 
+    <!-- Sidebar -->
+    <div layout:fragment="sidebar" class="px-3">
+        <div th:replace="~{fragments/sidebar :: content}"></div>
+    </div>
+
     <!-- Main content -->
     <div layout:fragment="content">
         <div th:replace="~{testcase-trends :: page-content}"></div>
@@ -33,21 +38,19 @@
 
     <!-- HTMX Response Block -->
     <th:block th:fragment="htmx-response">
+        <div th:replace="~{fragments/sidebar :: content}"></div>
         <div th:replace="~{testcase-trends :: page-content}"></div>
-    </th:block>
-
-    <!-- Page Content Fragment -->
-    <div th:fragment="page-content" class="fade-in" id="trends-main">
+        
         <!-- Breadcrumb swap (OOB) -->
         <ol id="breadcrumb" hx-swap-oob="true" class="breadcrumb mb-0" style="list-style: none; padding-left: 0;">
             <li class="breadcrumb-item fs-6">
-                <a href="/" hx-get="/" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
+                <a th:href="@{/} + ${currentQueryString}" th:attr="hx-get=@{/} + ${currentQueryString}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none">
                     <i class="bi bi-house-door"></i> Runs
                 </a>
             </li>
             <li class="breadcrumb-item fs-6">
-                <a th:href="@{/testcase/{className}(className=${className})}"
-                   th:attr="hx-get=@{/testcase/{className}(className=${className})}"
+                <a th:href="@{/testcase/{className}(className=${className})} + ${currentQueryString}"
+                   th:attr="hx-get=@{/testcase/{className}(className=${className})} + ${currentQueryString}"
                    hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true" class="text-decoration-none"
                    th:text="${simpleClassName}">
                     Class
@@ -55,8 +58,12 @@
             </li>
             <li class="breadcrumb-item active fs-6" aria-current="page">Trends</li>
         </ol>
+    </th:block>
 
-        <div class="container-fluid py-4">
+    <!-- Page Content Fragment -->
+    <div th:fragment="page-content" class="fade-in" id="trends-main">
+
+        <div class="container-fluid pb-4">
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
@@ -66,10 +73,8 @@
                     </h2>
                     <p class="text-muted mb-0 font-monospace small" th:text="${className}">Full Class Name</p>
                 </div>
-                <a th:href="@{/testcase/{className}(className=${className})}"
-                   class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-arrow-left me-1"></i> Back to History
-                </a>
+                <a th:href="@{/testcase/{className}(className=${className})} + ${currentQueryString}"
+                   class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back to History</a>
             </div>
 
             <!-- No Data -->
@@ -374,8 +379,9 @@
                 let html = '';
                 for (let i = 0; i < data.timestamps.length; i++) {
                     const isError = data.errors[i];
+                    const url = '/runs/' + data.rawTimestamps[i] + '/detail/' + data.ids[i] + window.location.search;
                     html += '<tr' + (isError ? ' class="table-danger"' : '') + '>';
-                    html += '<td>' + data.timestamps[i] + '</td>';
+                    html += '<td><a href="' + url + '" target="_blank" class="text-decoration-none fw-medium">' + data.timestamps[i] + ' <i class="bi bi-box-arrow-up-right small ms-1"></i></a></td>';
                     html += '<td class="text-end font-monospace">' + data.runtime[i] + '</td>';
                     html += '<td class="text-end font-monospace">' + (data.ipc[i] || '-') + '</td>';
                     html += '<td class="text-end font-monospace">' + formatNumber(data.instructions[i]) + '</td>';
@@ -392,6 +398,9 @@
                     html += '</td></tr>';
                 }
                 tbody.innerHTML = html;
+                if (typeof htmx !== 'undefined') {
+                    htmx.process(tbody);
+                }
             }
 
             // Handle window resize for responsive charts

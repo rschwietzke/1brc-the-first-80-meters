@@ -15,11 +15,14 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<div th:fragment="compare-pane">
+<th:block th:fragment="htmx-response">
+    <div th:replace="~{fragments/sidebar :: content}"></div>
+    
+    <div th:fragment="compare-pane">
 
     <!-- OOB Breadcrumb Update -->
     <ol id="breadcrumb-list" hx-swap-oob="true" class="breadcrumb mb-0">
-        <li class="breadcrumb-item"><a href="/" hx-get="/" hx-target="#main-content" hx-push-url="true"><i class="bi bi-house"></i> Runs</a></li>
+        <li class="breadcrumb-item"><a th:href="@{/} + ${currentQueryString}" th:attr="hx-get=@{/} + ${currentQueryString}" hx-target="#main-content" hx-push-url="true"><i class="bi bi-house"></i> Runs</a></li>
         <li class="breadcrumb-item active" aria-current="page">
             <i class="bi bi-arrow-left-right me-1"></i> Global Compare
         </li>
@@ -76,7 +79,8 @@
         </div>
     </div>
 
-</div>
+    </div>
+</th:block>
 
 </body>
 </html>

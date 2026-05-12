@@ -44,12 +44,12 @@
         
         <!-- Sidebar (Desktop) -->
         <aside class="tm-sidebar d-none d-lg-flex" id="sidebar">
-            <a class="tm-brand" href="/"
-               hx-get="/" hx-target="#main-content" hx-push-url="true">
+            <a class="tm-brand" th:href="@{/} + ${currentQueryString}"
+               th:attr="hx-get=@{/} + ${currentQueryString}" hx-target="#main-content" hx-push-url="true">
                 <i class="bi bi-rocket-takeoff"></i>
                 Explorer
             </a>
-            <div layout:fragment="sidebar" class="px-3" id="sidebar-content">
+            <div layout:fragment="sidebar" id="sidebar-content">
                 <div class="sidebar-placeholder p-3">
                     <i class="bi bi-funnel me-2"></i> Filters will appear here
                 </div>

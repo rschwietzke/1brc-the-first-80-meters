@@ -28,9 +28,7 @@
                 <p class="text-muted mb-4">
                     Benchmark data will magically appear here once the data import pipeline is configured.
                 </p>
-                <button class="btn btn-primary px-4 rounded-pill disabled">
-                    <i class="bi bi-cloud-arrow-down me-2"></i> Import Pending
-                </button>
+                <button class="btn btn-primary px-4 rounded-pill disabled"><i class="bi bi-cloud-arrow-down me-2"></i>Import Pending</button>
             </div>
         </div>
     </div>
@@ -49,7 +47,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-medium">
                             <i class="bi bi-calendar-event me-1"></i> 
-                            <span th:text="${#temporals.format(run.timestamp, 'MMM dd, yyyy HH:mm')}">Date</span>
+                            <span th:text="${#temporals.format(run.timestamp, 'yyyy-MM-dd''T''HH:mm''Z''')}">Date</span>
                         </span>
                         <i class="bi bi-chevron-right text-muted"></i>
                     </div>
