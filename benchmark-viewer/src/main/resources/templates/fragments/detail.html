@@ -228,18 +228,18 @@
                         <table class="table table-hover align-middle bg-white mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Run Timestamp</th>
+                                    <th class="ps-4">Run Timestamp</th>
                                     <th class="text-end">Median Runtime (ms)</th>
                                     <th class="text-end">Instructions</th>
                                     <th class="text-end">Cycles</th>
                                     <th class="text-end">GC Pause (ms)</th>
                                     <th class="text-end">Allocated Bytes</th>
-                                    <th class="text-center">Status</th>
+                                    <th class="text-center pe-4">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:each="hist : ${history}" th:class="${hist.id == measurement.id} ? 'table-primary' : ''">
-                                    <td>
+                                    <td class="ps-4">
                                         <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(hist.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${hist.id})} + ${currentQueryString}"
                                            class="text-decoration-none"
                                            th:attr="hx-get=@{/runs/{ts}/detail/{id}(ts=${#temporals.format(hist.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${hist.id})} + ${currentQueryString}"
@@ -255,7 +255,7 @@
                                     <td class="text-end font-monospace" th:text="${hist.cycles > 0 ? #numbers.formatInteger(hist.cycles, 1, 'COMMA') : '-'}"></td>
                                     <td class="text-end font-monospace" th:text="${hist.gcPauseMs > 0 ? #numbers.formatDecimal(hist.gcPauseMs, 1, 1) : '-'}"></td>
                                     <td class="text-end font-monospace" th:text="${hist.allocatedBytes > 0 ? #numbers.formatInteger(hist.allocatedBytes, 1, 'COMMA') : '-'}"></td>
-                                    <td class="text-center">
+                                    <td class="text-center pe-4">
                                         <i th:if="${hist.error}" class="bi bi-x-circle-fill text-danger" title="Error"></i>
                                         <i th:unless="${hist.error}" class="bi bi-check-circle-fill text-success" title="Success"></i>
                                     </td>

@@ -27,7 +27,7 @@
     </th:block>
 
     <!-- Sidebar -->
-    <div layout:fragment="sidebar" class="px-3">
+    <div layout:fragment="sidebar" id="sidebar-content">
         <div th:replace="~{fragments/sidebar :: content}"></div>
     </div>
 
@@ -245,7 +245,7 @@
                                 <table class="table table-hover align-middle bg-white mb-0 small" id="rawDataTable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>Timestamp</th>
+                                            <th class="ps-4">Timestamp</th>
                                             <th class="text-end">Runtime (ms)</th>
                                             <th class="text-end">IPC</th>
                                             <th class="text-end">Instructions</th>
@@ -255,7 +255,7 @@
                                             <th class="text-end">GC Pause (ms)</th>
                                             <th class="text-end">Allocated Bytes</th>
                                             <th class="text-end">JIT (ms)</th>
-                                            <th class="text-center">Status</th>
+                                            <th class="text-center pe-4">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody id="rawDataBody">
@@ -381,7 +381,7 @@
                     const isError = data.errors[i];
                     const url = '/runs/' + data.rawTimestamps[i] + '/detail/' + data.ids[i] + window.location.search;
                     html += '<tr' + (isError ? ' class="table-danger"' : '') + '>';
-                    html += '<td><a href="' + url + '" target="_blank" class="text-decoration-none fw-medium">' + data.timestamps[i] + ' <i class="bi bi-box-arrow-up-right small ms-1"></i></a></td>';
+                    html += '<td class="ps-4"><a href="' + url + '" target="_blank" class="text-decoration-none fw-medium">' + data.timestamps[i] + ' <i class="bi bi-box-arrow-up-right small ms-1"></i></a></td>';
                     html += '<td class="text-end font-monospace">' + data.runtime[i] + '</td>';
                     html += '<td class="text-end font-monospace">' + (data.ipc[i] || '-') + '</td>';
                     html += '<td class="text-end font-monospace">' + formatNumber(data.instructions[i]) + '</td>';
@@ -391,7 +391,7 @@
                     html += '<td class="text-end font-monospace">' + data.gcPauseMs[i] + '</td>';
                     html += '<td class="text-end font-monospace">' + formatNumber(data.allocatedBytes[i]) + '</td>';
                     html += '<td class="text-end font-monospace">' + data.jitCompilationMs[i] + '</td>';
-                    html += '<td class="text-center">';
+                    html += '<td class="text-center pe-4">';
                     html += isError
                         ? '<i class="bi bi-x-circle-fill text-danger" title="Error"></i>'
                         : '<i class="bi bi-check-circle-fill text-success" title="Success"></i>';

@@ -19,7 +19,7 @@
     </th:block>
 
     <!-- Sidebar -->
-    <div layout:fragment="sidebar" class="px-3">
+    <div layout:fragment="sidebar" id="sidebar-content">
         <div th:replace="~{fragments/sidebar :: content}"></div>
     </div>
 
@@ -72,14 +72,14 @@
                             <table class="table table-hover align-middle bg-white mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="px-3" style="width: 40px;"></th>
+                                        <th class="ps-4" style="width: 40px;"></th>
                                         <th>Run Timestamp</th>
                                         <th>JDK</th>
                                         <th>Dataset</th>
                                         <th>Hardware</th>
                                         <th class="text-end">Median (ms)</th>
                                         <th class="text-center">Status</th>
-                                        <th class="text-end">Details</th>
+                                        <th class="text-end pe-4">Details</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -87,7 +87,7 @@
                                         <td colspan="8" class="text-center py-4 text-muted">No executions found for this test case matching the active filters.</td>
                                     </tr>
                                     <tr th:each="m : ${measurements}">
-                                        <td class="px-3 text-center">
+                                        <td class="ps-4 text-center">
                                             <input class="form-check-input compare-cb" type="checkbox" th:value="${m.id}" onchange="updateCompareBtn()">
                                         </td>
                                         <td>
@@ -112,12 +112,10 @@
                                             <i th:if="${m.error}" class="bi bi-x-circle-fill text-danger" title="Error"></i>
                                             <i th:unless="${m.error}" class="bi bi-check-circle-fill text-success" title="Success"></i>
                                         </td>
-                                        <td class="text-end pe-3">
+                                        <td class="text-end pe-4">
                                             <a th:href="@{/runs/{ts}/detail/{id}(ts=${#temporals.format(m.testRun.timestamp, 'yyyy-MM-dd''T''HH:mm:ss')}, id=${m.id})} + ${currentQueryString}"
                                                class="btn btn-sm btn-outline-secondary"
-                                               title="View Details">
-                                                <i class="bi bi-info-circle"></i>
-                                            </a>
+                                               title="View Details"><i class="bi bi-info-circle"></i></a>
                                         </td>
                                     </tr>
                                 </tbody>
