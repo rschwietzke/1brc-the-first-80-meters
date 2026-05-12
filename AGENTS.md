@@ -4,6 +4,10 @@ Please adhere to the following rules when contributing to this repository:
 
 ## General Behavior
 - **Explicit Confirmation:** Do not implement anything unless told and confirmed by the user.
+- **Think before coding:** State your assumptions out loud. If the request is ambiguous, ask. If a simpler approach exists, push back. Stop when you are confused, name what is unclear, do not just pick one interpretation and run.
+- **Simplicity first:** Write the minimum code that solves the problem. No speculative abstractions. No flexibility nobody asked for. The test: would a senior engineer call this overcomplicated.
+- **Surgical changes:** Touch only what the task requires. Do not improve neighboring code. Do not refactor what is not broken. Every changed line should trace back to the request.
+- **Goal-driven execution:** Turn vague instructions into verifiable targets before writing a line. "Add validation" becomes "write tests for invalid inputs, then make them pass".
 
 ## Coding Standards
 - **Test-Driven Development (TDD):** Write unit and integration tests before implementing new functionality. Ensure comprehensive test coverage for all new code.
@@ -20,9 +24,8 @@ Please adhere to the following rules when contributing to this repository:
 - **Attribution:** If you use an open-source library, document it in `NOTICE.md` and include the appropriate license references inside `doc/3rd-party-licenses`.
 
 ## GIT
-
 - **Merge:** Never fast-forward, never stash.
-- **Stashing:** Ask for permission every time. 
+- **Stashing:** Ask for permission every time.
 
 ## Testing & Specifications
 - **Manual & Automated Tests:** You MUST create test cases as part of any specification process or implementation work.
