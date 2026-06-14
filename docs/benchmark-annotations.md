@@ -7,10 +7,15 @@ These "Source Annotations" can be placed anywhere in the file as standard single
 ## 1. Execution Control Filters
 These annotations define exactly when the harness is allowed to run the class. They override the filters defined in `benchmark.conf`.
 
-*   `// RUN: RUN_NAME` — **Whitelist**. The class will *only* execute for the run named `RUN_NAME` (e.g., `// RUN: NIGHTLY_ZGC`). If a class has any whitelist annotations, it automatically skips all other runs.
-*   `// -RUN: RUN_NAME` (or `// exclude-run:`) — **Blacklist**. The class will specifically skip the run named `RUN_NAME`.
-*   `// -JDK: VERSION` (or `// exclude-jdk:`) — Skips execution if the JDK label or version starts with this string (e.g., `// -JDK: 21` or `// -JDK: JDK_21_OPEN`).
-*   `// -DATA: LABEL` (or `// exclude-data:`) — Skips execution for a specific dataset label defined in your `[DATASETS]` config (e.g., `// -DATA: DATASET_1k`).
+*   `// RUN: RUN_NAME` (or `// RUNS: RUN_NAME`) — **Whitelist**. The class will *only* execute for the run named `RUN_NAME` (e.g., `// RUN: NIGHTLY_ZGC`). If a class has any whitelist annotations, it automatically skips all other runs.
+*   `// -RUN: RUN_NAME` (or `// exclude-run:`, `// -RUNS:`, `// exclude-runs:`) — **Blacklist**. The class will specifically skip the run named `RUN_NAME`.
+*   `// -JDK: VERSION` (or `// exclude-jdk:`, `// -JDKS:`, `// exclude-jdks:`) — Skips execution if the JDK label or version starts with this string (e.g., `// -JDK: 21` or `// -JDK: JDK_21_OPEN`).
+*   `// -DATA: LABEL` (or `// exclude-data:`, `// -DATASET:`, `// exclude-dataset:`, `// -DATASETS:`, `// exclude-datasets:`) — Skips execution for a specific dataset label defined in your `[DATASETS]` config (e.g., `// -DATA: DATASET_1k`).
+*   `// -GC: LABEL` (or `// exclude-gc:`, `// -GC_OPTS:`, `// exclude-gc_opts:`) — Skips execution for a specific GC configuration (e.g., `// -GC: SGC`).
+*   `// -VM: LABEL` (or `// exclude-vm:`, `// -VM_OPTS:`, `// exclude-vm_opts:`) — Skips execution for a specific VM configuration (e.g., `// -VM: MEM_1G`).
+
+> [!NOTE]
+> All dimension names are automatically unified/normalized. You can use either the configuration block plural/verbose name (e.g., `GC_OPTS`, `VM_OPTS`, `DATASETS`, `JDKS`) or the canonical short name (e.g., `GC`, `VM`, `DATA`, `JDK`) in your source comments.
 
 ## 2. Status & Evaluation Markers
 These annotations control how the class is processed and how it is visually represented in the generated HTML and Markdown reports.

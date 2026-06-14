@@ -292,13 +292,42 @@ public class ScriptGenerator {
                     });
                     if (excludedJdk) continue;
 
-                    for (String gcL : matchGcs) {
-                        for (String vmL : matchVms) {
+                    for (String gcL : matchGcs)
+                    {
+                        boolean excludedGc = cls.exclusions.stream().anyMatch(e -> {
+                            if (e.startsWith("GC:"))
+                            {
+                                return e.substring("GC:".length()).equals(gcL);
+                            }
+                            return false;
+                        });
+                        if (excludedGc)
+                        {
+                            continue;
+                        }
+
+                        for (String vmL : matchVms)
+                        {
+                            boolean excludedVm = cls.exclusions.stream().anyMatch(e -> {
+                                if (e.startsWith("VM:"))
+                                {
+                                    return e.substring("VM:".length()).equals(vmL);
+                                }
+                                return false;
+                            });
+                            if (excludedVm)
+                            {
+                                continue;
+                            }
+
                             for (String bdL : matchBindings) {
                                 for (String progL : matchProgs) {
                                     for (String dsL : matchDatasets) {
                                         boolean excludedDs = cls.exclusions.stream().anyMatch(e -> e.equals("DATA:" + dsL));
-                                        if (excludedDs) continue;
+                                        if (excludedDs)
+                                        {
+                                            continue;
+                                        }
 
                                         RunCombination rc = new RunCombination(
                                                 cls, runDef.name,
