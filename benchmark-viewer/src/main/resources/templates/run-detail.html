@@ -1,4 +1,17 @@
 <!DOCTYPE html>
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -21,7 +34,168 @@
     <!-- Main content -->
     <div layout:fragment="content">
         <div th:replace="~{fragments/variation-matrix :: content}"></div>
+        
+        <!-- Summary & Comparison Charts -->
+        <div class="card shadow-sm border-0 mt-4 mb-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <h5 class="card-title fw-bold text-dark">
+                    <i class="bi bi-bar-chart-line text-primary me-2"></i>Performance Analysis & Comparisons
+                </h5>
+                <ul class="nav nav-tabs card-header-tabs mt-3" id="chartTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-medium" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary-chart-pane" type="button" role="tab" aria-controls="summary-chart-pane" aria-selected="true">
+                            <i class="bi bi-grid-3x3 me-1"></i>All Permutations
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-medium" id="jdk-tab" data-bs-toggle="tab" data-bs-target="#jdk-chart-pane" type="button" role="tab" aria-controls="jdk-chart-pane" aria-selected="false">
+                            <i class="bi bi-cpu me-1"></i>JDK Comparison
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-medium" id="gc-tab" data-bs-toggle="tab" data-bs-target="#gc-chart-pane" type="button" role="tab" aria-controls="gc-chart-pane" aria-selected="false">
+                            <i class="bi bi-recycle me-1"></i>GC Comparison
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body bg-white rounded-bottom-3 p-4">
+                <div class="tab-content" id="chartTabContent">
+                    <div class="tab-pane fade show active" id="summary-chart-pane" role="tabpanel" aria-labelledby="summary-tab">
+                        <div id="summaryChart" style="width: 100%; height: 450px;"></div>
+                    </div>
+                    <div class="tab-pane fade" id="jdk-chart-pane" role="tabpanel" aria-labelledby="jdk-tab">
+                        <div id="jdkChart" style="width: 100%; height: 450px;"></div>
+                    </div>
+                    <div class="tab-pane fade" id="gc-chart-pane" role="tabpanel" aria-labelledby="gc-tab">
+                        <div id="gcChart" style="width: 100%; height: 450px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Scripts -->
+    <th:block layout:fragment="scripts">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            document.addEventListener('DOMContentLoaded', () => {
+                const ts = [[${#temporals.format(testRun.timestamp, 'yyyy-MM-dd\'T\'HH:mm:ss')}]];
+                
+                function initChart(elementId, apiUrl) {
+                    const chartDom = document.getElementById(elementId);
+                    if (!chartDom) {
+                        return;
+                    }
+                    
+                    let chart = echarts.getInstanceByDom(chartDom);
+                    if (chart) {
+                        chart.dispose();
+                    }
+                    chart = echarts.init(chartDom);
+                    chart.showLoading();
+                    
+                    fetch(apiUrl)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            chart.hideLoading();
+                            
+                            const option = {
+                                tooltip: {
+                                    trigger: 'axis',
+                                    axisPointer: {
+                                        type: 'shadow'
+                                    }
+                                },
+                                legend: {
+                                    type: 'scroll',
+                                    bottom: 0,
+                                    textStyle: {
+                                        fontFamily: 'Inter, sans-serif'
+                                    }
+                                },
+                                grid: {
+                                    left: '3%',
+                                    right: '4%',
+                                    bottom: '12%',
+                                    containLabel: true
+                                },
+                                xAxis: {
+                                    type: 'category',
+                                    data: data.categories,
+                                    axisLabel: {
+                                        interval: 0,
+                                        rotate: 35,
+                                        fontFamily: 'JetBrains Mono, monospace',
+                                        fontSize: 10
+                                    }
+                                },
+                                yAxis: {
+                                    type: 'value',
+                                    name: 'Runtime (ms)',
+                                    nameTextStyle: {
+                                        fontFamily: 'Inter, sans-serif'
+                                    },
+                                    axisLabel: {
+                                        fontFamily: 'JetBrains Mono, monospace'
+                                    }
+                                },
+                                series: data.series.map(s => {
+                                    s.label = {
+                                        show: false
+                                    };
+                                    return s;
+                                })
+                            };
+                            
+                            chart.setOption(option);
+                            
+                            window.addEventListener('resize', () => {
+                                chart.resize();
+                            });
+                        })
+                        .catch(err => {
+                            console.error('Failed to load chart data for ' + elementId, err);
+                            chart.hideLoading();
+                        });
+                }
+                
+                // Initialize active tab chart
+                initChart('summaryChart', `/api/runs/${ts}/summary`);
+                initChart('jdkChart', `/api/runs/${ts}/compare/jdk`);
+                initChart('gcChart', `/api/runs/${ts}/compare/gc`);
+                
+                // Resize charts when switching tabs to prevent zero-width render issue
+                document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(tabEl => {
+                    tabEl.addEventListener('shown.bs.tab', event => {
+                        const id = event.target.id;
+                        if (id === 'summary-tab') {
+                            const chart = echarts.getInstanceByDom(document.getElementById('summaryChart'));
+                            if (chart) {
+                                chart.resize();
+                            }
+                        } else if (id === 'jdk-tab') {
+                            const chart = echarts.getInstanceByDom(document.getElementById('jdkChart'));
+                            if (chart) {
+                                chart.resize();
+                            }
+                        } else if (id === 'gc-tab') {
+                            const chart = echarts.getInstanceByDom(document.getElementById('gcChart'));
+                            if (chart) {
+                                chart.resize();
+                            }
+                        }
+                    });
+                });
+            });
+            /*]]>*/
+        </script>
+    </th:block>
 
     <!-- HTMX Response Block -->
     <th:block th:fragment="htmx-response">

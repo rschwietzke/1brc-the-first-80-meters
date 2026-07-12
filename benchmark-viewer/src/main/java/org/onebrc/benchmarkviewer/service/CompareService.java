@@ -151,8 +151,8 @@ public class CompareService
         // Fetch all measurements matching the filter state, bypassing potential testRunId index matching issues
         final List<Measurement> allMeasurements = this.searchService.searchMeasurements(filterState, null, null);
 
-        final Map<String, Double> runtimesA = new TreeMap<>();
-        final Map<String, Double> runtimesB = new TreeMap<>();
+        final Map<String, Measurement> measurementsA = new TreeMap<>();
+        final Map<String, Measurement> measurementsB = new TreeMap<>();
 
         for (final Measurement m : allMeasurements)
         {
@@ -166,24 +166,47 @@ public class CompareService
 
             if (runId != null && runId.equals(candA.testRunId()) && key.equals(candA.environmentKey()))
             {
-                runtimesA.put(m.getClassName(), m.getMedianRuntimeMs());
+                measurementsA.put(m.getClassName(), m);
             }
             
             if (runId != null && runId.equals(candB.testRunId()) && key.equals(candB.environmentKey()))
             {
-                runtimesB.put(m.getClassName(), m.getMedianRuntimeMs());
+                measurementsB.put(m.getClassName(), m);
             }
         }
 
-        final Set<String> allClasses = new TreeSet<>(runtimesA.keySet());
-        allClasses.addAll(runtimesB.keySet());
+        final Set<String> allClasses = new TreeSet<>(measurementsA.keySet());
+        allClasses.addAll(measurementsB.keySet());
 
         final List<ComparisonRow> results = new ArrayList<>();
         for (final String className : allClasses)
         {
-            final Double a = runtimesA.get(className);
-            final Double b = runtimesB.get(className);
-            results.add(ComparisonRow.compute(className, a, b));
+            final Measurement a = measurementsA.get(className);
+            final Measurement b = measurementsB.get(className);
+            final Double runtimeA = a != null ? a.getMedianRuntimeMs() : 0.0;
+            final Double runtimeB = b != null ? b.getMedianRuntimeMs() : 0.0;
+
+            final double deltaMs = runtimeB - runtimeA;
+            final double deltaPct;
+
+            if (runtimeA == 0.0)
+            {
+                if (runtimeB == 0.0)
+                {
+                    deltaPct = 0.0;
+                }
+                else
+                {
+                    deltaPct = Double.POSITIVE_INFINITY;
+                }
+            }
+            else
+            {
+                deltaPct = (deltaMs / runtimeA) * 100.0;
+            }
+
+            final boolean hiddenSignal = ComparisonRow.checkHiddenSignal(a, b, deltaPct);
+            results.add(ComparisonRow.compute(className, runtimeA, runtimeB, hiddenSignal));
         }
 
         results.sort(Comparator.comparing(ComparisonRow::deltaPct).reversed());

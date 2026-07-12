@@ -19,6 +19,7 @@ package org.onebrc.benchmarkviewer.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.onebrc.benchmarkviewer.domain.ComparisonRow;
+import org.onebrc.benchmarkviewer.domain.Measurement;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -76,5 +77,53 @@ class CompareServiceTest
         assertThat(results.get(1).className()).isEqualTo("Reg20");
         assertThat(results.get(2).className()).isEqualTo("Imp10");
         assertThat(results.get(3).className()).isEqualTo("Imp50");
+    }
+
+    @Test
+    @DisplayName("9.1: Hidden signal detection - stable runtime + large counter shift")
+    void testHiddenSignalDetected()
+    {
+        final Measurement a = new Measurement();
+        a.setMedianRuntimeMs(100.0);
+        a.setInstructions(1000L);
+
+        final Measurement b = new Measurement();
+        b.setMedianRuntimeMs(102.0); // 2% runtime shift (stable)
+        b.setInstructions(1250L); // 25% counter shift (large shift)
+
+        // deltaPct = 2.0%
+        assertThat(ComparisonRow.checkHiddenSignal(a, b, 2.0)).isTrue();
+    }
+
+    @Test
+    @DisplayName("9.2: Hidden signal detection - both runtime and counters stable")
+    void testHiddenSignalNotDetectedWhenBothStable()
+    {
+        final Measurement a = new Measurement();
+        a.setMedianRuntimeMs(100.0);
+        a.setInstructions(1000L);
+
+        final Measurement b = new Measurement();
+        b.setMedianRuntimeMs(102.0); // 2% runtime shift (stable)
+        b.setInstructions(1050L); // 5% counter shift (stable)
+
+        // deltaPct = 2.0%
+        assertThat(ComparisonRow.checkHiddenSignal(a, b, 2.0)).isFalse();
+    }
+
+    @Test
+    @DisplayName("9.2: Hidden signal detection - runtime not stable")
+    void testHiddenSignalNotDetectedWhenRuntimeNotStable()
+    {
+        final Measurement a = new Measurement();
+        a.setMedianRuntimeMs(100.0);
+        a.setInstructions(1000L);
+
+        final Measurement b = new Measurement();
+        b.setMedianRuntimeMs(110.0); // 10% runtime shift (not stable)
+        b.setInstructions(1500L); // 50% counter shift (large shift)
+
+        // deltaPct = 10.0%
+        assertThat(ComparisonRow.checkHiddenSignal(a, b, 10.0)).isFalse();
     }
 }

@@ -33,7 +33,7 @@ class DataImportServiceTest
     @DisplayName("Should parse sysinfo.txt correctly")
     void testParseSysinfo()
     {
-        final DataImportService service = new DataImportService(null, null);
+        final DataImportService service = new DataImportService(null, null, null);
         final String sysinfoContent = """
             Hostname: some-host
             Kernel: 6.8.0-31-generic
@@ -58,7 +58,7 @@ class DataImportServiceTest
     @DisplayName("Should parse meta.json correctly")
     void testParseMetaJson()
     {
-        final DataImportService service = new DataImportService(null, null);
+        final DataImportService service = new DataImportService(null, null, null);
         final String json = """
             {
               "timestamp": "20260505-175402",
@@ -78,7 +78,7 @@ class DataImportServiceTest
     @DisplayName("Should parse CSV correctly")
     void testParseCsv()
     {
-        final DataImportService service = new DataImportService(null, null);
+        final DataImportService service = new DataImportService(null, null, null);
         final String csvContent = """
             JDK,GC_OPTS,VM_OPTS,PROG_OPTS,BINDING,DATA,RunTimestamp,Class,MedianRuntimeMs,Checksum,PerfRuntimeMs,JfrRuntimeMs,Instructions,Cycles,Branches,BranchMisses,L1Misses,LLCMisses,PageFaults,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys,GcPauseMs,AllocatedBytes,JitCompilationMs
             JDK_21_OPEN,"-XX:+UseZGC","-Xms1g -Xmx1g","-wc 0 -mc 1 -t 8","taskset -c 0-7",10k,20260505-175402,org.onebrc.again26.BRC100,10.5,OK,20.0,30.0,100,200,300,400,500,600,700,800,900,1000,1.5,1.1,1.2,1.3,45.2,21879136,123.4
@@ -122,7 +122,7 @@ class DataImportServiceTest
     @DisplayName("Should parse CSV without JFR columns gracefully")
     void testParseCsvWithoutJfrColumns()
     {
-        final DataImportService service = new DataImportService(null, null);
+        final DataImportService service = new DataImportService(null, null, null);
         final String csvContent = """
             JDK,GC_OPTS,VM_OPTS,PROG_OPTS,BINDING,DATA,RunTimestamp,Class,MedianRuntimeMs,Checksum,PerfRuntimeMs,JfrRuntimeMs,Instructions,Cycles,Branches,BranchMisses,L1Misses,LLCMisses,PageFaults,TaskClock,ContextSwitches,CpuMigrations,IPC,SecElapsed,SecUser,SecSys
             JDK_21_OPEN,"-XX:+UseZGC","-Xms1g -Xmx1g","-wc 0 -mc 1 -t 8","taskset -c 0-7",10k,20260505-175402,org.onebrc.again26.BRC100,10.5,OK,20.0,30.0,100,200,300,400,500,600,700,800,900,1000,1.5,1.1,1.2,1.3

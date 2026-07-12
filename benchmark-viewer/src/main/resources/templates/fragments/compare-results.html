@@ -37,7 +37,12 @@
                     <tbody>
                     <tr th:each="row : ${results}">
                         <td class="ps-4 font-monospace small">
-                            <span th:text="${row.className.substring(row.className.lastIndexOf('.') + 1)}"></span>
+                            <div class="d-flex align-items-center">
+                                <span th:text="${row.className.substring(row.className.lastIndexOf('.') + 1)}"></span>
+                                <span th:if="${row.hiddenSignal}" class="badge bg-warning text-dark ms-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Compensated Degradation: Runtime delta is stable (&lt;5%), but hardware counters shifted significantly (&gt;20%).">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> Anomaly
+                                </span>
+                            </div>
                             <small class="text-muted d-block opacity-50" th:text="${row.className.substring(0, row.className.lastIndexOf('.') > 0 ? row.className.lastIndexOf('.') : 0)}"></small>
                         </td>
                         

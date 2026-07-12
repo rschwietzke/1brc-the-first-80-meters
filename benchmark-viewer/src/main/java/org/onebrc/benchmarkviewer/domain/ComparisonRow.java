@@ -24,7 +24,8 @@ public record ComparisonRow(
     Double runtimeA,
     Double runtimeB,
     Double deltaMs,
-    Double deltaPct
+    Double deltaPct,
+    boolean hiddenSignal
 )
 {
     /**
@@ -44,6 +45,14 @@ public record ComparisonRow(
      * @return a computed ComparisonRow
      */
     public static ComparisonRow compute(final String className, final Double runtimeA, final Double runtimeB)
+    {
+        return compute(className, runtimeA, runtimeB, false);
+    }
+
+    /**
+     * Factory method to compute a ComparisonRow with explicit hiddenSignal status.
+     */
+    public static ComparisonRow compute(final String className, final Double runtimeA, final Double runtimeB, final boolean hiddenSignal)
     {
         final Double safeA = runtimeA != null ? runtimeA : 0.0;
         final Double safeB = runtimeB != null ? runtimeB : 0.0;
@@ -67,6 +76,56 @@ public record ComparisonRow(
             deltaPct = (deltaMs / safeA) * 100.0;
         }
 
-        return new ComparisonRow(className, safeA, safeB, deltaMs, deltaPct);
+        return new ComparisonRow(className, safeA, safeB, deltaMs, deltaPct, hiddenSignal);
+    }
+
+    /**
+     * Checks for hidden signal anomalies between two measurements.
+     */
+    public static boolean checkHiddenSignal(final Measurement a, final Measurement b, final double deltaPct)
+    {
+        if (a == null || b == null)
+        {
+            return false;
+        }
+
+        // Stable runtime: absolute percentage change < 5%
+        if (Math.abs(deltaPct) >= 5.0)
+        {
+            return false;
+        }
+
+        // Check counter shifts > 20%
+        return isShifted(a.getInstructions(), b.getInstructions())
+            || isShifted(a.getCycles(), b.getCycles())
+            || isShifted(a.getBranches(), b.getBranches())
+            || isShifted(a.getBranchMisses(), b.getBranchMisses())
+            || isShifted(a.getL1Misses(), b.getL1Misses())
+            || isShifted(a.getLlcMisses(), b.getLlcMisses())
+            || isShifted(a.getPageFaults(), b.getPageFaults())
+            || isShifted(a.getContextSwitches(), b.getContextSwitches())
+            || isShifted(a.getGcPauseMs(), b.getGcPauseMs())
+            || isShifted(a.getAllocatedBytes(), b.getAllocatedBytes())
+            || isShifted(a.getJitCompilationMs(), b.getJitCompilationMs());
+    }
+
+    private static boolean isShifted(final double a, final double b)
+    {
+        if (a == 0.0)
+        {
+            return false;
+        }
+        final double pct = ((b - a) / a) * 100.0;
+        return Math.abs(pct) > 20.0;
+    }
+
+    private static boolean isShifted(final long a, final long b)
+    {
+        if (a == 0L)
+        {
+            return false;
+        }
+        final double pct = ((double)(b - a) / a) * 100.0;
+        return Math.abs(pct) > 20.0;
     }
 }

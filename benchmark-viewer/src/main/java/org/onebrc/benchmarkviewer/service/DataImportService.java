@@ -38,6 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import jakarta.persistence.EntityManager;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -47,17 +50,53 @@ public class DataImportService
 
     private final TestRunRepository testRunRepository;
     private final MeasurementRepository measurementRepository;
+    private final EntityManager entityManager;
 
     /**
      * Construct the data import service.
      *
      * @param testRunRepository     repository for persisting test runs
      * @param measurementRepository repository for persisting measurements
+     * @param entityManager         the entity manager for Hibernate Search
      */
-    public DataImportService(final TestRunRepository testRunRepository, final MeasurementRepository measurementRepository)
+    public DataImportService(final TestRunRepository testRunRepository,
+                             final MeasurementRepository measurementRepository,
+                             final EntityManager entityManager)
     {
         this.testRunRepository = testRunRepository;
         this.measurementRepository = measurementRepository;
+        this.entityManager = entityManager;
+    }
+
+    /**
+     * Clear the database and re-import all data.
+     */
+    @Transactional
+    public void reimportAll(final Path directory)
+    {
+        log.info("Starting database re-import. Clearing all existing measurements and runs.");
+        this.measurementRepository.deleteAll();
+        this.testRunRepository.deleteAll();
+
+        log.info("Importing directory {}", directory);
+        this.importDirectory(directory);
+
+        log.info("Rebuilding search indexes.");
+        try
+        {
+            final SearchSession searchSession = Search.session(this.entityManager);
+            searchSession.massIndexer()
+                    .idFetchSize(150)
+                    .batchSizeToLoadObjects(25)
+                    .threadsToLoadObjects(4)
+                    .startAndWait();
+        }
+        catch (final InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+            log.error("Mass indexer was interrupted during reimport", e);
+        }
+        log.info("Database re-import completed successfully.");
     }
 
     @Transactional

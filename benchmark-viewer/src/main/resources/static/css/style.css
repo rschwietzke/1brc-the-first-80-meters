@@ -303,11 +303,10 @@ h1, h2, h3, h4, h5, h6 {
 
 /* HTMX Indicator */
 .htmx-indicator {
-    opacity: 0;
-    transition: opacity var(--tm-transition);
+    display: none !important;
 }
-.htmx-request .htmx-indicator {
-    opacity: 1;
+.htmx-request.htmx-indicator, .htmx-request .htmx-indicator {
+    display: flex !important;
 }
 
 /* =============================================================================

@@ -54,3 +54,6 @@ out_expected.txt
 # Agent Files
 .agent/
 .agent_apply.json
+
+# Benchmark Viewer Runtime Data (H2 DB, Lucene index)
+benchmark-viewer/db/
