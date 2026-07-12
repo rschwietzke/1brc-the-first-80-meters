@@ -175,19 +175,19 @@ Each step ends with a manual verification gate — **STOP and wait for user OK**
 **Goal:** Select two environments, see delta table with percentage changes color-coded.
 
 ### Tests first:
-- [ ] 7.1 Write unit test for delta calculation: correct Δ ms and Δ % for two measurement sets
-- [ ] 7.2 Write unit test for delta sorting: biggest regressions first by default
-- [ ] 7.3 Write controller test: GET `/runs/{timestamp}/compare?envA=...&envB=...` returns comparison model
+- [x] 7.1 Write unit test for delta calculation: correct Δ ms and Δ % for two measurement sets
+- [x] 7.2 Write unit test for delta sorting: biggest regressions first by default
+- [x] 7.3 Write controller test: GET `/runs/{timestamp}/compare?envA=...&envB=...` returns comparison model
 
 ### Implementation:
-- [ ] 7.4 Create `CompareController` with `@GetMapping("/runs/{timestamp}/compare")`
-- [ ] 7.5 Create `fragments/compare.html` — environment selector (two dropdowns to pick envA, envB)
-- [ ] 7.6 Create `fragments/compare-results.html` — table: Class, Runtime A, Runtime B, Δ ms, Δ %. Red = regression, green = improvement.
-- [ ] 7.7 Sort by Δ % descending (biggest regressions first). Add column sort toggles.
-- [ ] 7.8 Optional: ECharts scatter plot (X = env A, Y = env B, diagonal = parity)
-- [ ] 7.9 Apply active sidebar filters to comparison query
-- [ ] 7.10 Update breadcrumb: Runs → [timestamp] → Compare
-- [ ] 7.11 All tests pass
+- [x] 7.4 Create `CompareController` with `@GetMapping("/runs/{timestamp}/compare")`
+- [x] 7.5 Create `fragments/compare.html` — environment selector (two dropdowns to pick envA, envB)
+- [x] 7.6 Create `fragments/compare-results.html` — table: Class, Runtime A, Runtime B, Δ ms, Δ %. Red = regression, green = improvement.
+- [x] 7.7 Sort by Δ % descending (biggest regressions first). Add column sort toggles.
+- [x] 7.8 Optional: ECharts scatter plot (X = env A, Y = env B, diagonal = parity)
+- [x] 7.9 Apply active sidebar filters to comparison query
+- [x] 7.10 Update breadcrumb: Runs → [timestamp] → Compare
+- [x] 7.11 All tests pass
 
 **🛑 MANUAL VERIFY then STOP:**
 - Select "JDK 21 + ZGC + 2G" vs "JDK 25 + ZGC + 2G"
@@ -203,20 +203,20 @@ Each step ends with a manual verification gate — **STOP and wait for user OK**
 **Goal:** See how a class + environment performed across all runs over time.
 
 ### Tests first:
-- [ ] 8.1 Write unit test for timeline data assembly: correct ordering by timestamp, correct metric values per point
-- [ ] 8.2 Write controller test: GET `/api/timeline?className=...&gcOpts=...` returns valid JSON
-- [ ] 8.3 Write controller test: GET `/timeline` returns fragment with chart container
+- [x] 8.1 Write unit test for timeline data assembly: correct ordering by timestamp, correct metric values per point
+- [x] 8.2 Write controller test: GET `/api/timeline?className=...&gcOpts=...` returns valid JSON
+- [x] 8.3 Write controller test: GET `/timeline` returns fragment with chart container
 
 ### Implementation:
-- [ ] 8.4 Create `TimelineController` with `@GetMapping("/timeline")` — accepts dimension filters
-- [ ] 8.5 Create `@GetMapping("/api/timeline")` — JSON endpoint for ECharts
-- [ ] 8.6 Create `fragments/timeline.html` — ECharts line chart: X = timestamps, Y = MedianRuntimeMs
-- [ ] 8.7 Create `static/js/charts.js` — ECharts init utilities (theme, tooltip, zoom, click handlers)
-- [ ] 8.8 Wire ECharts initialization on `htmx:afterSwap`
-- [ ] 8.9 Metric toggle: overlay hardware counters (Instructions, IPC) on secondary Y-axis
-- [ ] 8.10 Wire data point click → execution detail navigation
-- [ ] 8.11 Update breadcrumb: Runs → Timeline → [className]
-- [ ] 8.12 All tests pass
+- [x] 8.4 Create `TimelineController` with `@GetMapping("/timeline")` — accepts dimension filters
+- [x] 8.5 Create `@GetMapping("/api/timeline")` — JSON endpoint for ECharts
+- [x] 8.6 Create `fragments/timeline.html` — ECharts line chart: X = timestamps, Y = MedianRuntimeMs
+- [x] 8.7 Create `static/js/charts.js` — ECharts init utilities (theme, tooltip, zoom, click handlers)
+- [x] 8.8 Wire ECharts initialization on `htmx:afterSwap`
+- [x] 8.9 Metric toggle: overlay hardware counters (Instructions, IPC) on secondary Y-axis
+- [x] 8.10 Wire data point click → execution detail navigation
+- [x] 8.11 Update breadcrumb: Runs → Timeline → [className]
+- [x] 8.12 All tests pass
 
 **🛑 MANUAL VERIFY then STOP:**
 - Timeline for `BRC035_NoLambda` + ZGC + 2G → chart with data point(s)
@@ -232,24 +232,24 @@ Each step ends with a manual verification gate — **STOP and wait for user OK**
 **Goal:** Surface counter anomalies, add summary charts, and polish the full UX.
 
 ### Tests first:
-- [ ] 9.1 Write unit test for hidden signal detection: stable runtime (< 5% delta) + large counter shift (> 20%) → flagged
-- [ ] 9.2 Write unit test for hidden signal detection: both runtime and counters stable → not flagged
-- [ ] 9.3 Write controller test: GET `/api/runs/{timestamp}/summary` returns valid chart JSON
-- [ ] 9.4 Write controller test: POST `/admin/reimport` triggers re-import
+- [x] 9.1 Write unit test for hidden signal detection: stable runtime (< 5% delta) + large counter shift (> 20%) → flagged
+- [x] 9.2 Write unit test for hidden signal detection: both runtime and counters stable → not flagged
+- [x] 9.3 Write controller test: GET `/api/runs/{timestamp}/summary` returns valid chart JSON
+- [x] 9.4 Write controller test: POST `/admin/reimport` triggers re-import
 
 ### Implementation:
-- [ ] 9.5 Implement hidden signal detection in comparison and timeline views. Show ⚠️ indicator on affected rows/points.
-- [ ] 9.6 Create `/api/runs/{timestamp}/summary` — JSON for per-class bar chart
-- [ ] 9.7 Create `/api/runs/{timestamp}/compare/jdk` — JSON for JDK comparison grouped bar chart
-- [ ] 9.8 Create `/api/runs/{timestamp}/compare/gc` — JSON for GC comparison grouped bar chart
-- [ ] 9.9 Embed summary ECharts in run detail page
-- [ ] 9.10 Add "Reimport Data" button → `@PostMapping("/admin/reimport")`
-- [ ] 9.11 Add loading spinners (Bootstrap spinner via HTMX events)
-- [ ] 9.12 Add error notifications (Bootstrap toast/alert)
-- [ ] 9.13 Verify HTMX navigation: back/forward buttons, deep links, breadcrumbs
-- [ ] 9.14 Verify faceted filtering end-to-end
-- [ ] 9.15 Add `README.md` to `benchmark-viewer/`
-- [ ] 9.16 All tests pass
+- [x] 9.5 Implement hidden signal detection in comparison and timeline views. Show ⚠️ indicator on affected rows/points.
+- [x] 9.6 Create `/api/runs/{timestamp}/summary` — JSON for per-class bar chart
+- [x] 9.7 Create `/api/runs/{timestamp}/compare/jdk` — JSON for JDK comparison grouped bar chart
+- [x] 9.8 Create `/api/runs/{timestamp}/compare/gc` — JSON for GC comparison grouped bar chart
+- [x] 9.9 Embed summary ECharts in run detail page
+- [x] 9.10 Add "Reimport Data" button → `@PostMapping("/admin/reimport")`
+- [x] 9.11 Add loading spinners (Bootstrap spinner via HTMX events)
+- [x] 9.12 Add error notifications (Bootstrap toast/alert)
+- [x] 9.13 Verify HTMX navigation: back/forward buttons, deep links, breadcrumbs
+- [x] 9.14 Verify faceted filtering end-to-end
+- [x] 9.15 Add `README.md` to `benchmark-viewer/`
+- [x] 9.16 All tests pass
 
 **🛑 MANUAL VERIFY (final):**
 - Full walkthrough: landing → pick run → matrix → filter by ZGC → compare JDK 21 vs 25 → spot regressions → detail → derived metrics → timeline → reimport → browser back/forward
